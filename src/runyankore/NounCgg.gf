@@ -16,6 +16,7 @@ lin
     -}
   UseN noun = noun ;
 
+  --Noun = {s : NounType=>Number => Str ; nc : NClass} ;
   AdjCN ap cn = {s=\\ntype, num=>cn.s!ntype!num ++ ap.s!AgP3 num cn.nc; nc=cn.nc};
 
 --    Determiner: Type = {s:Str; ntype:NounType; num:Number; pos:Position}; -- type for Determier necessary for catCgg.gf

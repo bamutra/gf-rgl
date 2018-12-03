@@ -15,7 +15,7 @@ lin
   bird_N   = mkN "ekinyonyi" KI_BI ;
   boat_N   = mkN "eryato" RI_MA ;
   book_N   = mkN "ekitabo" KI_BI ;
-  boy_N    = mkN "omwana" "abaana" MU_BA ;
+  boy_N    = mkN "omwojo" "abojo" MU_BA ;
   car_N    = mkN "emootoka" N_N ;
   chair_N  = mkN "entebbe" N_N;
   cloud_N  = mkN "ekikyu" KI_BI ;
@@ -23,7 +23,7 @@ lin
   girl_N   = mkN "omwishiki" MU_BA ;
   shoe_N   = mkN "ekaito" N_N ;
   table_N  = mkN "emeza" N_N ;
-  bad_A    = mkAdjective "bi" False;
+  bad_A    = mkAdjective "bi" False; --False means the adjective is a stem and comes after the complet noun
   beautiful_A = mkAdjective "rungi" False; 
   far_Adv = mkAdv "hare";
   now_Adv = mkAdv "hati";
