@@ -213,16 +213,23 @@ oper
   -}
   combine_morphemes : Str -> Str -> Str ;
   combine_morphemes = \ f, s ->
-    case <(Predef.dp 1 f), (Predef.take 1 s)> of {
-         <"n" , "r"> => f + "d" + (Predef.drop 1 s) ;
-         <"u" , "a" | "e" | "o" | "i"> => Predef.tk 1 f + "w" + s ;
-         <"i" , "a" | "e" | "o"> => Predef.tk 1 f + "y" + s ;
-         <"n" , "b" | "p"> => Predef.tk 1 f + "m" + s ;
-         <"n" , "m"> => Predef.tk 1 f + s ; -- However, note that for pronouns, the n changes to m
-         <"n" , "h"> => Predef.tk 1 f + "mp" + Predef.drop 1 s ;
-         <"i", "i">  => f + Predef.drop 1 s ;
-         <_ , _ > => f + s
-    } ;
+    case <(Predef.length f), (Predef.length s)> of {
+         <0,0> => "" ;
+         <0,1> => s ;
+         <1,0> => f ;
+         <_, _> => 
+           case <(Predef.dp 1 f), (Predef.take 1 s)> of {
+             <"n" , "r"> => f + "d" + (Predef.drop 1 s) ;
+             <"u" , "a" | "e" | "o" | "i"> => Predef.tk 1 f + "w" + s ;
+             <"i" , "a" | "e" | "o"> => Predef.tk 1 f + "y" + s ;
+             <"n" , "b" | "p"> => Predef.tk 1 f + "m" + s ;
+             <"n" , "m"> => Predef.tk 1 f + s ; -- However, note that for pronouns, the n changes to m
+             <"n" , "h"> => Predef.tk 1 f + "mp" + Predef.drop 1 s ;
+             <"i", "i">  => f + Predef.drop 1 s ;
+             <_ , _ > => f + s
+           } 
+    };
+    
   
 
     {-
