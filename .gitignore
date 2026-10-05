@@ -5,3 +5,5 @@ dist/
 *.pgf
 *.tmp
 *~
+*.png
+*.dot
