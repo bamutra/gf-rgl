@@ -386,14 +386,18 @@ lin
     Reason: When I add a BIND command, I get two bind tokens in the linearizations
     -}
 
-  ImpVP  vp = let vMorphs = mkVerbMorphs in {
+  ImpVP  vp = let vMorphs = mkVerbMorphs ;
+                   -- use the verb's own present ending (kwa+ta, i+ja), as EmbedVP does;
+                   -- the hard-coded -a gave *kwaa for kwata
+                   restPres = case vp.isPresBlank of {True => vMorphs!VFInf!RestOfVerb ; False => vp.pres}
+               in {
         s =table{
-          ImpPos  => vp.s ++ Predef.BIND ++ vMorphs!VFInf!RestOfVerb ++ vp.comp;
+          ImpPos  => vp.s ++ Predef.BIND ++ restPres ++ vp.comp;
           ImpNeg =>  case vp.isCompApStem of {   -- How do I make the number dynamic use case?
                   True =>vMorphs!VFPres!SecNegM ++ Predef.BIND ++ vp.s ++ Predef.BIND ++ 
-                        vMorphs!VFInf!RestOfVerb ++ (mkAdjPronNoIVClitic (AgMUBAP2 Sg)) ++ vp.ap;
+                        restPres ++ (mkAdjPronNoIVClitic (AgMUBAP2 Sg)) ++ vp.ap;
                   False  => vMorphs!VFPres!SecNegM ++ Predef.BIND ++ vp.s ++ Predef.BIND ++ 
-                        vMorphs!VFInf!RestOfVerb ++ vp.comp
+                        restPres ++ vp.comp
               }
         } 
   };  --: VP -> Imp ;                 -- walk / do not walk
