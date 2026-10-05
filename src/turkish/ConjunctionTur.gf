@@ -4,7 +4,6 @@ concrete ConjunctionTur of Conjunction =
   lin
     ConjS conj ss = {
       s = linCoord []!conj.sep ++ ss.s!conj.sep ++ conj.s ++ ss.s!4;
-      subord = linCoord []!conj.sep ++ ss.subord!conj.sep ++ conj.s ++ ss.subord!4;
       } ;
 
     ConjNP conj ss = {
@@ -14,10 +13,8 @@ concrete ConjunctionTur of Conjunction =
       } ;
 
     BaseS x y  = {s      = table {4 => y.s;      _ => x.s};
-                  subord = table {4 => y.subord; _ => x.subord};
                  } ;
     ConsS x xs = {s      = table {4 => xs.s!4; t => x.s++linCoord bindComma!t++xs.s!t};
-                  subord = table {4 => xs.subord!4; t => x.subord++linCoord bindComma!t++xs.subord!t} ;
                  } ;
 
     BaseNP x y =
@@ -84,12 +81,18 @@ concrete ConjunctionTur of Conjunction =
        h = xs.h} ;
 
 
-    ConjRS _ _ = variants {} ;
-    ConsRS _ _ = variants {} ;
-    BaseRS _ _ = variants {} ;
+    ConjRS conj ss = {
+      s = \\a => linCoord [] ! conj.sep ++ ss.s ! a ! conj.sep ++ conj.s ++ ss.s ! a ! 4
+    } ;
+    ConsRS x xs = {
+      s = \\a => table {4 => xs.s ! a ! 4; i => x.s ! a ++ linCoord bindComma ! i ++ xs.s ! a ! i}
+    } ;
+    BaseRS x y = {
+      s = \\a => table {4 => y.s ! a; _ => x.s ! a}
+    } ;
 
   lincat
-    [S]   = {s,subord : Ints 4 => Str} ;
+    [S]   = {s : Ints 4 => Str} ;
     [Adv] = {s : Ints 4 => Str} ;
     [AdV] = {s : Ints 4 => Str} ;
     [NP]  = {s : Case => Ints 4 => Str; h : Harmony; a : Agr} ;
@@ -97,5 +100,6 @@ concrete ConjunctionTur of Conjunction =
     [CN]  = {s   : Number => Case => Ints 4 => Str;
              gen : Number => Agr  => Ints 4 => Str;
              h   : Harmony} ;
+    [RS]  = {s : Agr => Ints 4 => Str} ;
 
 }

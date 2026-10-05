@@ -32,7 +32,6 @@ concrete ConjunctionBul of Conjunction =
 
     ConjAP conj ss = {
       s     = \\aform,p => linCoord []!conj.sep ++ ss.s!aform!p!conj.sep ++ conj.s ++ ss.s!aform!p!4;
-      adv   =              ss.adv!conj.conj ++ conj.s ++ ss.adv!4;
       isPre = ss.isPre
       } ;
 
@@ -61,11 +60,11 @@ concrete ConjunctionBul of Conjunction =
     BaseNP x y =
       {s  = \\role=>table {4 => y.s!role; _ => x.s!role};
        gn = conjGenNum x.gn y.gn;
-       p  = x.p} ;
+       p  = conjPronPerson x.p y.p} ;
     ConsNP x xs =
       {s  = \\role=>table {4 => xs.s!role!4; t => x.s!role++linCoord bindComma!t++xs.s!role!t};
        gn = conjGenNum xs.gn x.gn;
-       p  = x.p} ;
+       p  = conjPronPerson x.p xs.p} ;
 
     BaseAP x y =
       {s  = \\aform,p => table {4 => y.s!aform!p; _ => x.s!aform!p} ;

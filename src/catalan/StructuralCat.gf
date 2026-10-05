@@ -30,17 +30,22 @@ lin
   during_Prep = mkPrep "durant" ; ----
   either7or_DConj = {s1,s2 = "o" ; n = Sg} ;
   everybody_NP = makeNP ["tothom"] Masc Sg ;
-  every_Det = {s,sp = \\_,_ => "cada" ; n = Sg ; s2 = [] ; isNeg = False} ;
+  every_Det = {
+    s,sp = \\_,_ => "cada";
+    spn =\\c => prepCase c ++ "tot" ;
+    n = Sg ; s2 = \\g => [] ; isNeg = False} ;
   everything_NP = pn2np (mkPN "tot" Masc) ;
   everywhere_Adv = ss ["a tot arreu"] ;
   few_Det = {
-    s,sp = \\g,c => prepCase c ++ genForms "pocs" "poques" ! g ; n = Pl ; s2 = [] ; isNeg = False} ;
+    s,sp = \\g,c => prepCase c ++ genForms "pocs" "poques" ! g ;
+    spn = \\c => prepCase c ++ "pocs" ;
+    n = Pl ; s2 = \\g => [] ; isNeg = False} ;
 ---  first_Ord = {s = \\ag => (regA "primer").s ! Posit ! AF ag.g ag.n} ;
   for_Prep = mkPrep ["per a"] ;
   from_Prep = complGen ; ---
   he_Pron = 
     mkPronoun 
-     "ell" "el" "li" "ell" ["el seu"] ["la seva"] ["els seus"] ["les seves"]
+     "ell" "el" "li" "ell" "seu" "seva" "seus" "seves"
       Masc Sg P3 ;
   here_Adv = mkAdv "aquí" ;		-- acÌ
   here7to_Adv = mkAdv ["cap aquí"] ;
@@ -54,22 +59,26 @@ lin
   i_Pron = 
     mkPronoun
       "jo" "em" "em" "mi"
-      ["el meu"] ["la meva"] ["els meus"] ["les meves"]
+      "meu" "meva" "meus" "meves"
       Fem Sg P1 ;
   in_Prep = mkPrep "en" ;
   it_Pron = mkPronoun 
      "ell" "ho" "li" "ell"
-     ["el seu"] ["la seva"] ["els seus"] ["les seves"]
+     "seu" "seva" "seus" "seves"
      Masc Sg P3 ;
 
   less_CAdv = X.mkCAdv "menys" conjThan ; ----
   many_Det = {
-    s,sp = \\g,c => prepCase c ++ genForms "molts" "moltes" ! g ; n = Pl ; s2 = [] ; isNeg = False} ;
+    s,sp = \\g,c => prepCase c ++ genForms "molts" "moltes" ! g ;
+    spn = \\c => prepCase c ++ "molts" ;
+    n = Pl ; s2 = \\g => [] ; isNeg = False} ;
   more_CAdv = X.mkCAdv "més" conjThan ;
   most_Predet = {s = \\_,c => prepCase c ++ ["la majoria"] ; c = CPrep P_de ;
     a = PNoAg} ;
   much_Det = {
-    s,sp = \\g,c => prepCase c ++ genForms "molt" "molta" ! g ; n = Sg ; s2 = [] ; isNeg = False} ;
+    s,sp = \\g,c => prepCase c ++ genForms "molt" "molta" ! g ;
+    spn = \\c => prepCase c ++ "molt" ;
+    n = Sg ; s2 = \\g => [] ; isNeg = False} ;
   must_VV = deVV (verbV (haver_59 "haver" True)) ;
   no_Utt = ss "no" ;
   on_Prep = mkPrep "sobre" ;
@@ -85,14 +94,18 @@ lin
   she_Pron = 
     mkPronoun
       "ella" "la" "li" "ella"
-      ["el seu"] ["la seva"] ["els seus"] ["les seves"]
+      "seu" "seva" "seus" "seves"
       Fem Sg P3 ;
   so_AdA = ss "tan" ;
   somebody_NP = pn2np (mkPN ["alg˙"] Masc) ;
-  somePl_Det = {s,sp = 
-    \\g,c => prepCase c ++ genForms "alguns" "algunes" ! g ; n = Pl ; s2 = [] ; isNeg = False} ;
+  somePl_Det = {
+    s,sp = \\g,c => prepCase c ++ genForms "alguns" "algunes" ! g ;
+    spn = \\c => prepCase c ++ "alguns" ;
+    n = Pl ; s2 = \\g => [] ; isNeg = False} ;
   someSg_Det = {
-    s,sp = \\g,c => prepCase c ++ genForms "algun" "alguna" ! g ; n = Sg ; s2 = [] ; isNeg = False} ;
+    s,sp = \\g,c => prepCase c ++ genForms "algun" "alguna" ! g ;
+    spn = \\c => prepCase c ++ "quelcom" ;
+    n = Sg ; s2 = \\g => [] ; isNeg = False} ;
   something_NP = pn2np (mkPN ["quelcom"] Masc) ;
   somewhere_Adv = ss ["a algun lloc"] ;
   that_Quant =
@@ -103,6 +116,7 @@ lin
     in {
       s = \\_ => aquell ;
       sp = aquell ;
+      spn= aquell ! Sg ! Masc ;
       s2 = [] ; isNeg = False
     } ;
   there_Adv = mkAdv "allà" ;		-- all·
@@ -111,7 +125,7 @@ lin
   therefore_PConj = ss ["per tant"] ;
   they_Pron = mkPronoun
     "ells" "els" "els" "ells"
-    ["el seu"] ["la seva"] ["els seus"] ["les seves"]
+    "seu" "seva" "seus" "seves"
     Masc Pl P3 ;
 
   this_Quant =
@@ -122,6 +136,7 @@ lin
     in {
       s = \\_ => aquest ;
       sp = aquest ;
+      spn= aquest ! Sg ! Masc ;
       s2 = [] ; isNeg = False
     } ;
   through_Prep = mkPrep "mitjançant" ;
@@ -133,7 +148,7 @@ lin
   we_Pron = 
     mkPronoun 
       "nosaltres" "ens" "ens" "nosaltres"
-      ["el nostre"] ["la nostra"] ["els nostres"] ["les nostres"]
+      "nostre" "nostra" "nostres" "nostres"
       Masc Pl P1 ;
    whatSg_IP = {s = \\c => prepCase c ++ ["què"] ; a = aagr Masc Sg} ;
    whatPl_IP = {s = \\c => prepCase c ++ ["què"] ; a = aagr Masc Pl} ; ---
@@ -152,16 +167,16 @@ lin
   yes_Utt = ss "sí" ;  
   youSg_Pron = mkPronoun 
     "tu" "et" "et" "tu"
-    ["el teu"] ["la teva"] ["els teus"] ["les teves"]
+    "teu" "teva" "teus" "teves"
     Masc Sg P2 ;
   youPl_Pron =
     mkPronoun
       "vosaltres" "us" "us" "vosaltres"
-      ["el vostre"] ["la vostra"] ["els vostres"] ["les vostres"]
+      "vostre" "vostra" "vostres" "vostres"
       Masc Pl P2 ;
   youPol_Pron = mkPronoun
       "vosté" "el" "li" "vosté"
-      ["el seu"] ["la seva"] ["els seus"] ["les seves"]
+      "seu" "seva" "seus" "seves"
       Masc Sg P3 ;
    not_Predet = {s = \\a,c => prepCase c ++ "no pas" ; c = Nom ;
     a = PNoAg} ;
@@ -172,7 +187,7 @@ oper
   
 lin
   if_then_Conj = {s1 = "si" ; s2 = "llavors" ; n = Sg ; lock_Conj = <>} ;
-  
+
   no_Quant =
 	let
 	capS : Str = "cap" ;
@@ -183,6 +198,7 @@ lin
     in {
       s = \\_ => cap ;
       sp = cap ;
+      spn= \\c => prepCase c ++ "res" ;
       s2 = [] ; isNeg = True
     } ;
   nobody_NP = pn2npNeg (mkPN "ningú") ;

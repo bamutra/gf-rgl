@@ -4,7 +4,7 @@
 -- John J. Camilleri 2011 -- 2013
 -- Licensed under LGPL
 
-concrete NumeralMlt of Numeral = CatMlt [Numeral,Digits] ** open Prelude,ResMlt in {
+concrete NumeralMlt of Numeral = CatMlt [Numeral,Digits,Decimal] ** open Prelude,ResMlt in {
 
   flags coding=utf8 ;
 
@@ -63,6 +63,8 @@ concrete NumeralMlt of Numeral = CatMlt [Numeral,Digits] ** open Prelude,ResMlt 
     Sub100 = Form2 ;
     Sub1000 = Form2 ;
     Sub1000000 = Form2 ;
+    Sub1000000000 = Form2 ;
+    Sub1000000000000 = Form2 ;
 
   oper
 
@@ -335,6 +337,9 @@ concrete NumeralMlt of Numeral = CatMlt [Numeral,Digits] ** open Prelude,ResMlt 
       f = Hund ; -- NOT IMPORTANT
     } ;
 
+    pot3as4 m = m ;
+    pot4as5 m = m ;
+
   oper
       -- Build "x thousand" table
       numTable : (CardOrd => NumCase => Str) = overload {
@@ -383,11 +388,6 @@ concrete NumeralMlt of Numeral = CatMlt [Numeral,Digits] ** open Prelude,ResMlt 
       T3 => BIND++","++BIND ;
       _  => BIND
     } ;
-    inc : DTail -> DTail = \t -> case t of {
-      T1 => T2 ;
-      T2 => T3 ;
-      T3 => T1
-    } ;
 
   lin
     -- Dig
@@ -431,5 +431,19 @@ concrete NumeralMlt of Numeral = CatMlt [Numeral,Digits] ** open Prelude,ResMlt 
         n = numform ;
         tail = inc i.tail
       } ;
+
+    PosDecimal d = d ** {hasDot=False} ;
+    NegDecimal d = {
+        s = \\o => "-" ++ BIND ++ d.s ! o ;
+        n = d.n ;
+        hasDot=False
+        } ;
+    IFrac d i = {
+      s=\\o=>d.s ! NumNom ++
+             if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+             i.s ! o;
+      n = d.n;
+      hasDot=True
+    } ;
 
 }

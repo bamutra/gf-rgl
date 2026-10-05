@@ -46,18 +46,18 @@ resource ParadigmsPor =
 -- To abstract over gender names, we define the following identifiers.
 
 oper
-  Gender : Type ;
+  Gender : PType ;
   Gender = MorphoPor.Gender ;
 
-  masculine : Gender ;
-  masculine = Masc ;
+  masculine, male : Gender ;
+  masculine, male = Masc ;
 
-  feminine  : Gender ;
-  feminine = Fem ;
+  feminine, female : Gender ;
+  feminine, female = Fem ;
 
 -- To abstract over number names, we define the following.
 
-  Number : Type ;
+  Number : PType ;
   Number = MorphoPor.Number ;
 
   singular : Number ;
@@ -102,7 +102,7 @@ oper
 --2 Nouns
 
   regN : Str -> N ; --%
-  regN x = lin N (mkNomReg x) ;
+  regN x = lin N (mkNomReg x ** {relType=NRelPrep P_de}) ;
 
   femN  : N -> N ; --%
   femN n = n ** {g = feminine} ;
@@ -111,7 +111,7 @@ oper
   mascN n = n ** {g = masculine} ;
 
   mk2N : (bastão, bastões : Str) -> Gender -> N ; --%
-  mk2N x y g = lin N (mkNounIrreg x y g) ;
+  mk2N x y g = lin N (mkNounIrreg x y g ** {relType=NRelPrep P_de}) ;
 
   -- The regular function takes the singular form and the gender, and
   -- computes the plural and the gender by a heuristic (see MorphoPor
@@ -206,49 +206,87 @@ oper
       = \n -> lin PN {s = n.s ! Sg ; g = n.g} ;
     } ;
 
---2 Adjectives
-  compADeg : A -> A ; --%
-  compADeg a = a ** {
-    s = table {
-      Posit => a.s ! Posit ;
-      _ => \\f => "mais" ++  a.s ! Posit ! f
-      } ;
+  mkGN = overload {
+    mkGN : (Anna : Str) -> GN = \s -> lin GN (regPN s) ; -- feminine for "-a", otherwise masculine
+    mkGN : (Pilar : Str) -> Gender -> GN = \s,g -> lin GN (mk2PN s g) ; -- force gender
     } ;
 
-  liftAdj : Adj -> A ; --%
-  liftAdj adj = compADeg (lin A {s = \\_ => adj.s ; isPre = False ; copTyp = serCopula}) ;
+  mkSN = overload {
+    mkSN : Str -> SN = \s -> lin SN {s = \\_ => s; pl = s} ;
+    mkSN : Str -> Str -> Str -> SN = \male,female,pl -> lin SN {s = table {Masc=>male; Fem=>female}; pl = pl} ;
+    } ;
+
+  mkLN = overload {
+    mkLN : Str -> LN = \s ->
+      lin LN {s = s ;
+              onPrep = False ;
+              art = NoArt ;
+              g = Masc ;
+              num = Sg} ;
+    mkLN : Str -> Gender -> LN = \s,g ->
+      lin LN {s = s ;
+              onPrep = False ;
+              art = NoArt ;
+              g = g ;
+              num = Sg} ;
+
+    mkLN : Str -> Gender -> Number -> LN = \s,g,num ->
+      lin LN {s = s ;
+              onPrep = False ;
+              art = NoArt ;
+              g = g ;
+              num = num} ;
+  } ;
+
+  defLN : LN -> LN = \n -> n ** {art = UseArt} ;
+
+--2 Adjectives
+  compADeg : Adj -> A ; --%
+  compADeg a = lin A
+    {s = a.s ;
+     compar = \\_ => nonExist ; --
+     isPre = False ;       -- default values
+     copTyp = serCopula ;
+     isDeg = False
+     } ;
+
+  -- liftAdj : Adj -> A ; --%
+  -- liftAdj adj = compADeg (lin A {s = \\_ => adj.s ; isPre = False ; copTyp = serCopula}) ;
 
   regA : Str -> A ; --%
-  regA a = liftAdj (mkAdjReg a) ;
+  regA a = compADeg (mkAdjReg a) ;
 
   mk2A : (patrão,patroa : Str) -> A ; --%
-  mk2A ms fs = liftAdj (mkAdjReg2 ms fs) ;
+  mk2A ms fs = compADeg (mkAdjReg2 ms fs) ;
 
   mk4A : (bobão,bobona,bobões,bobonas : Str) -> A ; --%
-  mk4A a b c d = liftAdj (mkAdj4 a b c d) ;
+  mk4A a b c d = compADeg (mkAdj4 a b c d) ;
 
   mk5A : (preto,preta,pretos,pretas,pretamente : Str) -> A ; --%
-  mk5A a b c d e = liftAdj (mkAdj a b c d e) ;
+  mk5A a b c d e = compADeg (mkAdj a b c d e) ;
 
   adjCopula : A -> CopulaType -> A ; --%
   adjCopula a cop = a ** {copTyp = cop} ;
 
+  -- mkADeg a b = a ** {
+  --   s = table {
+  --     Posit => a.s ! Posit ;
+  --     _ => b.s ! Posit
+  --       -- Compar => b.s ! Posit ;
+  --       -- Superl => "o" ++ b.s ! Posit ;
+  --     }
+  --   } ;
   mkADeg : A -> A -> A ; --%
   mkADeg a b = a ** {
-    s = table {
-      Posit => a.s ! Posit ;
-      _ => b.s ! Posit
-        -- Compar => b.s ! Posit ;
-        -- Superl => "o" ++ b.s ! Posit ;
-      }
-    } ;
+    compar = \\num => b.s ! AF Masc num ; -- melhor, melhores
+    isDeg = True } ;
 
   invarA : Str -> A ; -- invariable adjective, e.g. "simples"
-  invarA a = liftAdj (mkAdj4 a a a a) ;
+  invarA a = compADeg (mkAdj4 a a a a) ;
 
   mkNonInflectA : A -> Str -> A ;
   mkNonInflectA blanco hueso = blanco ** {
-    s = \\x,y => blanco.s ! x ! y ++ hueso
+    s = \\x => blanco.s ! x ++ hueso
     } ;
 
   mkA = overload {
@@ -559,6 +597,8 @@ oper
                   isNeg = False} ** {lock_NP = <>} ;
 
   reflVerboV : Verbum -> V = \ve -> reflV (lin V (verboV ve)) ; --%
+
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False; hasArt=False} ;
 
 
 } ;

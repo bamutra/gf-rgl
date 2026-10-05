@@ -19,6 +19,9 @@ resource ParamX = open Prelude in {
      ;
 
   param
+    Sex = Male | Female ;
+
+  param
 
     Polarity    = Pos | Neg ;
 
@@ -61,5 +64,11 @@ resource ParamX = open Prelude in {
   param
     DTail = T1 | T2 | T3 ;
 
+  oper
+    inc : DTail -> DTail = \t -> case t of {
+      T1 => T2 ;
+      T2 => T3 ;
+      T3 => T1
+      } ;
 
 }

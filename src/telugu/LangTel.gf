@@ -1,7 +1,8 @@
---# -path=.:../abstract:../common
+--# -path=.:../abstract:../common:../api:../prelude
 
-concrete LangTel of Lang = 
+concrete LangTel of Lang =
   GrammarTel,
   LexiconTel
+  ,DocumentationTel --# notpresent
   ** {
 }

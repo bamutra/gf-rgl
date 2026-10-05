@@ -4,6 +4,8 @@ lincat
   RNP = Grammar.NP ;
   RNPList = Grammar.ListNP ;
 
+  X = {s : Str} ; -- for words that are difficult to classify, mainly for MorphoDict
+
 lin
   BaseVPS = variants {} ;
   ConsVPS = variants {} ;
@@ -20,18 +22,22 @@ lin
   GenModNP num np cn = DetCN (DetQuant DefArt num) (AdvCN cn (PrepNP possess_Prep np)) ;     -- this man's car(s) ; DEFAULT the car of this man
   GenModIP = variants {} ;     -- Num -> IP -> CN -> IP ; -- whose car(s)
   CompBareCN cn = CompCN cn ; -- (is) teacher ; DEFAULT is a teacher
-  StrandQuestSlash = QuestSlash ; -- whom does John live with ; DEFAULT with whom does John live
-  StrandRelSlash = RelSlash ; -- that he lives in ; DEFAULT in which he lives
-  EmptyRelSlash = RelSlash IdRP ; -- he lives in ; DEFAULT in which he lives
+  StrandQuestSlash = QuestSlash ; -- whom does John live with (default in Eng)
+  StrandRelSlash = RelSlash ; -- that he lives in (standard in Eng)
+  PiedPipingQuestSlash = QuestSlash ; -- with whom does John live (default in most languages)
+  PiedPipingRelSlash = RelSlash ; -- in which he lives  (default in most languages)
+  EmptyRelSlash = RelSlash IdRP ; -- he lives in ; that he lives in
   MkVPS vp = variants {} ;     -- Temp -> Pol -> VP -> VPS ; -- hasn't slept
   ConjVPS = variants {} ;     -- Conj -> [VPS] -> VPS ; -- has walked and won't sleep
   PredVPS = variants {} ;     -- NP -> VPS -> S ; -- has walked and won't sleep
+  RelVPS = variants {} ;      -- RP -> VPS -> RS ; -- which won't sleep
   MkVPI vp = variants {} ;     -- Temp -> Pol -> VP -> VPI ; -- to sleep / hasn't slept
   ConjVPI = variants {} ;     -- Conj -> [VPI] -> VPI ; -- has walked and won't sleep
   ComplVPIVV = variants {} ;     -- VV -> VPI -> VP ; -- want to sleep and to walk
   MkVPS2 = variants {} ;     --     : Temp -> Pol -> VPSlash -> VPS2 ;  -- has loved
   ConjVPS2 = variants {} ;     --   : Conj -> [VPS2] -> VPS2 ;          -- has loved and now hates
   ComplVPS2 = variants {} ;     --  : VPS2 -> NP -> VPS ;               -- has loved and now hates that person
+  ReflVPS2 = variants {} ;      --  : VPS2 -> RNP -> VPS ;              -- have loved and now hate myself and my car
   MkVPI2 = variants {} ;     --     : Ant  -> Pol -> VPSlash -> VPI2 ;  -- to have loved
   ConjVPI2 = variants {} ;     --   : Conj -> [VPI2] -> VPI2 ;          -- to love and have hated
   ComplVPI2 = variants {} ;     --  : VPI2 -> NP -> VPI ;               -- to love and hate that person
@@ -51,6 +57,8 @@ lin
   PastPartAgentAP = variants {} ;     -- VPSlash -> NP -> AP ; -- (opportunity) lost by the company
   NominalizeVPSlashNP = variants {} ;     -- VPSlash -> NP -> NP ;
   ProgrVPSlash = variants {} ;            -- VPSlash -> VPSlash ;
+  A2VPSlash = variants {} ;           -- A2 -> VPSlash ;
+  N2VPSlash = variants {} ;           -- N2 -> VPSlash ;
   ExistsNP = ExistNP ;     -- NP -> Cl ; -- there exists a number / there exist numbers
   ExistCN cn = ExistNP (DetCN (DetQuant IndefArt NumSg) cn) ;
   ExistMassCN cn = ExistNP (MassNP cn) ;
@@ -79,6 +87,7 @@ lin
   Base_rn_RNP = variants {} ;     -- RNP -> NP -> RNPList ; -- myself, John
   Cons_rr_RNP = variants {} ;     -- RNP -> RNPList -> RNPList ; -- my family, myself, John
   Cons_nr_RNP = variants {} ;     -- NP -> RNPList -> RNPList ; -- John, my family, myself
+  ReflPossPron = PossPron he_Pron ;  -- : Quant ;  -- Swe sin,sitt,sina
   ComplGenVV = variants {} ;     -- VV -> Ant -> Pol -> VP -> VP ; -- want not to have slept
   ComplSlashPartLast = ComplSlash ;
   --SlashV2V = variants {} ;     -- V2V -> Ant -> Pol -> VPS -> VPSlash ; -- force (her) not to have slept
@@ -92,7 +101,7 @@ lin
   InOrderToVP = variants {} ;     -- VP -> Adv ; -- (in order) to publish the document
   ApposNP = variants {} ;     -- NP -> NP -> NP ; -- Mr Macron, the president of France,
   AdAdV = variants {} ;     -- AdA -> AdV -> AdV ; -- almost always
-  UttAdV = variants {} ;     -- AdV -> Utt ; -- always(!)
+  UttAdV adv = {s = adv.s} ;     -- AdV -> Utt ; -- always(!)
   PositAdVAdj = variants {} ;     -- A -> AdV ; -- (that she) positively (sleeps)
   CompS = variants {} ;     -- S -> Comp ; -- (the fact is) that she sleeps
   CompQS = variants {} ;     -- QS -> Comp ; -- (the question is) who sleeps
@@ -107,6 +116,7 @@ lin
   weFem_Pron = we_Pron ;  -- DEFAULT we (masc)
   youPlFem_Pron = youPl_Pron ;  -- DEFAULT you plural (masc)
   theyFem_Pron = they_Pron ;  -- DEFAULT they (masc)
+  theyNeutr_Pron = they_Pron ;  -- DEFAULT they (masc)
   youPolFem_Pron = youPol_Pron ;  -- DEFAULT you polite (masc)
   youPolPl_Pron = youPl_Pron ;  -- DEFAULT you plural (masc)
   youPolPlFem_Pron = youPl_Pron ;  -- DEFAULT you plural (masc)
@@ -117,6 +127,8 @@ lin
   UttDatIP ip = UttAccIP (lin IP ip) ; -- whom (dative) ; DEFAULT who
   UttVPShort = UttVP ; -- have fun, as opposed to "to have fun" ; DEFAULT UttVP
 
+  TPastSimple = Grammar.TPast ;   --# notpresent
+
   SQuestVPS = variants {} ; -- : NP   -> VPS -> QS ;         -- has she walked
   QuestVPS = variants {} ; --  : IP   -> VPS -> QS ;         -- who has walked
 
@@ -124,6 +136,15 @@ lin
   ExistS t p np = UseCl t p (ExistNP np) ;
   ExistNPQS t p np = UseQCl t p (QuestCl (ExistNP np)) ;
   ExistIPQS t p np = UseQCl t p (ExistIP np) ;
+
+  SubjunctRelCN cn rs = RelCN cn rs ; -- no difference from indicative
+
+lin
+  UseComp_estar = UseComp ;
+  UseComp_ser = UseComp ;
+
+lin
+  CardCNCard = variants {} ;
 
 oper
   quoted : Str -> Str = \s -> "\"" ++ s ++ "\"" ; ---- TODO bind ; move to Prelude?

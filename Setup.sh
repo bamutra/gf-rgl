@@ -38,15 +38,15 @@ done
 if [ -z "$dest" ]; then
   dest=$(echo "$GF_LIB_PATH" | sed 's/:.*$//')
 fi
-if [ -z "$dest" ] && [ -f "../gf-core/DATA_DIR" ]; then
-  dest=$(cat ../gf-core/DATA_DIR)
+if [ -z "$dest" ] && [ "$(gf --version | tail -1 | cut -c -14)" == "Shared folder:" ]; then
+  dest=$(gf --version | tail -1 | cut -c 16-)
   if [ -n "$dest" ]; then dest="${dest}/lib"; fi
 fi
 if [ -z "$dest" ]; then
   echo "Unable to determine where to install the RGL. Please do one of the following:"
   echo " - Pass the --dest=... flag to this script"
   echo " - Set the GF_LIB_PATH environment variable"
-  echo " - Compile & install GF from the gf-core repository (must be in same directory as gf-rgl)"
+  echo " - Compile & install GF from the gf-core repository"
   exit 1
 fi
 
@@ -59,6 +59,7 @@ gfc="${gf} --batch --quiet --gf-lib-path=${dist}"
 mkdir -p "${dist}/prelude"
 mkdir -p "${dist}/present"
 mkdir -p "${dist}/alltenses"
+mkdir -p "${dist}/morphodict"
 
 # Build: prelude
 echo "Building [prelude]"
@@ -68,10 +69,12 @@ ${gfc} --gfo-dir="${dist}"/prelude "${src}"/prelude/*.gf
 # Gather all language modules for building
 modules_present=
 modules_alltenses=
+modules_morphodict=
 for lang in $langs; do
   for mod in $modules_langs $modules_api; do
     if [ $mod == "Compatibility" ] && [[ "$langs_compat" != *"$lang"* ]]; then continue; fi
     if [ $mod == "Try" ] && [[ "$langs_try" != *"$lang"* ]]; then continue; fi
+    if [ $mod == "Symbol" ] && [[ "$langs_try" != *"$lang"* ]]; then continue; fi
     if [ $mod == "Symbolic" ] && [[ "$langs_symbolic" != *"$lang"* ]]; then continue; fi
     for file in "${src}"/*/"${mod}${lang}".gf; do
       if [ ! -f "$file" ]; then continue; fi
@@ -79,7 +82,11 @@ for lang in $langs; do
       modules_alltenses="${modules_alltenses} ${file}"
     done
   done
+  file="${src}/morphodict/MorphoDict${lang}.gf"
+  if [ ! -f "$file" ]; then continue; fi
+  modules_morphodict="${modules_morphodict} ${file}"
 done
+
 
 # Build: present
 echo "Building [present]"
@@ -95,6 +102,15 @@ for module in $modules_alltenses; do
   ${gfc} --no-pmcfg --gfo-dir="${dist}"/alltenses "${module}"
 done
 
+# Build: morphodict
+echo "Building [morphodict]"
+if [ $verbose = true ]; then echo $modules_morphodict; fi
+for module in $modules_morphodict; do
+  ${gfc} --no-pmcfg --gfo-dir="${dist}"/morphodict "${module}"
+done
+
 # Copy
+if [ $dest == $dist ]; then exit 0; fi
 echo "Copying to ${dest}"
-cp -R -p "${dist}"/* "${dest}"
+mkdir -p "${dest}"
+cp -R "${dist}"/* "${dest}"

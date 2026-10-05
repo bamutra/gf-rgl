@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, LambdaCase #-}
 
 -- | Main build script for RGL
 
@@ -8,8 +8,8 @@ import System.IO (hPutStrLn,stderr)
 import System.IO.Error (catchIOError)
 import System.Exit (ExitCode(..),exitFailure)
 import System.Environment (getArgs,lookupEnv)
-import System.Process (rawSystem)
-import System.FilePath ((</>),splitSearchPath) -- ,takeFileName,addExtension,dropExtension)
+import System.Process (rawSystem,readProcess)
+import System.FilePath ((</>),splitSearchPath)
 import System.Directory (createDirectoryIfMissing,copyFile,getDirectoryContents,removeDirectoryRecursive,findFile)
 #if __GLASGOW_HASKELL__>=800
 import System.Directory (getModificationTime,setModificationTime)
@@ -61,7 +61,7 @@ errLocation = unlines $
   [ "Unable to determine where to install the RGL. Please do one of the following:"
   , " - Pass the " ++ destination_flag ++ "... flag to this script"
   , " - Set the GF_LIB_PATH environment variable"
-  , " - Compile & install GF from the gf-core repository (must be in same directory as gf-rgl)"
+  , " - Compile & install GF from the gf-core repository"
   ]
 
 -- | Copy single file between directories
@@ -116,10 +116,11 @@ data Info = Info
 mkInfo :: IO Info
 mkInfo = do
   args <- getArgs
+  let gf = maybe default_gf id (getFlag gf_flag args)
   -- Look for install location in a few different places
   let mflag = getFlag destination_flag args
-  mbuilt <- catchIOError (readFile "../gf-core/DATA_DIR" >>= \d -> return (Just (d </> "lib"))) (\e -> return Nothing)
   menvar <- lookupEnv "GF_LIB_PATH" >>= return . fmap (head . splitSearchPath)
+  mbuilt <- catchIOError (readProcess gf ["--version"] "" >>= return . getPath) (\e -> return Nothing)
   let
     inst_dir =
       case catMaybes [mflag,menvar,mbuilt] of
@@ -129,11 +130,17 @@ mkInfo = do
   return $ Info
     { infoBuildDir = "dist"
     , infoInstallDir = inst_dir
-    , infoGFPath = maybe default_gf id (getFlag gf_flag args)
+    , infoGFPath = gf
     , infoVerbose = verbose
     }
   where
     default_gf = "gf"
+
+    getPath s =
+      let l = last (lines s)
+      in if take 14 l == "Shared folder:"
+           then Just (drop 15 l </> "lib")
+           else Nothing
 
 getRGLBuildDir :: Info -> Mode -> FilePath
 getRGLBuildDir info mode = infoBuildDir info </> getRGLBuildSubDir mode
@@ -143,11 +150,12 @@ getRGLBuildSubDir mode =
   case mode of
     Present   -> "present"
     AllTenses -> "alltenses"
+    MorphoDict -> "morphodict"
 
 -------------------------------------------------------------------------------
 -- Build modes
 
-data Mode = Present | AllTenses
+data Mode = Present | AllTenses | MorphoDict
   deriving (Show,Eq)
 
 all_modes :: [String]
@@ -180,6 +188,7 @@ rglCommands =
   , RGLCommand "lang"    False $ gfcp [l,s]
   , RGLCommand "api"     False $ gfcp [t,sc]
   , RGLCommand "compat"  False $ gfcp [c]
+  , RGLCommand "morphodict" False $ gfcp [m]
 
   -- Special command, invoked when command ends in .gf
   , RGLCommand "modules"  False $ \modes args bi ->  do
@@ -216,13 +225,19 @@ rglCommands =
     s mode args = (symbol,optml mode langTry args)
     c mode args = (compat,optml AllTenses langCompatibility args)
     t mode args = (try,optml mode langTry args)
+    m mode args = (morphodict,optml mode langMorphodict args)
     sc mode args = (symbolic,optml mode langSymbolic args)
 
     optml :: Mode -> (LangInfo -> Bool) -> [String] -> ([LangInfo] -> [LangInfo])
     optml mode pred args =
       \langsAll ->
-        let langsDefault = filter (if mode == Present then langPresent else const True) (filter pred langsAll)
+        let langsDefault = filter (mode2langinfo mode) (filter pred langsAll)
         in  getOptLangs langsAll langsDefault args
+
+    mode2langinfo = \case
+      Present    -> langPresent
+      MorphoDict -> langMorphodict
+      _          -> const True
 
 -------------------------------------------------------------------------------
 -- Getting module paths/names
@@ -252,6 +267,9 @@ syntax l = sourceDir </> "api" </> ("Syntax" ++ langCode l ++ ".gf")
 
 symbolic :: LangInfo -> FilePath
 symbolic l = sourceDir </> "api" </> ("Symbolic" ++ langCode l ++ ".gf")
+
+morphodict :: LangInfo -> FilePath
+morphodict l = sourceDir </> "morphodict" </> ("MorphoDict" ++ langCode l ++ ".gf")
 
 -------------------------------------------------------------------------------
 -- Argument helpers
@@ -295,8 +313,9 @@ getOptMode args =
     else explicit_modes
   where
     explicit_modes =
-      [Present|have "present"]++
-      [AllTenses|have "alltenses"]
+      [Present | have "present"] ++
+      [AllTenses | have "alltenses"] ++
+      [MorphoDict | have "morphodict"]
     have mode = mode `elem` args
 
 -- | List of languages overriding the default definitions
@@ -359,8 +378,8 @@ gfcn :: Info -> Mode -> String -> [FilePath] -> IO ()
 gfcn bi mode summary files = do
   let dir = getRGLBuildDir bi mode
       preproc = case mode of
-                  Present   -> "--preproc=mkPresent"
-                  AllTenses -> ""
+                  Present -> "--preproc=mkPresent"
+                  _       -> ""
   createDirectoryIfMissing True dir
   if length files > 0
   then do

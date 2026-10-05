@@ -40,14 +40,14 @@ resource ParadigmsSpa =
 -- To abstract over gender names, we define the following identifiers.
 
 oper
-  Gender : Type ;
+  Gender : PType ;
 
   masculine : Gender ;
   feminine  : Gender ;
 
 -- To abstract over number names, we define the following.
 
-  Number : Type ;
+  Number : PType ;
 
   singular : Number ;
   plural   : Number ;
@@ -143,6 +143,39 @@ oper
     mkPN : N -> PN ;   -- gender from noun
     } ;
 
+  mkGN = overload {
+    mkGN : (Anna : Str) -> GN = \s -> lin GN (regPN s) ; -- feminine for "-a", otherwise masculine
+    mkGN : (Pilar : Str) -> Gender -> GN = \s,g -> lin GN (mk2PN s g) ; -- force gender
+    } ;
+
+  mkSN = overload {
+    mkSN : Str -> SN = \s -> lin SN {s = \\_ => s; pl = s} ;
+    mkSN : Str -> Str -> Str -> SN = \male,female,pl -> lin SN {s = table {Masc=>male; Fem=>female}; pl = pl} ;
+    } ;
+
+  mkLN = overload {
+    mkLN : Str -> LN = \s ->
+      lin LN {s = s ;
+              onPrep = False ;
+              art = NoArt ;
+              g = Masc ;
+              num = Sg} ;
+    mkLN : Str -> Gender -> LN = \s,g ->
+      lin LN {s = s ;
+              onPrep = False ;
+              art = NoArt ;
+              g = g ;
+              num = Sg} ;
+    mkLN : Str -> Gender -> Number -> LN = \s,g,num ->
+      lin LN {s = s ;
+              onPrep = False ;
+              art = NoArt ;
+              g = g ;
+              num = num} ;
+  } ;
+
+
+  defLN : LN -> LN = \n -> n ** {art = UseArt} ;
 
 --2 Adjectives
 
@@ -330,8 +363,8 @@ oper
   Gender = MorphoSpa.Gender ;
   Number = MorphoSpa.Number ;
   CopulaType = DiffSpa.CopulaType ;
-  masculine = Masc ;
-  feminine = Fem ;
+  masculine, male = Masc ;
+  feminine, female = Fem ;
   singular = Sg ;
   plural = Pl ;
   serCopula = DiffSpa.serCopula ;
@@ -347,11 +380,11 @@ oper
   } ;
 
 
-  mk2N x y g = mkNounIrreg x y g ** {lock_N = <>} ;
-  regN x = mkNomReg x ** {lock_N = <>} ;
-  compN x y = {s = \\n => x.s ! n ++ y ; g = x.g ; lock_N = <>} ;
-  femN x = {s = x.s ; g = feminine ; lock_N = <>} ;
-  mascN x = {s = x.s ; g = masculine ; lock_N = <>} ;
+  mk2N x y g = mkNounIrreg x y g ** {relType=NRelPrep P_de; lock_N = <>} ;
+  regN x = mkNomReg x ** {relType=NRelPrep P_de; lock_N = <>} ;
+  compN x y = x ** {s = \\n => x.s ! n ++ y} ;
+  femN x = {s = x.s ; g = feminine ; relType=NRelPrep P_de; lock_N = <>} ;
+  mascN x = {s = x.s ; g = masculine ; relType=NRelPrep P_de; lock_N = <>} ;
 
   mkN2 = \n,p -> n ** {lock_N2 = <> ; c2 = p} ;
   deN2 n = mkN2 n genitive ;
@@ -369,25 +402,28 @@ oper
   makeNP x g n = {s = (pn2np (mk2PN x g)).s; a = agrP3 g n ; hasClit = False ; isPol = False ; isNeg = False} ** {lock_NP = <>} ;
 
   mk7A a b c d e f g =
-    compADeg {s = \\_ => (mkAdj a b c d e f g).s ; isPre = False ; copTyp = serCopula ; lock_A = <>} ;
+    compADeg (mkAdj a b c d e f g) ;
 
   mk5A a b c d e = mk7A a a b b c d e ;
 
-  mk2A a b = compADeg {s = \\_ => (adjEspanol a b).s ; isPre = False ; copTyp = serCopula ; lock_A = <>} ;
+  mk2A a b = compADeg (adjEspanol a b) ;
 
-  regA a = compADeg {s = \\_ => (mkAdjReg a).s ; isPre = False ; copTyp = serCopula ; lock_A = <>} ;
+  regA a = compADeg (mkAdjReg a) ;
   adjCopula a cop = a ** {copTyp = cop} ;
-  prefA a = {s = a.s ; isPre = True ; copTyp = a.copTyp ; lock_A = <>} ;
+  prefA a = a ** {isPre = True} ;
 
-  mkA2 a p = a ** {c2 = p ; lock_A2 = <>} ;
+  mkA2 a p = lin A2 (a ** {c2 = p}) ;
 
-  mkADeg a b =
-   {s = table {Posit => a.s ! Posit ; _ => b.s ! Posit} ;
-    isPre = a.isPre ; copTyp = a.copTyp ; lock_A = <>} ;
-  compADeg a =
-    {s = table {Posit => a.s ! Posit ; _ => \\f => "más" ++ a.s ! Posit ! f} ;
-     isPre = a.isPre ; copTyp = a.copTyp ;
-     lock_A = <>} ;
+  mkADeg a b = a ** {
+    compar = \\num => b.s ! AF Masc num ; -- mejor, mejores
+    isDeg = True } ;
+  compADeg a = lin A
+    {s = a.s ;
+     compar = \\_ => nonExist ; --
+     isPre = False ;       -- default values
+     copTyp = serCopula ;
+     isDeg = False
+     } ;
   regADeg a = compADeg (regA a) ;
 
   mkAdv x = ss x ** {lock_Adv = <>} ;
@@ -514,7 +550,7 @@ oper
 
   mkN = overload {
     mkN : (luz : Str) -> N = regN ;
-    mkN : Str -> Gender -> N = \s,g -> {s = (regN s).s ; g = g ; lock_N = <>};
+    mkN : Str -> Gender -> N = \s,g -> (regN s) ** {g = g};
     mkN : (baston,bastones : Str) -> Gender -> N = mk2N ;
     mkN : N -> Str -> N = compN ;
     } ;
@@ -544,7 +580,7 @@ oper
     mkA : (_,_,_,_,_,_,_ : Str) -> A = mk7A ;
     mkA : (bueno : A) -> (mejor : A) -> A = mkADeg ;
     mkA : (blanco : A) -> (hueso : Str) -> A = \blanco,hueso -> blanco **
-      { s = \\x,y => blanco.s ! x ! y ++ hueso } ;
+      { s = \\x => blanco.s ! x ++ hueso } ;
     mkA : A -> CopulaType -> A =
       adjCopula ;
     } ;
@@ -555,7 +591,7 @@ oper
   regA : Str -> A ;
   adjCopula : A -> CopulaType -> A ;
   mkADeg : A -> A -> A ;
-  compADeg : A -> A ;
+  compADeg : Adj -> A ;
   regADeg : Str -> A ;
   prefA : A -> A ;
   prefixA = prefA ;
@@ -582,6 +618,6 @@ oper
   mk2V2  : V -> Prep -> V2 ;
   dirV2 : V -> V2 ;
 
-
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False ; hasArt=False} ;
 
 } ;

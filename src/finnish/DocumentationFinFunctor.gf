@@ -30,6 +30,33 @@ lin
     s1 = heading1 (heading noun_Category) ;
     s2 = inflNoun (\nf -> (snoun2nounSep noun).s ! nf)
     } ;
+    
+  InflectionPN = \pn -> {
+    t  = "s" ;
+    s1 = heading1 "Erisnimi" ;
+    s2 = inflPN (\c -> pn.s ! c)
+    } ;
+
+  InflectionLN ln = {
+    t  = "s" ;
+    s1 = heading1 "Paikannimi" ;
+    s2 = inflPN (\c -> ln.s ! c)
+    } ;
+
+  InflectionGN gn = {
+    t  = "s" ;
+    s1 = heading1 "Etunimi"++case gn.g of {
+                               Male   => "(mies)" ;
+                               Female => "(nainen)"
+                             } ;
+    s2 = inflPN (\c -> gn.s ! c)
+    } ;
+
+  InflectionSN sn = {
+    t  = "s" ;
+    s1 = heading1 "Sukunimi" ;
+    s2 = inflPN (\c -> (sn.s ! Male).s ! c)
+    } ;
 
   InflectionA, InflectionA2 = \adj -> {
     t  = "a" ;
@@ -41,7 +68,7 @@ lin
          inflNoun (\nf -> (snoun2nounSep {s = \\f => adj.s ! Superl ! sAN f ; h = adj.h}).s ! nf)
     } ;
 
-  InflectionAdv adv = {
+  InflectionAdv, InflectionAdV, InflectionAdA, InflectionAdN = \adv -> {
     t  = "adv" ;
     s1 = heading1 (heading adverb_Category) ;
     s2 = paragraph adv.s
@@ -51,6 +78,29 @@ lin
     t  = "prep" ;
     s1 = heading1 (heading preposition_Category) ;
     s2 = paragraph ((S.mkAdv (lin Prep p) S.it_NP).s ++ ";" ++ (S.mkAdv (lin Prep p) S.we_NP).s)
+    } ;
+
+  InflectionCl = \cl -> {
+    t  = "lause" ;
+    s1 = heading1 "Lause" ;
+    s2 = frameTable (
+           tr (intagAttr "th" "colspan=3" "Yksinkertaiset aikamuodot" ++
+               intagAttr "th" "colspan=3" "Perfektimuodot") ++
+           tr (th "aikamuoto" ++ th "väitelause" ++ th "kysymys" ++
+               th "aikamuoto" ++ th "väitelause" ++ th "kysymys") ++
+           inflClauseTense (heading present_Parameter)
+                           (heading present_Parameter ++ " " ++ heading perfect_Parameter)
+                           Pres cl ++
+           inflClauseTense (heading past_Parameter)
+                           (heading past_Parameter ++ " " ++ heading perfect_Parameter)
+                           Past cl ++
+           inflClauseTense (heading future_Parameter)
+                           (heading future_Parameter ++ " " ++ heading perfect_Parameter)
+                           Fut cl ++
+           inflClauseTense (heading conditional_Parameter)
+                           (heading conditional_Parameter ++ " " ++ heading perfect_Parameter)
+                           Cond cl
+         )
     } ;
 
   InflectionV v = {
@@ -132,16 +182,30 @@ lin
 
 oper
   verbExample : CatFin.Cl -> Str = \cl -> (S.mkUtt cl).s ;
+
+  inflClauseTense : Str -> Str -> ResFin.Tense -> CatFin.Cl -> Str =
+    \simple,perfect,tense,cl ->
+      tr (intagAttr "th" "rowspan=2" simple ++
+          td (cl.s ! tense ! Simul ! Pos ! SDecl) ++
+          td (cl.s ! tense ! Simul ! Pos ! SQuest) ++
+          intagAttr "th" "rowspan=2" perfect ++
+          td (cl.s ! tense ! Anter ! Pos ! SDecl) ++
+          td (cl.s ! tense ! Anter ! Pos ! SQuest)) ++
+      tr (td (cl.s ! tense ! Simul ! Neg ! SDecl) ++
+          td (cl.s ! tense ! Simul ! Neg ! SQuest) ++
+          td (cl.s ! tense ! Anter ! Neg ! SDecl) ++
+          td (cl.s ! tense ! Anter ! Neg ! SQuest)) ;
+
 {-
 -} --# notpresent
-  inflVerb : CatFin.V -> Str = \verb0 ->
+  inflVerb : SVerb1 -> Str = \verb0 ->
      let
        verb = sverb2verbSep verb0 ;
        vfin : ResFin.VForm -> Str = \f ->
          verb.s ! f ;
 
        nounNounHeading : Parameter -> Parameter -> Str = \n1,n2 ->
-         (S.mkUtt (G.PossNP (S.mkCN n1) (S.mkNP (snoun2nounSep n2)))).s ;
+         (S.mkUtt (G.PossNP (S.mkCN n1) (S.mkNP (lin N (snoun2nounSep n2))))).s ;
      in
        heading3 (nounNounHeading present_Parameter indicative_Parameter) ++
        frameTable (
@@ -288,6 +352,22 @@ oper
           tr (th (heading abessive_Parameter) ++ td (nouns (NCase Sg Abess)) ++ td (nouns (NCase Pl Abess))) ++
           tr (th (heading comitative_Parameter)  ++ td "" ++ td (nouns (NComit))) ++
           tr (th (heading instructive_Parameter) ++ td "" ++ td (nouns (NInstruct)))
+          ) ;
+	  
+  inflPN : (Case -> Str) -> Str = \nouns ->
+    frameTable (
+          tr (th (heading nominative_Parameter) ++ td (nouns (Nom))) ++ 
+          tr (th (heading genitive_Parameter) ++ td (nouns (Gen))) ++ 
+          tr (th (heading partitive_Parameter) ++ td (nouns (Part))) ++ 
+          tr (th (heading translative_Parameter) ++ td (nouns (Transl))) ++ 
+          tr (th (heading essive_Parameter) ++ td (nouns (Ess))) ++ 
+          tr (th (heading inessive_Parameter) ++ td (nouns (Iness))) ++ 
+          tr (th (heading elative_Parameter) ++ td (nouns (Elat))) ++ 
+          tr (th (heading illative_Parameter) ++ td (nouns (Illat))) ++ 
+          tr (th (heading adessive_Parameter) ++ td (nouns (Adess))) ++ 
+          tr (th (heading ablative_Parameter) ++ td (nouns (Ablat))) ++ 
+          tr (th (heading allative_Parameter) ++ td (nouns (Allat))) ++ 
+          tr (th (heading abessive_Parameter) ++ td (nouns (Abess))) 
           ) ;
 
 lin

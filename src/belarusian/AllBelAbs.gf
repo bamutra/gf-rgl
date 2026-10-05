@@ -1,0 +1,4 @@
+abstract AllBelAbs =
+  Lang,
+  Extend
+  ** {}

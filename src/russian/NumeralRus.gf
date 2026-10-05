@@ -1,6 +1,6 @@
 --# -path=.:../abstract:../common:../../prelude
 
-concrete NumeralRus of Numeral = CatRus [Numeral,Digits] ** open ResRus, InflectionRus, Prelude in {
+concrete NumeralRus of Numeral = CatRus [Numeral,Digits,Decimal] ** open ResRus, InflectionRus, Prelude in {
 
 flags  coding=utf8 ;
 
@@ -11,7 +11,7 @@ lincat Digit = {s : DForm => DetTable ; size : NumSize ; o : DForm => PronForms}
 lincat Sub10 = {s : Place => DForm => DetTable ; size : NumSize ; o : Place => DForm => PronForms ; just1 : Bool} ;
 lincat Sub100 = {s : Place => DetTable ; size : NumSize ; o : Place => PronForms; just1 : Bool} ;
 lincat Sub1000 = {s : Place => DetTable ; size : NumSize ; o : Place => PronForms; just1 : Bool} ;
-lincat Sub1000000 = {s : DetTable ; size : NumSize ; o : PronForms; just1 : Bool} ;
+lincat Sub1000000, Sub1000000000, Sub1000000000000 = {s : DetTable ; size : NumSize ; o : PronForms; just1 : Bool} ;
 -- just1 to correctly generate exactly 1000
 
 -- : Sub1000000 -> Numeral ; -- 123456 [coercion to top category]
@@ -403,20 +403,85 @@ lin pot3plus n m = {
   just1 = False ;
   size = Num5
   } ;
+lin pot3as4 n = n ;
+
+lin pot41 = {
+  s=\\g,a,c => million.s ! Sg ! c ;
+  o=pronounAdj1A "миллионный" ;
+  just1=True ;
+  size=Num5
+  } ;
+
+lin pot4 n = {
+  s=\\g,a,c => n.s ! attr ! Masc ! a ! c
+    ++ million.s ! animNumSizeNum Inanimate c n.size ! numSizeCase c n.size ;
+  o=prependPF (n.s ! attr ! Masc ! Inanimate ! Nom) (pronounAdj1A "миллионный") ;
+  just1=False ;
+  size=Num5
+  } ;
+
+lin pot4plus n m = {
+  s=\\g,a,c => n.s ! attr ! Masc ! a ! c
+    ++ million.s ! animNumSizeNum Inanimate c n.size ! numSizeCase c n.size
+    ++ m.s ! g ! a ! c ;
+  o=m.o ;
+  just1=False ;
+  size=m.size
+  } ;
+
+lin pot4decimal d = {
+  s=\\g,a,c => d.s ++ million.s ! Sg ! Gen ;
+  o=pronounAdj1A "миллионный" ;
+  just1=False ;
+  size=Num5
+  } ;
+
+lin pot4as5 n = n ;
+
+lin pot51 = {
+  s=\\g,a,c => milliard.s ! Sg ! c ;
+  o=pronounAdj1A "миллиардный" ;
+  just1=True ;
+  size=Num5
+  } ;
+
+lin pot5 n = {
+  s=\\g,a,c => n.s ! attr ! Masc ! a ! c
+    ++ milliard.s ! animNumSizeNum Inanimate c n.size ! numSizeCase c n.size ;
+  o=prependPF (n.s ! attr ! Masc ! Inanimate ! Nom) (pronounAdj1A "миллиардный") ;
+  just1=False ;
+  size=Num5
+  } ;
+
+lin pot5plus n m = {
+  s=\\g,a,c => n.s ! attr ! Masc ! a ! c
+    ++ milliard.s ! animNumSizeNum Inanimate c n.size ! numSizeCase c n.size
+    ++ m.s ! g ! a ! c ;
+  o=m.o ;
+  just1=False ;
+  size=m.size
+  } ;
+
+lin pot5decimal d = {
+  s=\\g,a,c => d.s ++ milliard.s ! Sg ! Gen ;
+  o=pronounAdj1A "миллиардный" ;
+  just1=False ;
+  size=Num5
+  } ;
 
 -- numerals as sequences of digits
 
 lincat
   Dig = TDigit ;
 
-lin
-  IDig d = {s = d.s ; n = d.n ; size = d.size} ;
+  lin
+    IDig d = d ** {tail = T1} ;
 
-  IIDig d i = {
-    s = d.s ++ BIND ++ i.s ;
-    n = Pl ;
-    size = i.size
-  } ;
+    IIDig d i = {
+      s = d.s ++ spaceIf i.tail ++ i.s ;
+      size = i.size ;
+      tail = inc i.tail
+    } ;
 
   D_0 = mk2Dig "0" Num5 ;
   D_1 = mk4Dig "1" "1" Sg Num1 ; ----
@@ -429,7 +494,28 @@ lin
   D_8 = mk2Dig "8" Num5 ;
   D_9 = mk2Dig "9" Num5 ;
 
-oper
+  PosDecimal d = d ** {hasDot=False} ;
+  NegDecimal d = {
+    s = "-" ++ BIND ++ d.s ;
+    size = NumAll ;
+    hasDot=False
+  } ;
+  IFrac d i = {
+    s=d.s ++
+      if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+      i.s;
+    size = NumAll ;
+    hasDot=True
+  } ;
+
+  oper
+    spaceIf : DTail -> Str = \t -> case t of {
+      T3 => SOFT_SPACE ;
+      _  => BIND
+      } ;
+
+  oper
+
   mk3Dig : Str -> Str -> NumSize -> TDigit = \c,o,size -> mk4Dig c o Pl size ;
   mk2Dig : Str -> NumSize -> TDigit = \c,size -> mk3Dig c (c + "o") size ;
   mk4Dig : Str -> Str -> Number -> NumSize -> TDigit = \c,o,n,size -> {

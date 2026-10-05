@@ -25,10 +25,15 @@ concrete SentenceBul of Sentence = CatBul ** open Prelude, ResBul in {
                        VPhrasal Dat => personalClitics agr ! Dat++vp.clitics;
                        VPhrasal c   => vp.clitics++personalClitics agr ! c
                      }
-        in case orPol p vp.p of {
-             Pos => vp.ad.s ++ verb Perf ++ clitic ;
-             Neg => "не" ++ vp.ad.s ++ clitic ++ verb Imperf
+        in case <p,vp.p> of {
+             <Pos,Pos> => vp.ad.s ++ verb Perf ++ clitic ;
+             <Pos,Neg> => vp.ad.s ++ "не" ++ clitic ++ verb Imperf ;
+             _         => "не" ++ vp.ad.s ++ clitic ++ verb Imperf
            } ++ compl ;
+    } ;
+
+    AdvImp adv imp = {
+      s = \\pol,gennum => adv.s ++ imp.s ! pol ! gennum
     } ;
 
     SlashVP np slash =  {
@@ -66,8 +71,7 @@ concrete SentenceBul of Sentence = CatBul ** open Prelude, ResBul in {
       s = \\q => t.s ++ p.s ++ cl.s ! t.t ! t.a ! p.p ! q
     } ;
     UseRCl t p cl = {
-      s    = \\agr => t.s ++ p.s ++ cl.s ! t.t ! t.a ! p.p ! agr ;
-      role = cl.role
+      s    = \\agr => t.s ++ p.s ++ cl.s ! t.t ! t.a ! p.p ! agr
     } ;
     UseSlash t p cl = {
       s = \\agr => t.s ++ p.s ++ cl.s ! agr ! t.t ! t.a ! p.p ! Main ;

@@ -80,7 +80,8 @@ oper
   mkNounByDeclPal : Str -> Declension -> Bool -> Noun = \lemma,decl,pal ->
     case decl of {
       D0|D1|D2|D3 => mkNounByGendDeclPal lemma Masc decl pal ;
-      D4|D5|D6|DR => mkNounByGendDeclPal lemma Fem  decl pal
+      D4|D5|D6|DR => mkNounByGendDeclPal lemma Fem  decl pal ;
+      DG => mkNounByGendDeclPal nonExist Fem  decl pal  -- FIX ME REMAKE
     } ;
 
   -- Specified gender and declension; default palatalization
@@ -97,7 +98,8 @@ oper
       D4 => mkNoun_D4 lemma gend     ;
       D5 => mkNoun_D5 lemma gend pal ;
       D6 => mkNoun_D6 lemma gend pal ;
-      DR => mkNoun_DR lemma
+      DR => mkNoun_DR lemma ;
+      DG => mkNoun_DR nonExist -- FIX ME REMAKE
     } ;
 
   -- Indeclinable noun
@@ -257,7 +259,7 @@ oper
     in {
       s = table {
         Sg => case stem of {
-          #exception_D6 => \\_ => NON_EXISTENT ;
+          #exception_D6 => \\_ => nonExist ;
           _ => table {
             Nom => stem + "s" ;
             Gen => stem + "s" ;
@@ -288,17 +290,17 @@ oper
         Sg => table {
           Nom => stem + "šanās" ;
           Gen => stem + "šanās" ;
-          Dat => NON_EXISTENT ;
+          Dat => nonExist ;
           Acc => stem + "šanos" ;
-          Loc => NON_EXISTENT ;
+          Loc => nonExist ;
           Voc => stem + "šanās"
         } ;
         Pl => table {
           Nom => stem + "šanās" ;
           Gen => stem + "šanos" ;
-          Dat => NON_EXISTENT ;
+          Dat => nonExist ;
           Acc => stem + "šanās" ;
-          Loc => NON_EXISTENT ;
+          Loc => nonExist ;
           Voc => stem + "šanās"
         }
       } ;

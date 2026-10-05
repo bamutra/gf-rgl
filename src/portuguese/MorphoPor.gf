@@ -151,8 +151,8 @@ oper
   mkAdj : (_,_,_,_,_ : Str) -> Adj =
     \burro,burra,burros,burras,burramente ->
     {s = table {
-       ASg g _ => genForms burro burra ! g ;
-       APl g   => genForms burros burras ! g ;
+       AF g Sg => genForms burro burra ! g ;
+       AF g Pl => genForms burros burras ! g ;
        AA      => burramente
        }
     } ;
@@ -169,8 +169,8 @@ oper
           } + "mente" ;
     in {
       s = table {
-        ASg g _ => genForms ms fs ! g ;
-        APl g   => genForms mp fp ! g ;
+        AF g Sg => genForms ms fs ! g ;
+        AF g Pl => genForms mp fp ! g ;
         AA      => adv
         }
     } ;
@@ -251,10 +251,11 @@ oper
 
   mkOrdinal : A -> Ord = \adj ->
   lin Ord {
-    s = \\ag => adj.s ! Posit ! (genNum2Aform ag.g ag.n) ;
+    s = \\ag => adj.s ! genNum2Aform ag.g ag.n ;
+    s2 = \\_ => []
     } ;
 
-  mkQuantifier : (esse,essa,esses,essas : Str) -> Quant = \esse,essa,esses,essas->
+  mkQuantifier : (esse,essa,esses,essas,esso : Str) -> Quant = \esse,essa,esses,essas,esso->
     let
       attrforms : Number => Gender => Case => Str = table {
         Sg => \\g,c => prepCase c ++ genForms esse essa ! g ;
@@ -264,14 +265,16 @@ oper
       s = \\_ => attrforms ;
       s2 = [] ;
       sp = attrforms  ; -- in spanish it was different
+      spn= \\c => prepCase c ++ esso ;
       isNeg = False
       } ;
 
   mkDeterminer : (muito,muita : Str) -> Number -> Bool -> Det = \muito,muita,number,neg ->
     lin Det {
       s,sp = \\g,c => prepCase c ++ genForms muito muita ! g ;
+      spn = \\c => prepCase c ++ muito ;
       n = number;
-      s2 = [] ;
+      s2 = \\g => [] ;
       isNeg = neg
       } ;
 

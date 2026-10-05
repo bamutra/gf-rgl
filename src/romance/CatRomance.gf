@@ -1,4 +1,4 @@
-incomplete concrete CatRomance of Cat = CommonX - [SC,Pol]
+incomplete concrete CatRomance of Cat = CommonX - [SC,Pol,MU]
   ** open Prelude, CommonRomance, ResRomance, (R = ParamX) in {
 
   flags optimize=all_subs ;
@@ -62,20 +62,21 @@ incomplete concrete CatRomance of Cat = CommonX - [SC,Pol]
     CN      = {s : Number => Str ; g : Gender} ;
     Pron    = Pronoun ;
     NP      = NounPhrase ;
-    Det     = {
+    Det,DAP = {
       s : Gender => Case => Str ;
       n : Number ;
-      s2 : Str ;            -- -ci
+      s2 : Gender => Str ;            -- -ci
       sp : Gender => Case => Str ;   -- substantival: mien, mienne
+      spn: Case => Str ;
       isNeg : Bool -- negative element, e.g. aucun
       } ;
     Quant = {
       s  : Bool => Number => Gender => Case => Str ;
       s2 : Str ;
       sp : Number => Gender => Case => Str ;
+      spn: Case => Str ;  -- neutral Spa: esto, eso, Por: isto, isso
       isNeg : Bool -- negative element, e.g. aucun
       } ;
-    DAP = {s : Gender => Str ; n : Number} ;
     Predet  = {
       s : AAgr   => Case => Str ;
       c : Case ; -- c : la plupart de
@@ -83,12 +84,13 @@ incomplete concrete CatRomance of Cat = CommonX - [SC,Pol]
       } ;
     Num     = {s : Gender => Str ; isNum : Bool ; n : Number} ;
     Card    = {s : Gender => Str ; n : Number} ;
-    Ord     = {s : AAgr   => Str} ;
+    Ord     = {s, s2 : AAgr => Str} ;
 
 -- Numeral
 
     Numeral = {s : CardOrd => Str ; n : Number} ;
-    Digits  = {s : CardOrd => Str ; n : Number} ;
+    Digits  = {s : CardOrd => Str ; n : Number ; tail : DTail} ;
+    Decimal = {s : CardOrd => Str ; n : Number ; hasDot : Bool} ;
 
 -- Structural
 
@@ -105,13 +107,20 @@ incomplete concrete CatRomance of Cat = CommonX - [SC,Pol]
     V3, V2A, V2V = Verb ** {c2,c3 : Compl} ;
     VS = Verb ** {m : RPolarity => Mood} ;
 
-    A  = {s : Degree => AForm => Str ; isPre : Bool ; copTyp : CopulaType} ;
-    A2 = {s : Degree => AForm => Str ; c2 : Compl ; copTyp : CopulaType} ;
+    A  = {s : AForm => Str ; compar : ComparAgr => Str ; isPre : Bool ; copTyp : CopulaType ; isDeg : Bool} ;
+    A2 = {s : AForm => Str ; compar : ComparAgr => Str ; c2 : Compl ; copTyp : CopulaType ; isDeg : Bool} ;
 
-    N  = Noun ;
-    N2 = Noun  ** {c2 : Compl} ;
-    N3 = Noun  ** {c2,c3 : Compl} ;
-    PN = {s : Str ; g : Gender} ;
+    N  = Noun  ** {relType : NRelType};
+    N2 = Noun  ** {relType : NRelType; c2 : Compl} ;
+    N3 = Noun  ** {relType : NRelType; c2,c3 : Compl} ;
+    GN, PN = {s : Str ; g : Gender} ;
+    SN = {s : Gender => Str ; pl : Str} ;
+    LN = {s  : Str;
+          onPrep : Bool;
+          art : HasArt;
+          g : Gender;
+          num : Number;
+         } ;
 
 -- tense augmented with passé simple
   lincat
@@ -122,22 +131,29 @@ incomplete concrete CatRomance of Cat = CommonX - [SC,Pol]
     SSlash = \ss -> ss.s ! aagr Masc Sg ! Indic ++ ss.c2.s ;
     ClSlash = \cls -> cls.s ! aagr Masc Sg ! DDir ! RPres ! Simul ! RPos ! Indic ++ cls.c2.s ;
 
-    VP = \vp -> infVP vp (agrP3 Masc Sg) ;
-    VPSlash = \vps -> infVP vps (agrP3 Masc Sg) ++ vps.c2.s ;
+    VP = \vp -> infVP vp RPos (agrP3 Masc Sg) ;
+    VPSlash = \vps -> infVP vps RPos (agrP3 Masc Sg) ++ vps.c2.s ;
 
-    V, VS, VQ, VA = \v -> infVP (predV v) (agrP3 Masc Sg);
-    V2, V2A, V2Q, V2S = \v -> infVP (predV v) (agrP3 Masc Sg) ++ v.c2.s ;
-    V3 = \v -> infVP (predV v) (agrP3 Masc Sg) ++ v.c2.s ++ v.c3.s ;
-    VV = \v -> infVP (predV v) (agrP3 Masc Sg) ;
-    V2V = \v -> infVP (predV v) (agrP3 Masc Sg) ;
+    V, VS, VQ, VA = \v -> infVP (predV v) RPos (agrP3 Masc Sg);
+    V2, V2A, V2Q, V2S = \v -> infVP (predV v) RPos (agrP3 Masc Sg) ++ v.c2.s ;
+    V3 = \v -> infVP (predV v) RPos (agrP3 Masc Sg) ++ v.c2.s ++ v.c3.s ;
+    VV = \v -> infVP (predV v) RPos (agrP3 Masc Sg) ;
+    V2V = \v -> infVP (predV v) RPos (agrP3 Masc Sg) ;
 
     NP = \np -> (np.s ! Nom).comp ;
     Conj = \c -> c.s2 ;
 
-    A = \a -> a.s ! Posit ! ASg Masc APred ;
-    A2 = \a -> a.s ! Posit ! ASg Masc APred ++ a.c2.s ;
+    A = \a -> a.s ! genNum2Aform Masc Sg ;
+    A2 = \a -> a.s ! genNum2Aform Masc Sg ++ a.c2.s ;
+
+    Det = \d -> d.s ! Masc ! Nom ++ d.s2 ! Masc ;
+    Ord = \o -> o.s ! aagr Masc Sg ++ o.s2 ! aagr Masc Sg ;
 
     N = \n -> n.s ! Sg ;
     N2 = \n -> n.s ! Sg ++ n.c2.s ;
     N3 = \n -> n.s ! Sg ++ n.c2.s ++ n.c3.s ;
+
+  lincat MU = {s : Str ; isPre : Bool ; hasArt : Bool} ;
+
+
 }

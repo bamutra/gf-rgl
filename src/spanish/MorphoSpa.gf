@@ -60,12 +60,9 @@ oper
 
   mkAdj : (x1,_,_,_,_,_,x7 : Str) -> Adj = \buen,solo,gran,sola,solos,solas,solamente ->
     {s = table {
-      ASg Masc AAttr => buen ;
-      ASg Masc APred => solo ;
-      ASg Fem AAttr => gran ;
-      ASg Fem APred => sola ;
-      APl Masc   => solos ;
-      APl Fem    => solas ;
+      AAttr g => genForms buen gran ! g ; -- un buen amigo, una gran idea
+      AF g Sg => genForms solo sola ! g ;
+      AF g Pl => genForms solos solas ! g ;
       AA         => solamente
       }
     } ;
@@ -169,65 +166,65 @@ oper
   -- Used in application grammars, please don't remove. /IL
   agr2pron : Agr => Pron = table {
     {g=Masc ; n=Sg ; p=P1}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "yo" "me" "me" "mí"
            "mi" "mi" "mis" "mis"
-            Masc Sg P1 ;
+            Masc Sg P1) ;
     {g=Masc ; n=Sg ; p=P2}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "tú" "te" "te" "ti"
            "tu" "tu" "tus" "tus"
-            Masc Sg P2 ;
+            Masc Sg P2) ;
     {g=Masc ; n=Sg ; p=P3}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "él" "lo" "le" "él"
            "su" "su" "sus" "sus"
-            Masc Sg P3 ;
+            Masc Sg P3) ;
     {g=Masc ; n=Pl ; p=P1}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "nosotros" "nos" "nos" "nosotros"
            "nuestro" "nuestra" "nuestros" "nuestras"
-            Masc Pl P1 ;
+            Masc Pl P1) ;
     {g=Masc ; n=Pl ; p=P2}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "vosotros" "os" "os" "vosotros"
            "vuestro" "vuestra" "vuestros" "vuestras"
-            Masc Pl P2 ;
+            Masc Pl P2) ;
     {g=Masc ; n=Pl ; p=P3}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "ellos" "los" "les" "ellos"
            "su" "su" "sus" "sus"
-            Masc Pl P3 ;
+            Masc Pl P3) ;
     {g=Fem ; n=Sg ; p=P1}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "yo" "me" "me" "mí"
            "mi" "mi" "mis" "mis"
-            Fem Sg P1 ;
+            Fem Sg P1) ;
     {g=Fem ; n=Sg ; p=P2}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "tú" "te" "te" "ti"
            "tu" "tu" "tus" "tus"
-            Fem Sg P2 ;
+            Fem Sg P2) ;
     {g=Fem ; n=Sg ; p=P3}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "ella" "la" "le" "ella"
            "su" "su" "sus" "sus"
-            Fem Sg P3 ;
+            Fem Sg P3) ;
     {g=Fem ; n=Pl ; p=P1}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "nosotras" "nos" "nos" "nosotras"
            "nuestro" "nuestra" "nuestros" "nuestras"
-            Fem Pl P1 ;
+            Fem Pl P1) ;
     {g=Fem ; n=Pl ; p=P2}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "vosotras" "os" "os" "vosotras"
            "vuestro" "vuestra" "vuestros" "vuestras"
-            Fem Pl P2 ;
+            Fem Pl P2) ;
     {g=Fem ; n=Pl ; p=P3}
-      => mkPronoun
+      => lin Pron (mkPronoun
            "ellas" "las" "les" "ellas"
            "su" "su" "sus" "sus"
-            Fem Pl P3
+            Fem Pl P3)
     } ;
 
 --2 Determiners
@@ -239,34 +236,33 @@ oper
 
   mkOrdinal : A -> Ord = \adj->
   lin Ord {
-    s = \\ag => adj.s ! Posit ! genNum2Aform ag.g ag.n ;
+    s = \\ag => adj.s ! genNum2Aform ag.g ag.n ;
+    s2 = \\_ => []
     } ;
 
-  mkQuantifier : (ese,esa,esos,esas : Str) -> Quant = \ese,esa,esos,esas->
+  mkQuantifier : (ese,esa,esos,esas,eso : Str) -> Quant = \ese,esa,esos,esas,eso->
     let
-      se  : Str = Predef.drop 1 ese ;
-      sa  : Str = Predef.drop 1 esa ;
-      sos : Str = Predef.drop 1 esos ;
-      sas : Str = Predef.drop 1 esas ;
-      E   : Str = "é" ;
       attrforms : Number => Gender => Case => Str = table {
         Sg => \\g,c => prepCase c ++ genForms ese esa ! g ;
         Pl => \\g,c => prepCase c ++ genForms esos esas ! g ----
         } ;
       npforms : Number => Gender => Case => Str = table {
-        Sg => \\g,c => prepCase c ++ genForms (E + se)  (E + sa)  ! g ;
-        Pl => \\g,c => prepCase c ++ genForms (E + sos) (E + sas) ! g }
+        Sg => \\g,c => prepCase c ++ genForms ese  esa  ! g ;
+        Pl => \\g,c => prepCase c ++ genForms esos esas ! g }
     in lin Quant {
       s = \\_ => attrforms ;
       s2 = [] ;
-      sp = npforms  ; isNeg = False
+      sp = npforms ;
+      spn= \\c => prepCase c ++ eso ;
+      isNeg = False
       } ;
 
   mkDeterminer : (mucho,mucha : Str) -> Number -> Bool -> Det = \mucho,mucha,number,neg ->
     lin Det {
       s,sp = \\g,c => prepCase c ++ genForms mucho mucha ! g ;
+      spn = \\c => prepCase c ++ mucho ;
       n = number;
-      s2 = [] ;
+      s2 = \\c => [] ;
       isNeg = neg
       } ;
 

@@ -1,4 +1,4 @@
-concrete NumeralEus of Numeral = CatEus [Numeral,Digits] ** open Prelude, ResEus, ParamX in {
+concrete NumeralEus of Numeral = CatEus [Numeral,Digits,Decimal] ** open Prelude, ResEus, ParamX in {
 
 oper LinDigit : Type = { s : DForm => Str ; 
                          n : Number ; 
@@ -29,6 +29,8 @@ lincat Sub10 = LinDigit ;
 lincat Sub100 = {s : Str ; n : Number } ;
 lincat Sub1000 = {s : Str ; n : Number ; isHundred : Bool } ;
 lincat Sub1000000 = {s : Str ; n : Number } ;
+lincat Sub1000000000 = {s : Str ; n : Number } ;
+lincat Sub1000000000000 = {s : Str ; n : Number } ;
 
 
 ----------------------------------------------------------------------------
@@ -71,6 +73,7 @@ lin pot2plus d e =
     n = Pl ;
     isHundred = True } ;
 lin pot2as3 n = n ;
+lin pot21 = {s = "ehun" ; n = Pl ; isHundred = True} ;
 lin pot3 n =
   {s = table {Sg => [] ; Pl => n.s } ! n.n ++ "mila" ;
    n = n.n } ;
@@ -81,6 +84,21 @@ lin pot3plus n m =
   in 
     { s = table {Sg => [] ; Pl => n.s } ! n.n ++ "mila" ++ ta ++ m.s ;
       n = n.n } ;
+
+lin pot31 = {s = "mila" ; n = Pl} ;
+lin pot3as4 n = n ;
+lin pot3decimal n = {s = n.s ! NCard ++ "mila" ; n = Pl} ;
+
+lin pot41 = {s = "milioi bat" ; n = Pl} ;
+lin pot4 n = {s = n.s ++ "milioi" ; n = Pl} ;
+lin pot4plus n m = {s = n.s ++ "milioi" ++ m.s ; n = Pl} ;
+lin pot4as5 n = n ;
+lin pot4decimal n = {s = n.s ! NCard ++ "milioi" ; n = Pl} ;
+
+lin pot51 = {s = "mila milioi" ; n = Pl} ;
+lin pot5 n = {s = n.s ++ "mila milioi" ; n = Pl} ;
+lin pot5plus n m = {s = n.s ++ "mila milioi" ++ m.s ; n = Pl} ;
+lin pot5decimal n = {s = n.s ! NCard ++ "mila milioi" ; n = Pl} ;
 
 ----------------------------------------------------------------------------
 
@@ -112,5 +130,18 @@ lin D_9 = mkDig "9" ;
 lin IDig dig = dig ;
     -- : Dig -> Digits -> Digits ; 
 lin IIDig dig digs = digs ** {s = \\co => glue (dig.s ! co) (digs.s ! co) } ;
+lin PosDecimal d = d ** {hasDot=False} ;
+lin NegDecimal d = {
+      s = \\co => glue "-" (d.s ! co) ;
+      n = Pl ;
+      hasDot=False
+    } ;
+lin IFrac d i = {
+      s = \\co => d.s ! co ++
+                  if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+                  i.s ! co ;
+      n = Pl ;
+      hasDot=True
+      } ;
 
 }

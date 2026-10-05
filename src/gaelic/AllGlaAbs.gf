@@ -1,0 +1,4 @@
+abstract AllGlaAbs =
+  Lang,
+  Extend
+  ** {}

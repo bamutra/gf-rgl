@@ -3,8 +3,8 @@ concrete NounEng of Noun = CatEng ** open MorphoEng, ResEng, Prelude in {
   flags optimize=all_subs ;
 
   lin
-    DetCN det cn = { 
-      s = \\c => det.s ++ cn.s ! det.n ! npcase2case c ; 
+    DetCN det cn = {
+      s = \\c => det.s ++ cn.s ! det.n ! npcase2case c ;
       a = agrgP3 det.n cn.g
       } ;
 
@@ -39,24 +39,24 @@ concrete NounEng of Noun = CatEng ** open MorphoEng, ResEng, Prelude in {
 
     DetQuant quant num = {
       s  = quant.s ! num.hasCard ! num.n ++ num.s ! quant.isDef ! Nom;
-      sp = \\g,hasAdj,c => case <num.hasCard,num.n> of {
-                             <False,Sg> => quant.sp ! g ! hasAdj ! num.n ! c ++ num.s  ! quant.isDef ! Nom ;
-                             _          => quant.s  !     True   ! num.n     ++ num.sp ! quant.isDef ! npcase2case c
+      sp = \\g,hasAdj,c => case num.hasCard of {
+                             False => quant.sp ! g ! hasAdj ! num.n ! c ++ num.s  ! quant.isDef ! Nom ;
+                             _     => quant.s  !     True   ! num.n     ++ num.sp ! quant.isDef ! npcase2case c
                            } ;
       n  = num.n ;
       hasNum = num.hasCard
       } ;
 
     DetQuantOrd quant num ord = {
-      s  =            quant.s  ! num.hasCard ! num.n ++ num.s ! quant.isDef ! Nom ++ ord.s ! Nom; 
-      sp = \\g,_,c => quant.s  ! num.hasCard ! num.n ++ num.s ! quant.isDef ! Nom ++ ord.s ! npcase2case c ; 
+      s  =            quant.s  ! num.hasCard ! num.n ++ num.s ! quant.isDef ! Nom ++ ord.s ! Nom;
+      sp = \\g,_,c => quant.s  ! num.hasCard ! num.n ++ num.s ! quant.isDef ! Nom ++ ord.s ! npcase2case c ;
       n  = num.n ;
       hasNum = True
       } ;
 
     DetNP det = {
       -- s = case det.hasNum of {True => \\_ => det.s ; _ => \\c => det.sp ! c} ;
-      s = det.sp ! Neutr ! False ;
+      s = \\c => det.sp ! Neutr ! False ! c ;
       a = agrP3 det.n
       } ;
 
@@ -77,6 +77,8 @@ concrete NounEng of Noun = CatEng ** open MorphoEng, ResEng, Prelude in {
     NumDigits n = {s,sp = \\_ => n.s ! NCard ; n = n.n} ;
     OrdDigits n = {s    = n.s ! NOrd} ;
 
+    NumDecimal d = {s,sp = \\_ => d.s ! NCard ; n = d.n} ;
+
     NumNumeral numeral = {s,sp = \\d => numeral.s ! d ! NCard; n = numeral.n} ;
     OrdNumeral numeral = {s    = numeral.s ! True ! NOrd} ;
 
@@ -84,9 +86,9 @@ concrete NounEng of Noun = CatEng ** open MorphoEng, ResEng, Prelude in {
                      sp = \\_,c => adn.s ++ num.sp!False!c ;
                      n  = num.n} ;
 
-    OrdSuperl a = {s = \\c => a.s ! AAdj Superl c } ;
+    OrdSuperl a = {s = \\c => getSuperl c a} ;
 
-    OrdNumeralSuperl n a = {s = \\c => n.s ! True ! NOrd ! Nom ++ a.s ! AAdj Superl c } ;
+    OrdNumeralSuperl n a = {s = \\c => n.s ! True ! NOrd ! Nom ++ getSuperl c a} ;
 
     DefArt = {
       s  = \\hasCard,n => artDef ;
@@ -113,7 +115,7 @@ concrete NounEng of Noun = CatEng ** open MorphoEng, ResEng, Prelude in {
 
     MassNP cn = {
       s = \\c => cn.s ! Sg ! npcase2case c ;
-      a = agrP3 Sg
+      a = agrgP3 Sg cn.g
       } ;
 
     UseN n = n ;
@@ -173,5 +175,10 @@ concrete NounEng of Noun = CatEng ** open MorphoEng, ResEng, Prelude in {
       } ;
 
     DetDAP d = d ;
+
+    QuantityNP n m = {
+      s = \\c => preOrPost m.isPre m.s (n.s ! NCard ! Nom) ;
+      a = agrgP3 n.n Neutr
+    } ;
 
 }

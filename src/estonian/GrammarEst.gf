@@ -1,6 +1,6 @@
-concrete GrammarEst of Grammar = 
-  NounEst, 
-  VerbEst, 
+concrete GrammarEst of Grammar =
+  NounEst,
+  VerbEst,
   AdjectiveEst,
   AdverbEst,
   NumeralEst,
@@ -12,7 +12,8 @@ concrete GrammarEst of Grammar =
   TextX,
   IdiomEst,
   StructuralEst,
-  TenseX
+  TenseX,
+  NamesEst
   ** {
 
 flags startcat = Phr ; unlexer = finnish ; lexer = text ;

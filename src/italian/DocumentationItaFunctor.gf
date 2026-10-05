@@ -40,17 +40,53 @@ lin
            )
     } ;
 
+  InflectionGN = \gn -> {
+    t = "pn" ;
+    s1 = heading1 ("Prenome" ++
+                   case gn.g of {
+                     Masc => "("+heading masculine_Parameter+")" ;
+                     Fem  => "("+heading feminine_Parameter+")"
+                   }) ;
+    s2 = gn.s
+    } ;
+
+  InflectionSN = \gn -> {
+    t = "pn" ;
+    s1 = heading1 "Cognome" ;
+    s2 = gn.s ! Masc
+    } ;
+
+  InflectionPN = \pn -> {
+    t = "pn" ;
+    s1 = heading1 ("Nome Proprio" ++
+                   case pn.g of {
+                     Masc => "("+heading masculine_Parameter+")" ;
+                     Fem  => "("+heading feminine_Parameter+")"
+                   }) ;
+    s2 = pn.s
+    } ;
+
+  InflectionLN = \ln -> {
+    t = "nl" ;
+    s1 = heading1 ("Nom del Luogo" ++
+                   case ln.g of {
+                     Masc => "("+heading masculine_Parameter+")" ;
+                     Fem  => "("+heading feminine_Parameter+")"
+                   }) ;
+    s2 = paragraph ln.s
+    } ;
+
   InflectionA, InflectionA2 = \adj -> {
     t  = "a" ;
     s1 = heading1 (nounHeading adjective_Category).s ;
     s2 = frameTable (
            tr (th ""                            ++ th (heading singular_Parameter)  ++ th  (heading plural_Parameter)) ++
-           tr (th (heading masculine_Parameter) ++ td (adj.s ! Posit ! (genNum2Aform Masc Sg)) ++ td (adj.s ! Posit ! (genNum2Aform Masc Pl))) ++
-           tr (th (heading feminine_Parameter)  ++ td (adj.s ! Posit ! (genNum2Aform Fem Sg))  ++ td (adj.s ! Posit ! (genNum2Aform Fem Pl)))
+           tr (th (heading masculine_Parameter) ++ td (adj.s ! (genNum2Aform Masc Sg)) ++ td (adj.s ! genNum2Aform Masc Pl)) ++
+           tr (th (heading feminine_Parameter)  ++ td (adj.s ! (genNum2Aform Fem Sg))  ++ td (adj.s ! genNum2Aform Fem Pl))
          )
     } ;
 
-  InflectionAdv adv = {
+  InflectionAdv, InflectionAdV, InflectionAdA, InflectionAdN = \adv -> {
     t  = "adv" ;
     s1 = heading1 "Adverbe" ;
     s2 = paragraph adv.s
@@ -60,6 +96,32 @@ lin
     t  = "prep" ;
     s1 = heading1 "Préposition" ;
     s2 = paragraph p.s
+    } ;
+
+  InflectionCl = \cl -> {
+    t  = "cl" ;
+    s1 = heading1 "Frase" ;
+    s2 = frameTable (
+           tr (intagAttr "th" "colspan=3" "Tempi semplici" ++
+               intagAttr "th" "colspan=3" "Tempi composti") ++
+           tr (th "Tempo" ++ th "Affermazione" ++ th "Domanda" ++
+               th "Tempo" ++ th "Affermazione" ++ th "Domanda") ++
+           inflClauseTense (heading present_Parameter)
+                           (heading present_Parameter ++ " " ++ heading perfect_Parameter)
+                           RPres cl ++
+           inflClauseTense (heading past_Parameter)
+                           (heading past_Parameter ++ " " ++ heading perfect_Parameter)
+                           RPast cl ++
+           inflClauseTense (heading past_Parameter)
+                           (heading past_Parameter ++ " " ++ heading perfect_Parameter)
+                           RPasse cl ++
+           inflClauseTense (heading future_Parameter)
+                           (heading future_Parameter ++ " " ++ heading perfect_Parameter)
+                           RFut cl ++
+           inflClauseTense (heading conditional_Parameter)
+                           (heading conditional_Parameter ++ " " ++ heading perfect_Parameter)
+                           RCond cl
+         )
     } ;
 
   InflectionV v = {
@@ -143,6 +205,18 @@ lin
   MkTag i = ss i.t ;
 
 oper
+  inflClauseTense : Str -> Str -> RTense -> Cl -> Str = \simple,perfect,tense,cl ->
+    tr (intagAttr "th" "rowspan=2" simple ++
+        td (cl.s ! DDir ! tense ! Simul ! RPos ! Indic) ++
+        td (cl.s ! DInv ! tense ! Simul ! RPos ! Indic) ++
+        intagAttr "th" "rowspan=2" perfect ++
+        td (cl.s ! DDir ! tense ! Anter ! RPos ! Indic) ++
+        td (cl.s ! DInv ! tense ! Anter ! RPos ! Indic)) ++
+    tr (td (cl.s ! DDir ! tense ! Simul ! (RNeg True) ! Indic) ++
+        td (cl.s ! DInv ! tense ! Simul ! (RNeg True) ! Indic) ++
+        td (cl.s ! DDir ! tense ! Anter ! (RNeg True) ! Indic) ++
+        td (cl.s ! DInv ! tense ! Anter ! (RNeg True) ! Indic)) ;
+
   verbExample : CatIta.Cl -> Str = \cl ->
      (S.mkUtt cl).s
      ++ ";" ++ (S.mkUtt (S.mkS S.anteriorAnt cl)).s  --# notpresent

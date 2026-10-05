@@ -10,12 +10,11 @@ concrete ConjunctionRus of Conjunction =
     [IAdv] = {s1,s2 : Str} ;
     [AdV] = {s1,s2 : Str} ;
     [AP] = {s1,s2 : AdjTable ;
-      short1,short2 : AgrTable ;
+      short1,short2 : GenNum => Str ;
       isPost : Bool;
       preferShort : ShortFormPreference
       } ;
     [DAP] = {s1,s2 : DetTable ;
-      g : Gender ;
       c : Case ;
       size : NumSize
       } ;
@@ -59,7 +58,7 @@ concrete ConjunctionRus of Conjunction =
 
     -- ConsAP : AP -> ListAP -> ListAP ;   -- red, white, blue
     ConsAP x xs = consrTable3 GenNum Animacy Case comma x xs ** {
-      short1 = \\ag=> x.short ! ag ++ comma ++ xs.short1 ! ag ;
+      short1 = \\gn=> x.short ! gn ++ comma ++ xs.short1 ! gn ;
       short2 = xs.short2 ;
       isPost = orB x.isPost xs.isPost ;
       preferShort = selectAPForm x.preferShort xs.preferShort
@@ -67,14 +66,12 @@ concrete ConjunctionRus of Conjunction =
 
     -- : DAP -> DAP -> ListDAP ;       --
     BaseDAP x y = twoTable3 Gender Animacy Case x y ** {
-      g = conjGender x.g y.g ;
       c = y.c ;
       size = conjSize x.size y.size ;  -- different genders -> plural?
       } ;
 
     -- : DAP -> ListDAP -> ListDAP ;   --
     ConsDAP x xs = consrTable3 Gender Animacy Case comma x xs ** {
-      g = xs.g ;  --?
       c = xs.c ;  -- ?
       size = xs.size  -- different genders -> plural?
       } ;
@@ -83,7 +80,6 @@ concrete ConjunctionRus of Conjunction =
     ConjDet conj xs = {
       s=\\g,anim,cas => conj.s1 ++ xs.s1 ! g ! anim ! cas ++ conj.s2 ++ xs.s2 ! g ! anim ! cas ;
       type=NormalDet ; -- hopefully ok to drop empty cases
-      g=xs.g ;
       c=xs.c ;
       size=xs.size
       } ;
@@ -95,17 +91,20 @@ concrete ConjunctionRus of Conjunction =
     ConsS = consrTable Mood comma ;
 
     -- : RS -> RS -> ListRS ;       -- who walks, whom I know
-    BaseRS x y = twoTable3 GenNum Animacy Case x y ** {c = y.c} ;
+    BaseRS x y = twoTable3 GenNum Animacy Case x y ;
 
     -- : RS -> ListRS -> ListRS ;   -- who walks, whom I know, who is here
-    ConsRS xs x = consrTable3 GenNum Animacy Case comma xs x ** {c = xs.c} ;
+    ConsRS xs x = consrTable3 GenNum Animacy Case comma xs x ;
 
     -- : Conj -> ListAdv -> Adv ;   -- here or there
     ConjAdv = conjunctDistrSS ;
     -- : Conj -> ListIAdv -> IAdv ;   -- where or why
     ConjIAdv = conjunctDistrSS ;
-    -- : Conj -> ListAdV -> AdV ;   -- always or sometimes
-    ConjAdV = conjunctDistrSS ;
+    -- : Conj -> ListAdV -> AdV ;   -- always or sometimes;
+    ConjAdV conj xs = {
+      s = conj.s1 ++ xs.s1 ++ conj.s2 ++ xs.s2 ;
+      p = Pos
+      } ;
 
     -- : Conj -> ListAP -> AP ;     -- cold and warm
     ConjAP conj xs = conjunctDistrTable3 GenNum Animacy Case conj xs ** {
@@ -117,9 +116,7 @@ concrete ConjunctionRus of Conjunction =
     ConjS conj ss = conjunctDistrTable Mood conj ss ;
 
     -- : Conj -> ListRS -> RS ;     -- who walks and whose mother runs
-    ConjRS conj ss = conjunctDistrTable3 GenNum Animacy Case conj ss ** {
-      c = ss.c
-      } ;
+    ConjRS conj ss = conjunctDistrTable3 GenNum Animacy Case conj ss ;
 
     -- : CN -> CN -> ListCN ;      -- man, woman
     BaseCN x y = {
@@ -142,7 +139,9 @@ concrete ConjunctionRus of Conjunction =
       s = \\n,cas => conj.s1 ++ xs.s1 ! n ! cas ++ conj.s2 ++ xs.s2 ! n ! cas ;
       g = xs.g ;
       mayben = JustPl ;
-      anim = xs.anim
+      anim = xs.anim ;
+      rel = (guessAdjectiveForms "");
+      rt = GenType ;
     } ;
 
     -- : NP -> NP -> ListNP ;      -- John, Mary
@@ -162,17 +161,17 @@ concrete ConjunctionRus of Conjunction =
       --prep1 = \\c => x.prep ! c ++ comma ++ xs.prep1 ! c ;
       --prep2 = xs.prep2 ;
       a = conjAgr x.a xs.a ;
-      pron = xs.pron ;
-      anim = conjAnim x.anim xs.anim
+      pron = xs.pron
     } ;
 
     -- : Conj -> ListNP -> NP ;     -- she or we
     ConjNP conj xs = {
       s = \\c => conj.s1 ++ xs.s1 ! c ++ conj.s2 ++ xs.s2 ! c ;
-      --prep = \\c => conj.s1 ++ xs.prep1 ! c ++ conj.s2 ++ xs.prep2 ! c ;
-      a = xs.a ; -- TODO: dep. on conj as well?
-      pron = xs.pron ;
-      anim = xs.anim
+      a = case conj.n of {
+            Sg => xs.a ;
+            Pl => case xs.a of {Ag gn p => Ag GPl p}
+          } ;
+      pron = xs.pron
     } ;
 
   oper

@@ -68,6 +68,14 @@ oper
   mkPN : Str -> Animacy -> PN -- Proper noun with given animacy
     = \str,ani -> lin PN {s = str ; animacy = ani} ;
 
+-- Given names and surnames
+  mkGN : Str -> GN = \s -> lin GN {s = s} ;
+  mkSN : Str -> SN = \s -> lin SN {s = s} ;
+
+-- Location names
+  mkLN : Str -> LN -- Location name from a string
+    = \str -> lin LN {s = str} ;
+
 -- Determiner
 
   mkDet = overload {
@@ -81,11 +89,9 @@ oper
       = \s,n,nu,ne,m -> lin Det (makeDet s n nu ne ** {mod=m})
   };
 
- {-
-
--- AdN
-  mkAdN : Str -> AdN = \s -> ss s ;
--}
+-- Adverb modifying a numeral
+  mkAdN : Str -> AdN
+    = \s -> lin AdN {s = s} ;
 --2 Adjectives
 
   mkA : overload {
@@ -127,8 +133,8 @@ oper
   } ;
 
   mkV3 = overload {
-    mkV3 : Str -> V3 -- Predictable V3, را for direct object, no prepositions.
-     = \s -> lin V3 (regV s ** {c2 = prepOrRa "را" ; c3 = noPrep}) ;
+    mkV3 : Str -> V3 -- Predictable ditransitive: recipient with به, theme with را.
+     = \s -> lin V3 (regV s ** {c2 = prepOrRa "به" ; c3 = prepOrRa "را"}) ;
     mkV3 : V -> (dir,indir : Str) -> V3 -- Takes a verb and two prepositions or را as strings (can be empty).
      = \v,p,q -> lin V3 (v ** {c2 = prepOrRa p ; c3 = prepOrRa q}) ;
     mkV3 : V -> (dir,indir : Prep) -> V3 -- Takes a verb and two prepositions
@@ -151,6 +157,15 @@ oper
       = \v,p -> lin VA (v ** {c2 = p}) ;
     } ;
 
+  mkV2A = overload {
+    mkV2A : Str -> V2A -- predictable verb with a direct object and adjective complement
+      = \s -> lin V2A (regV s ** {c2 = prepOrRa "را"}) ;
+    mkV2A : V -> V2A -- V2A out of V; را for the direct object
+      = \v -> lin V2A (v ** {c2 = prepOrRa "را"}) ;
+    mkV2A : V -> Prep -> V2A -- V2A out of V with the given object marker or preposition
+      = \v,p -> lin V2A (v ** {c2 = p})
+  } ;
+
   mkVS = overload {
    mkVS : Str -> VS -- predictable verb with sentence complement in subjunctive.
     = \s -> lin VS (regV s ** {compl=subjunctive}) ;
@@ -161,14 +176,14 @@ oper
   } ;
 
   mkVV = overload {
-    mkVV : Str -> VV -- Predictable VV, subjunctive complement, is auxiliary.
-     = \s -> lin VV (regV s ** {isAux = True ; compl = subjunctive ; isDef = False}) ;
-    mkVV : V -> VV -- takes its VP complement in subjunctive. Is auxiliary.
-     = \v -> v ** {isAux = True ; compl = subjunctive ; isDef = False} ;
+    mkVV : Str -> VV -- Predictable VV with a subjunctive complement.
+     = \s -> lin VV (regV s ** {isAux = False ; compl = subjunctive ; isDef = False}) ;
+    mkVV : V -> VV -- takes its VP complement in subjunctive.
+     = \v -> lin VV (v ** {isAux = False ; compl = subjunctive ; isDef = False}) ;
     mkVV : VVForm -> V -> VV -- takes its VP complement in the given VVForm
-     = \vvf,v -> v ** {isAux = True ; compl = vvf ; isDef = False} ;
+     = \vvf,v -> lin VV (v ** {isAux = False ; compl = vvf ; isDef = False}) ;
     mkVV : (isAux : Bool) -> VVForm -> V -> VV -- takes its VP complement in the given VVForm. Whether it's auxiliary (T/F) given as the first argument.
-     = \isAux,vvf,v -> v ** {isAux = isAux ; compl = vvf ; isDef = False}
+     = \isAux,vvf,v -> lin VV (v ** {isAux = isAux ; compl = vvf ; isDef = False})
   } ;
 
   defVV : VV -> VV = \vv -> vv ** {isDef=True} ;
@@ -200,6 +215,12 @@ oper
 ----2 Adverbs
   mkAdv : Str -> Adv -- Takes a string, returns an adverb.
     = \str -> lin Adv {s = str} ;
+
+  mkAdV : Str -> AdV -- Takes a string, returns a verb-modifying adverb.
+    = \str -> lin AdV {s = str} ;
+
+  mkAdA : Str -> AdA -- Takes a string, returns an adjective-modifying adverb.
+    = \str -> lin AdA {s = str} ;
 
 ----2 Prepositions
 
@@ -240,6 +261,9 @@ oper
 
   mkInterj : Str -> Interj
     = \s -> lin Interj {s=s} ;
+
+  mkVoc : Str -> Voc
+    = \s -> lin Voc {s=s} ;
 
 --.
 --2 Definitions of paradigms
@@ -282,19 +306,19 @@ oper
 
   mkN = overload {
     mkN : (sg : Str) -> N -- Takes singular form, returns a noun with ها as the plural form.
-      = \sg -> mkN01 sg inanimate ;
+      = \sg -> lin N (mkN01 sg inanimate) ;
     mkN : (sg,pl : Str) -> N -- Takes singular and plural forms. Use for ان or its allomorphs, and loanwords with Arabic plural.
-      = \sg,pl -> M.mkN sg pl inanimate ;
+      = \sg,pl -> lin N (M.mkN sg pl inanimate) ;
     mkN : (possStem : Str) -> N -> N -- Noun with an unexpected possessive stem, e.g. مه where ه is a consonant, not vowel.
-      = \ps,n -> possStemN ps n ;
+      = \ps,n -> lin N (possStemN ps n) ;
 
     -- hidden from API
     mkN : (sg : Str) -> Animacy -> N -- Takes singular form and animacy. Inanimate plural ها. Animate plural ان or an allomorph of it (یان or گان) depending on the singular form.
       = \sg,ani -> case ani of {
-          Inanimate => mkN01 sg ani ;
-          Animate   => mkN02 sg ani } ;
+          Inanimate => lin N (mkN01 sg ani) ;
+          Animate   => lin N (mkN02 sg ani) } ;
     mkN : (sg,pl : Str) -> Animacy -> N -- Worst-case constructor: takes singular and plural forms and animacy. Use for e.g. loanwords with Arabic plural, or animate nouns with ها as plural.
-      = \sg,pl,ani -> M.mkN sg pl ani
+      = \sg,pl,ani -> lin N (M.mkN sg pl ani)
   } ;
 
   possStemN : Str -> N -> N = \possStem,n -> n ** {
@@ -304,18 +328,18 @@ oper
 
   } ;
 
-  mkN01 : (sg : Str) -> Animacy -> Noun ; -- Takes singular form and animacy, forms plural with ها
+  mkN01 : (sg : Str) -> Animacy -> N ; -- Takes singular form and animacy, forms plural with ها
   mkN01 sg ani =
     let pl : Str = case last sg of {
        --"د"|"ذ"|"ر"|"ز"|"ژ" => sg + "ها" ; -- these letters are separated by default
          _                     => zwnj sg "ها" } ; -- Using zero-width non-joiner, defined in MorphoPes
-    in M.mkN sg pl ani ;
+    in lin N (M.mkN sg pl ani) ;
 
-  mkN02 : (sg : Str) -> Animacy -> Noun ; -- Takes singular form and animacy, pattern matches singular and forms plural with either گان, یان or ان
+  mkN02 : (sg : Str) -> Animacy -> N ; -- Takes singular form and animacy, pattern matches singular and forms plural with either گان, یان or ان
   mkN02 str ani = case last str of {
-    "ه"       => M.mkN str (init str + "گان") ani ;
-    ("ا"|"و") => M.mkN str (str + "یان")      ani ;
-    _         => M.mkN str (str + "ان")       ani
+    "ه"       => lin N (M.mkN str (init str + "گان") ani) ;
+    ("ا"|"و") => lin N (M.mkN str (str + "یان") ani) ;
+    _         => lin N (M.mkN str (str + "ان") ani)
   };
 
   mk2Conj : Str -> Str -> Number -> Conj = \x,y,n ->
@@ -364,7 +388,7 @@ oper
     compoundV : Str -> V -> V
       = \s,v -> v ** {
           prefix = s ;
-          lightverb = case v.lightverb of {Kardan => Kardan ; _ => Light}
+          lightverb = case v.lightverb of {BareKardan | Kardan => Kardan ; _ => Light}
         } ;
     compoundV : Str -> V2 -> V -- hidden from public API
       = \s,v -> lin V (v ** {prefix = s}) ;
@@ -396,7 +420,7 @@ oper
          => {s = [] ; ra = ra   ; mod=Bare ; isPrep = False} ;
     prep => {s = prep ; ra = [] ; mod=Bare ; isPrep = True}
     } ;
-  noPrep = prepOrRa [] ;
+  noPrep : Prep = lin Prep (prepOrRa []) ;
 
   -- NB. The 'mod' field has different meaning for verbs and N2s.
   ezafeForN2 = {s = [] ; ra = [] ; mod=Ezafe ; isPrep = False} ;
@@ -427,11 +451,11 @@ oper
   mkQuant = overload {
 --    mkQuant : Pron -> Quant = \p -> {s = \\_,_,c => p.s!c ;a = p.a ; lock_Quant = <>};
     mkQuant :  Str -> Str -> Quant -- hidden from public API
-      = \sg,pl -> makeQuant sg pl Bare False;
+      = \sg,pl -> lin Quant (makeQuant sg pl Bare False);
     mkQuant :  Str -> Str -> (isNeg : Bool) -> Quant -- hidden from public API
-      = \sg,pl,isneg -> makeQuant sg pl Bare isneg;
+      = \sg,pl,isneg -> lin Quant (makeQuant sg pl Bare isneg);
     mkQuant :  Str -> Str -> Mod -> (isNeg : Bool) -> Quant -- hidden from public API
-      = \sg,pl,mod,isneg -> makeQuant sg pl mod isneg;
+      = \sg,pl,mod,isneg -> lin Quant (makeQuant sg pl mod isneg);
   } ;
 
 }

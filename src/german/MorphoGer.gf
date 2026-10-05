@@ -1,4 +1,4 @@
---# -path=.:../common:../../prelude
+--# -path=.:../common:../prelude:
 --
 ----1 A Simple German Resource Morphology
 ----
@@ -17,23 +17,25 @@ oper
 
 -- For $StructuralGer$.
 
-  mkPrep : Str -> PCase -> Preposition = \s,c -> 
-    {s = s ; s2 = [] ; c = c ; isPrep = True} ;
+  -- mkPrep : Str -> Case -> Preposition = \s,c ->
+  --   {s = \\_ => s ; s2 = [] ; c = c ; t = isPrep} ;
 
-  nameNounPhrase : {s : Case => Str} ->  {s : PCase => Str ; a : Agr ; 
-                                          -- isLight, isPron : Bool ; 
-                                          w : Weight ;
-                                          ext,rc : Str} = \name -> heavyNP {
-      s = \\c => usePrepC c (\k -> name.s ! k) ;
-      a = agrP3 Sg 
+  nameNounPhrase : Gender -> {s : Case => Str} -> {s : Bool => Case => Str ;
+                                                   a : Agr ;
+                                                   w : Weight ;
+                                                   ext,rc : Str} =
+    \g,name -> {
+      s = \\_,c => name.s ! c ;
+      a = agrgP3 g Sg ;
+      ext,rc = [] ;
+      w = WHeavy -- ok?
       } ;
 
-  detLikeAdj : Bool -> Number -> Str -> 
-    {s,sp : Gender => PCase => Str ; n : Number ; a : Adjf ; isDef : Bool} = \isDef,n,dies -> 
+  detLikeAdj : Bool -> Number -> Str ->
+    {s,sp : Gender => Case => Str ; n : Number ; a : Adjf ; isDef : Bool} = \isDef,n,dies ->
       {s,sp = appAdj (regA dies) ! n ; n = n ; a = Weak ; isDef = isDef} ;
-
-  detUnlikeAdj : Bool -> Number -> Str -> 
-    {s,sp : Gender => PCase => Str ; n : Number ; a : Adjf ; isDef : Bool} = \isDef,n,dies -> 
+  detUnlikeAdj : Bool -> Number -> Str ->
+    {s,sp : Gender => Case => Str ; n : Number ; a : Adjf ; isDef : Bool} = \isDef,n,dies ->
       {s,sp = appAdj (regDetA dies) ! n ; n = n ; a = Weak ; isDef = isDef} ;
 
   mkOrd : {s : Degree => AForm => Str} -> {s : AForm => Str} = \a ->
@@ -75,13 +77,25 @@ oper
     _ => Predef.tk 2 v
     } ;
 
+  stemVerbImpSg : Str -> Str -> Str = \inf,pres3Sg ->
+    let stem = stemVerb inf ;  -- vergeb.en, piss.en
+        stemI = init pres3Sg   -- vergib.t , piß.t
+    in case <stem,stemI> of {
+      <_ + ("e"|"i") + #nonvowels,
+        _ + ("i"|"ie") + #nonvowels> => stemI ; -- vergib , piß
+      _ => stem } ;            -- HL 7/17 (always the final vowel?)
+
+  nonvowels : pattern Str =
+    #(("p"|"b"|"f"|"t"|"d"|"v"|"k"|"g"|"c"|"h"|"j"
+         |"l"|"r"|"m"|"n"|"s"|"x"|"q"|"z"|"s"|"ß")*) ;
+
 -- For $Numeral$.
 
   LinDigit = {s : DForm => CardOrd => Str} ;
 
   cardOrd : Str -> Str -> CardOrd => Str = \drei,dritte ->
     table {
-      NCard _ _ => drei ;
+      NCard _ => drei ;
       NOrd a => (regA (init dritte)).s ! Posit ! a
       } ;
 
@@ -100,7 +114,7 @@ oper
   regDigit : Str -> LinDigit = \vier -> 
     mkDigit vier (vier + "zehn") (vier + "zig") (vier + "te") ;
 
-  invNum : CardOrd = NCard Masc Nom ;
+  invNum : CardOrd = NCard (AMod (GSg Masc) Nom) ;
 
 } ;
 

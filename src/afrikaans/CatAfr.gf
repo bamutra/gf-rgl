@@ -47,7 +47,7 @@ concrete CatAfr of Cat =
     NP = {s : NPCase => Str ; a : Agr ; isPron : Bool} ;
     Pron = Pronoun ;
 
-    Det = {s,sp : Gender => Str ; n : Number ; a : Adjf} ;
+    Det,DAP = {s,sp : Gender => Str ; n : Number ; a : Adjf} ;
     Quant = {
       s  : Bool => Number => Gender => Str ; 
       sp : Number => Gender => Str ; 
@@ -56,12 +56,14 @@ concrete CatAfr of Cat =
     Predet = {s : Number => Gender => Str} ;
     Num = {s : Str ; n : Number ; isNum : Bool} ;
     Card = {s : Gender => Case => Str ; n : Number} ;
+    ACard = {s : Str} ;
     Ord = {s : AForm => Str} ;
 
 -- Numeral
 
     Numeral = {s : CardOrd => Str ; n : Number } ;
     Digits = {s : CardOrd => Str ; n : Number } ;
+    Decimal = {s : CardOrd => Str ; n : Number ; hasDot : Bool} ;
 
 -- Structural
 
@@ -84,5 +86,21 @@ concrete CatAfr of Cat =
     N2 = {s : NForm => Str ; g : Gender} ** {c2 : Preposition} ;
     N3 = {s : NForm => Str ; g : Gender} ** {c2,c3 : Preposition} ;
     PN = {s : NPCase => Str} ;
+    GN = {s : NPCase => Str; g : Sex} ;
+    SN = {s : Sex => NPCase => Str; pl : NPCase => Str} ;
+    LN = {s : Adjf => NPCase => Str ; hasArt : Bool ; n : Number} ;
+
+lindef
+    VPSlash = \s -> {
+      s  = {s = \\_ => s; prefix = ""; aux = VHebben; vtype = VAct} ;
+      a1 = \\_ => "" ;
+      n0 = \\_ => "" ;
+      n2 = \\_ => "" ;
+      a2 = "" ;
+      isAux = False ;
+      inf = <"",False> ;
+      ext = "" ;
+      c2 = ""
+      } ;
 
 }

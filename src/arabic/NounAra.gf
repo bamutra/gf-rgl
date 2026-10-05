@@ -75,6 +75,24 @@ lin
       };
 -}
 
+  PartNP cn np = cn ** {
+    np = \\c => cn.np ! c ++ "مِنْ" ++ np.s ! Gen ;
+    isHeavy = True
+    } ;
+
+  CountNP det np = emptyNP ** {
+    s = \\c => det.s ! NoHum ! Masc ! c ++ "مِنْ" ++ np.s ! Gen ;
+    a = {pgn = agrP3 NoHum Masc (sizeToNumber det.n) ; isPron = False} ;
+    isHeavy = True
+    } ;
+
+  AdjDAP dap ap = dap ** {
+    s = \\h,g,c => dap.s ! h ! g ! c
+                ++ ap.s ! h ! g ! (sizeToNumber dap.n) ! dap.d ! c
+    } ;
+
+  ExtAdvNP np adv = AdvNP np adv ;
+
   AdvNP np adv = np ** {
     s = \\c => np.s ! c ++ adv.s ;
     isHeavy = True ;
@@ -128,6 +146,10 @@ lin
 
   NumDigits digits = digits ** {
     s = \\_,_,_ => digits.s ;
+    isNum = True
+    };
+  NumDecimal dec = dec ** {
+    s = \\_,_,_ => dec.s ;
     isNum = True
     };
 
@@ -233,6 +255,11 @@ lin
              }
     };
 
-  -- : CN -> NP -> CN ;     -- glass of wine
-  --PartNP
+  DetDAP d = d ;
+
+  QuantityNP n m = emptyNP ** {
+    s = \\c => preOrPost m.isPre m.s n.s ;
+    a = { pgn = agrP3 NoHum Masc (sizeToNumber n.n);
+          isPron = False }
+  };
 }

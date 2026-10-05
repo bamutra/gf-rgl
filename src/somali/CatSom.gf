@@ -80,6 +80,7 @@ concrete CatSom of Cat = CommonX - [Adv,IAdv] ** open ResSom, Prelude in {
     Card = BaseNum ;
     Numeral = ResSom.Numeral ;
     Digits = {s : CardOrd => Str ; n : Number} ;
+    Decimal = {s : CardOrd => Str ; n : Number; hasDot : Bool} ;
 
 
 
@@ -118,13 +119,18 @@ concrete CatSom of Cat = CommonX - [Adv,IAdv] ** open ResSom, Prelude in {
     N = ResSom.Noun ;
     N2 = ResSom.Noun2 ;
     N3 = ResSom.Noun3 ;
-    PN = ResSom.PNoun ;
+    GN, SN, LN, PN = ResSom.PNoun ;
 
-    Adv = ResSom.Adverb ; -- Preposition of an adverbial can merge with obligatory complements of the verb.
+    Adv = ResSom.Adverb ; -- Adposition of an adverbial can merge with obligatory complements of the verb.
 
 linref
     -- Cl = linCl ;
-    VP = infVP ;
+    V, VS, VQ, VA, VV = \v -> v.s ! VImp Sg Pos ;
+    V2A, V2V, V2S, V2Q, V2 = \v -> (prepTable ! v.c2).s ! ZeroObj ++ v.s ! VImp Sg Pos ;
+    V3 = \v -> (prepTable ! v.c2).s ! ZeroObj ++ (prepTable ! v.c3).s ! ZeroObj ++ v.s ! VImp Sg Pos ;
+    VP = linVP (VImp Sg Pos) Statement ;
     CN = linCN ;
-    Prep = \prep -> prep.s ! P3_Prep ++ prep.sii ++ prep.dhex ++ prep.hoostiisa ! Sg3 Masc ;
+    Prep = \prep -> prep.s ! ZeroObj ++ prep.sii ++ prep.dhex ++ prep.hoostiisa ! Sg3 Masc ;
+    A = \a -> a.s ! AF Sg Abs ;
+    A2 = \a -> (prepTable ! a.c2).s ! ZeroObj ++ a.s ! AF Sg Abs ;
 }

@@ -1,7 +1,8 @@
 --# -path=.:../abstract:../common:../api:../prelude
 
-concrete AllGer of AllGerAbs = 
+concrete AllGer of AllGerAbs =
   LangGer,
   IrregGer,
-  ExtraGer
-  ** {} ;
+  ExtendGer
+  ** open ExtraGer in {} ---- to force compilation
+  ;

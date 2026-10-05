@@ -1,14 +1,6 @@
 --# -path=.:../../prelude
 --# -coding=utf8
 
---1 A Simple English Resource Morphology
---
--- Aarne Ranta 2002 -- 2005
---
--- This resource morphology contains definitions needed in the resource
--- syntax. To build a lexicon, it is better to use $ParadigmsEng$, which
--- gives a higher-level access to this module.
-
 resource MorphoBul = ResBul ** open
   Predef,
   Prelude,
@@ -173,6 +165,7 @@ oper
           NF Sg Indef => sg ;
           NF Sg Def   => case sg of {
                            _+"а"=>sg+"та" ;
+                           _+"ю"=>sg+"та" ;
                            _+"я"=>sg+"та" ;
                            _+"о"=>sg+"то" ;
                            _+"у"=>sg+"то" ;

@@ -19,7 +19,19 @@ instance DiffPor of DiffRomance - [iAdvQuestionInv,chooseTA,otherInv,partAgr,sta
     -- exception
     vpAgrSubj v = <verbDefaultPart v, False> ;
 
+  -- AForm and comparatives
+  param
+    AFormSimple = AF Gender Number | AA ;
   oper
+    AForm = DiffPor.AFormSimple ;
+    aform2aagr : AForm -> AAgr = \a -> case a of {
+      DiffPor.AF g n => aagr g n ;
+      _              => aagr Masc Sg -- "le plus lentement"
+      } ;
+    genNum2Aform : Gender -> Number -> AForm = DiffPor.AF ;
+    genNumPos2Aform : Gender -> Number -> Bool -> AForm = \g,n,_ -> genNum2Aform g n ;
+    piuComp = "mais" ;
+
     conjunctCase : Case -> Case = \c -> case c of {
       Nom => Nom ;
       _ => Acc
@@ -278,5 +290,11 @@ instance DiffPor of DiffRomance - [iAdvQuestionInv,chooseTA,otherInv,partAgr,sta
     verboV : Verbum -> Verb ;
     -- make a verb of type haver
     verboV v = verbBesch v ** {vtyp = VTer ; p = [] } ;
+
+param
+  HasArt = NoArt | UseArt ;
+
+oper
+  superlCanBePost = False ;
 
 } ;

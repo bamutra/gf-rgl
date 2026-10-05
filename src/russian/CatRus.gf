@@ -1,12 +1,38 @@
-concrete CatRus of Cat = CommonX ** open ResRus, Prelude in {
+concrete CatRus of Cat = CommonX - [AdV, mkAdV] ** open ResRus, Prelude in {
 flags coding=utf8 ; optimize=all ;
 lincat
-  N, PN = ResRus.NounForms ;
+  N = ResRus.NounForms ;
+  PN = {
+    s : Case => Str ;
+    g : Gender ;
+    anim : Animacy ;
+    n : Number ;
+  } ;
+  GN = {
+    s : Case => Str ;
+    g : Sex ;
+  } ;
+  SN = {
+    s : Sex => Case => Str ;
+    p : Case => Str ;
+  } ;
+  LN = {
+    s : Case => Str ;
+    c : ResRus.ComplementCase ;
+    g : Gender ;
+    n : Number ;
+    anim : Animacy
+  } ;
   N2 = ResRus.Noun2Forms ;
   N3 = ResRus.Noun3Forms ;
 
   A, Ord = ResRus.AdjForms ;
   A2 = ResRus.AdjForms ** {c : ComplementCase} ;
+
+  AdV = {
+     s : Str ;
+     p : Polarity
+  } ;
 
   V, VS, VQ, VA = ResRus.VerbForms ;
   V2, V2S, V2Q, V2A, V2V = ResRus.VerbForms2 ;
@@ -16,19 +42,9 @@ lincat
   CN = ResRus.Noun ;
 
   NP = ResRus.NounPhrase ;
-  VP = {
-    adv : AgrTable ;  -- modals are in position of adverbials ones numgen gets fixed
-    verb : ResRus.VerbForms ;
-    dep : Str ;  -- dependent infinitives and such
-    compl : ComplTable
-    } ;
-  VPSlash = {
-    adv : AgrTable ;  -- modals are in position of adverbials ones numgen gets fixed
-    verb : ResRus.VerbForms ;
-    dep : Str ;  -- dependent infinitives and such
-    compl : ComplTable ;
-    c : ComplementCase
-    } ; ----
+  VP = ResRus.VP ;
+
+  VPSlash = ResRus.VPSlash ;
 
   AP = ResRus.Adjective ** {isPost : Bool} ;
 
@@ -57,17 +73,18 @@ lincat
   Det, DAP = {
     s : DetTable ;
     type : DetType ; -- main purpose is to avoid emptiness of articles, but can be reused later for something else
-    g : Gender ;
     c : Case ;
     size : NumSize
     } ;
   Predet = ResRus.Adjective ** {size : NumSize} ;
   IQuant = ResRus.Adjective ** {g: Gender; c: Case} ;
-  Quant = ResRus.Adjective ** {g: Gender; c: Case; type: DetType} ;
+  Quant = ResRus.Adjective ** {c: Case; type: DetType} ;
   Numeral = NumeralForms ;
   Num = NumDet ;
   Card = NumDet ;
-  Digits = {s : Str ; size: NumSize} ;
+  ACard = {s : Str} ;
+  Digits = {s : Str ; size: NumSize; tail: DTail} ;
+  Decimal = {s : Str ; size: NumSize; hasDot : Bool} ;
 
   QS  = {s : QForm => Str} ;
   QCl = {
@@ -104,12 +121,12 @@ lincat
 
 linref
   N = \s -> s.snom ;
-  PN = \s -> s.snom ;
+  PN,LN = \s -> s.s ! Nom ;
   Pron = \s -> s.nom ;
   N2 = \s -> s.snom ++ s.c2.s ;
   N3 = \s -> s.snom ++ s.c2.s ++ s.c3.s ;
-  A = \s -> case s.preferShort of {PrefShort => s.sm ; _ => s.msnom} ;
-  A2 = \s -> case s.preferShort of {PrefShort => s.sm ; _ => s.msnom} ++ s.c.s ;  -- ?
+  A = \s -> case s.preferShort of {PrefShort => s.short ! (GSg Masc) ; _ => s.msnom} ;
+  A2 = \s -> case s.preferShort of {PrefShort => s.short ! (GSg Masc) ; _ => s.msnom} ++ s.c.s ;  -- ?
   V = \s -> verbInf s ;
   V2 = \s -> (verbInf s) ++ s.c.s ;
   V2V = \s -> (verbInf s) ++ s.c.s ;
@@ -121,11 +138,47 @@ linref
   VP = \s -> s.adv ! Ag (GSg Neut) P3 ++ (verbInf s.verb) ++ s.dep ++ s.compl ! Pos ! Ag (GSg Neut) P3 ;
   Comp = \s -> copula.inf ++ s.s ! Ag (GSg Neut) P3 ++ s.adv ;
   IComp = \s -> s.s ! Ag (GSg Neut) P3 ++ s.adv ++ copula.inf;
-  VPSlash = \s -> s.adv ! Ag (GSg Neut) P3 ++ (verbInf s.verb) ++ s.dep ++ s.compl ! Pos ! Ag (GSg Neut) P3 ++ s.c.s ;
+  VPSlash = \s -> let vp : VP
+                            =  {verb = s.verb ;
+                                adv = s.adv ;
+                                dep = s.dep ;
+                                compl = \\p, a => s.compl1 ! p ! a ++ s.c.s ++ s.compl2 ! p ! a ;
+                                p = s.p
+                               }
+         in vp.adv ! Ag (GSg Neut) P3 ++ (verbInf vp.verb) ++ vp.dep ++ vp.compl ! Pos ! Ag (GSg Neut) P3 ;
   Cl = \s -> s.subj ++ s.adv ++ (verbInf s.verb) ++ s.dep ++ s.compl ! Pos ;
   ClSlash = \s -> s.subj ++ s.adv ++ (verbInf s.verb) ++ s.dep ++ s.compl ! Pos ;
   QCl = \s -> s.subj ++ s.adv ++ (verbInf s.verb) ++ s.dep ++ s.compl ! Pos ;
   RCl = \s -> s.subj ! GSg Neut ! Inanimate ! Nom ++ s.adv ! Ag (GSg Neut) P3 ++ (verbInf s.verb) ++ s.dep ++ s.compl ! Pos ! Ag (GSg Neut) P3  ;
   IP = \s -> s.nom ;
   RP = \s -> s.s!GSg Neut!Inanimate!Nom ;
+
+lindef
+  VP = \s -> {
+    adv = \\_ => "" ;
+    verb = {
+      inf,infrefl,
+      prsg1,prsg2,prsg3,
+      prpl1,prpl2,prpl3,
+      psgm,psgs,
+      isg2,isg2refl,ipl1,
+      prtr,ptr=s;
+      asp=Imperfective ;
+      fut=NullFuture ;
+      prap={
+        msnom,fsnom,nsnom,pnom,msgen,fsgen,pgen,msdat,fsacc,
+        msins,fsins,pins,msprep=s;
+        };
+      pppa={
+        msnom,fsnom,nsnom,pnom,msgen,fsgen,pgen,msdat,fsacc,
+        msins,fsins,pins,msprep=s;
+        short=\\_=>s;
+        };
+      refltran = Trans
+    } ;
+    dep = "" ;
+    compl = \\_,_ => "" ;
+    p = Pos
+    } ;
+
 }

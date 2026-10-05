@@ -1,4 +1,4 @@
-resource ParamRus = ParamX, CommonX [Temp] ** open Prelude, Maybe in {
+resource ParamRus = ParamX - [mkAdV, AdV], CommonX [Temp] ** open Prelude, Maybe in {
   -- Mostly follows https://en.wikipedia.org/wiki/List_of_glossing_abbreviations
   -- see theory.txt
 
@@ -33,6 +33,9 @@ param
   CopulaType = NomCopula | InsCopula | EllCopula | ExplicitCopula ;
   SpecialFuture = NormalFuture | BeFuture | BeFuture2 | CanFuture | WantFuture | NullFuture ;
   DetType = NormalDet | EmptyDef | EmptyIndef ; -- artificial parameter to side-step DetNP parsing issues
+  NRelType = GenType | AdjType ;
+  AForm ;
+
 oper
   MaybeAgr = Maybe Agr ;
   MaybeNumber = Maybe Number ;
@@ -60,7 +63,9 @@ oper
     snom, sgen, sdat, sacc, sins, sprep,
     pnom, pgen, pdat, pacc, pins, pprep : Str ;
     g : Gender ;
-    anim : Animacy
+    anim : Animacy ;
+    rel : AdjForms ;
+    rt : NRelType ;
   } ;
 
   AdjForms : Type = {
@@ -70,9 +75,9 @@ oper
     fsacc,                      -- amsacc = msgen, imsacc = msnom, nsacc = nsnom
     msins, fsins, pins,         -- nsins = msins, pdat = msins ; there is also variant fsins == fsgen
     msprep,                     -- nsprep = msprep, fsprep = fsgen, msloc = msprep
-    sm, sf, sn, sp,             -- short forms
     comp                        -- comparative variants
     : Str ;
+    short : GenNum => Str ;     -- short forms
     p : Bool ;
     preferShort : ShortFormPreference
   } ;
@@ -88,6 +93,27 @@ oper
     : Str ;
   } ;
 
+  PresPartForms : Type = {
+    msnom, fsnom, nsnom, pnom,  -- pvoc = pnom
+    msgen, fsgen, pgen,         -- nsgen = msgen ; ploc = pprep = pgen = pptv (?)
+    msdat,                      -- nsdat = msdat ; fsdat = fsgen
+    fsacc,                      -- amsacc = msgen, imsacc = msnom, nsacc = nsnom
+    msins, fsins, pins,         -- nsins = msins, pdat = msins ; there is also variant fsins == fsgen
+    msprep                      -- nsprep = msprep, fsprep = fsgen, msloc = msprep
+    : Str ;
+  } ;
+
+  PastPartForms : Type = {
+    msnom, fsnom, nsnom, pnom,  -- pvoc = pnom
+    msgen, fsgen, pgen,         -- nsgen = msgen ; ploc = pprep = pgen = pptv (?)
+    msdat,                      -- nsdat = msdat ; fsdat = fsgen
+    fsacc,                      -- amsacc = msgen, imsacc = msnom, nsacc = nsnom
+    msins, fsins, pins,         -- nsins = msins, pdat = msins ; there is also variant fsins == fsgen
+    msprep                      -- nsprep = msprep, fsprep = fsgen, msloc = msprep
+    : Str ;
+    short : GenNum => Str ;     -- short forms
+  } ;
+
   ConjType     = Predef.Ints 16 ;        -- Conjugation type
   TempParts = {p1: Str; p2: Str} ;
   VerbForms : Type = {
@@ -95,17 +121,37 @@ oper
     prsg1, prsg2, prsg3, prpl1, prpl2, prpl3,
     psgm, psgs,
     isg2, ipl1, isg2refl,
-    ppps,   -- past passive participle, stem
-    pppss,   -- past passive participle, short stem
     prtr, ptr  -- present and past transgressives (converbs)
     : Str ;
     fut : SpecialFuture ;
     asp : Aspect ;
     refltran : ReflTran ;
+    prap : PresPartForms ; -- present active participle
+    pppa : PastPartForms ; -- past passive participle
     } ;
   ComplementCase : Type = {s : Str ; c : Case ; hasPrep : Bool} ;
   VerbForms2 : Type = VerbForms ** {c : ComplementCase} ;
   VerbForms3 : Type = VerbForms ** {c : ComplementCase ; c2 : ComplementCase} ;
+
+  mkPresPartForms : Str -> PresPartForms = \s -> {
+    msnom=s+"ий"; fsnom=s+"ая"; nsnom=s+"ее"; pnom=s+"ие";
+    msgen=s+"его"; fsgen=s+"ей"; pgen=s+"их"; msdat=s+"ему";
+    fsacc=s+"ую"; msins=s+"им"; fsins=s+"ей"; pins=s+"ими";
+    msprep=s+"ем"
+    } ;
+
+  mkPastPassPartForms : Str -> Str -> PastPartForms = \s,ss -> {
+    msnom=s+"ый"; fsnom=s+"ая"; nsnom=s+"ое"; pnom=s+"ые";
+    msgen=s+"ого"; fsgen=s+"ой"; pgen=s+"ых"; msdat=s+"ому";
+    fsacc=s+"ую"; msins=s+"ым"; fsins=s+"ой"; pins=s+"ыми";
+    msprep=s+"ом";
+    short = table {
+              GSg Masc => ss;
+              GSg Fem  => ss+"а";
+              GSg Neut => ss+"о";
+              GPl      => ss+"ы"
+            }
+    } ;
 
   reflTran : Reflexivity -> Transitivity -> ReflTran = \r,t ->
     case <r,t> of {

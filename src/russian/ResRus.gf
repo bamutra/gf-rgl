@@ -1,3 +1,4 @@
+--# -path=.:../abstract:../common
 resource ResRus = ParamRus ** open Prelude, InflectionRus, Maybe in {
 flags coding=utf8 ; optimize=all ;
 
@@ -31,7 +32,9 @@ oper
     pnom, pgen, pdat, pacc, pins, pprep : Str ;
     g : Gender ;
     mayben : MaybeNumber ;
-    anim : Animacy
+    anim : Animacy ;
+    rel : AdjForms ;
+    rt : NRelType ;
   } ;
   Noun2Forms = NounForms ** {c2 : ComplementCase} ;
   Noun3Forms = NounForms ** {c2,c3 : ComplementCase} ;
@@ -43,7 +46,9 @@ oper
     s : Number => Case => Str ;
     g : Gender ;
     mayben : MaybeNumber ;  -- used to control dependent words
-    anim : Animacy
+    anim : Animacy ;
+    rel : AdjForms ;
+    rt : NRelType ;
   } ;
 
   NounPhrase = {
@@ -80,61 +85,63 @@ oper
       } ;
       g = forms.g ;
       mayben=forms.mayben ;
-      anim = forms.anim
+      anim = forms.anim ;
+      rel = forms.rel ;
+      rt = forms.rt ;
     } ;
 
-  guessNounForms : Str -> NounForms
-    = \word ->
+  guessNounForms : Str -> AdjForms -> NRelType -> NounForms
+    = \word, rel, rt ->
     let nfb : NounFormsBase =
     case word of {
-      _ + "уть"                            => makeNoun word Masc Inanimate (ZN 8 No B NoC) ;
-      _ + "ий"                             => makeNoun word Masc Inanimate (ZN 7 No A NoC) ;
-      _ + "ия"                             => makeNoun word Fem Inanimate (ZN 7 No A NoC) ;
-      _ + "ие"                             => makeNoun word Neut Inanimate (ZN 7 No A NoC) ;
-      _ + "ье"                             => makeNoun word Neut Inanimate (ZN 6 Ast A NoC) ;
-      _ + "тель"                           => makeNoun word Masc Inanimate (ZN 2 No A NoC) ;
-      _ + "ь"                              => makeNoun word Fem Inanimate (ZN 8 No A NoC) ;
-      _ + "и"                              => makeNoun word Neut Inanimate ZN0 ;
-      _ + #consonant + ("к"|"х"|"г") + "а" => makeNoun word Fem Inanimate (ZN 3 Ast A NoC) ;
-      _ + ("к" | "х" | "г")                => makeNoun word Masc Inanimate (ZN 3 No A NoC) ;
-      _ + ("к" | "х" | "г") + "а"          => makeNoun word Fem Inanimate (ZN 3 No A NoC) ;
-      _ + "ца"                             => makeNoun word Fem Animate (ZN 5 No A NoC) ;
-      _ + "й"                              => makeNoun word Masc Inanimate (ZN 6 No A NoC) ;
-      _ + ("ж" | "ш" | "ч" | "щ")          => makeNoun word Masc Inanimate (ZN 4 No A NoC) ;
-      _ + "ша"                             => makeNoun word Fem Animate (ZN 4 No A NoC) ;
-      _ + ("ж" | "ш" | "ч" | "щ") + "а"    => makeNoun word Fem Inanimate (ZN 4 No A NoC) ;
-      _ + "ц"                              => makeNoun word Masc Inanimate (ZN 5 Ast A NoC) ;
-      _ + "о"                              => makeNoun word Neut Inanimate (ZN 1 No A NoC) ;
-      _ + "а"                              => makeNoun word Fem Inanimate (ZN 1 No A NoC) ;
-      _                                    => makeNoun word Masc Inanimate (ZN 1 No A NoC)
+      _ + "уть"                            => makeNoun word Masc Inanimate rel rt (ZN 8 No B NoC) ;
+      _ + "ий"                             => makeNoun word Masc Inanimate rel rt (ZN 7 No A NoC) ;
+      _ + "ия"                             => makeNoun word Fem Inanimate rel rt (ZN 7 No A NoC) ;
+      _ + "ие"                             => makeNoun word Neut Inanimate rel rt (ZN 7 No A NoC) ;
+      _ + "ье"                             => makeNoun word Neut Inanimate rel rt (ZN 6 Ast A NoC) ;
+      _ + "тель"                           => makeNoun word Masc Inanimate rel rt (ZN 2 No A NoC) ;
+      _ + "ь"                              => makeNoun word Fem Inanimate rel rt (ZN 8 No A NoC) ;
+      _ + "и"                              => makeNoun word Neut Inanimate rel rt ZN0 ;
+      _ + #consonant + ("к"|"х"|"г") + "а" => makeNoun word Fem Inanimate rel rt (ZN 3 Ast A NoC) ;
+      _ + ("к" | "х" | "г")                => makeNoun word Masc Inanimate rel rt (ZN 3 No A NoC) ;
+      _ + ("к" | "х" | "г") + "а"          => makeNoun word Fem Inanimate rel rt (ZN 3 No A NoC) ;
+      _ + "ца"                             => makeNoun word Fem Animate rel rt (ZN 5 No A NoC) ;
+      _ + "й"                              => makeNoun word Masc Inanimate rel rt (ZN 6 No A NoC) ;
+      _ + ("ж" | "ш" | "ч" | "щ")          => makeNoun word Masc Inanimate rel rt (ZN 4 No A NoC) ;
+      _ + "ша"                             => makeNoun word Fem Animate rel rt (ZN 4 No A NoC) ;
+      _ + ("ж" | "ш" | "ч" | "щ") + "а"    => makeNoun word Fem Inanimate rel rt (ZN 4 No A NoC) ;
+      _ + "ц"                              => makeNoun word Masc Inanimate rel rt (ZN 5 Ast A NoC) ;
+      _ + "о"                              => makeNoun word Neut Inanimate rel rt (ZN 1 No A NoC) ;
+      _ + "а"                              => makeNoun word Fem Inanimate rel rt (ZN 1 No A NoC) ;
+      _                                    => makeNoun word Masc Inanimate rel rt (ZN 1 No A NoC)
     } in
     noMinorCases nfb ;
 
-  guessLessNounForms : Str -> Gender -> Animacy -> NounForms
-    = \word, g, anim ->
+  guessLessNounForms : Str -> Gender -> Animacy -> AdjForms -> NRelType -> NounForms
+    = \word, g, anim, rel, rt ->
     let nfb : NounFormsBase =
     case word of {
-      _ + "уть"                            => makeNoun word g anim (ZN 8 No B NoC) ;
-      _ + "ий"                             => makeNoun word g anim (ZN 7 No A NoC) ;
-      _ + "ия"                             => makeNoun word g anim (ZN 7 No A NoC) ;
-      _ + "ие"                             => makeNoun word g anim (ZN 7 No A NoC) ;
-      _ + "ье"                             => makeNoun word g anim (ZN 6 Ast A NoC) ;
-      _ + "тель"                           => makeNoun word g anim (ZN 2 No A NoC) ;
-      _ + "ь"                              => makeNoun word g anim
+      _ + "уть"                            => makeNoun word g anim rel rt (ZN 8 No B NoC) ;
+      _ + "ий"                             => makeNoun word g anim rel rt (ZN 7 No A NoC) ;
+      _ + "ия"                             => makeNoun word g anim rel rt (ZN 7 No A NoC) ;
+      _ + "ие"                             => makeNoun word g anim rel rt (ZN 7 No A NoC) ;
+      _ + "ье"                             => makeNoun word g anim rel rt (ZN 6 Ast A NoC) ;
+      _ + "тель"                           => makeNoun word g anim rel rt (ZN 2 No A NoC) ;
+      _ + "ь"                              => makeNoun word g anim rel rt
                                                (case g of {Fem => (ZN 8 No A NoC); _ => (ZN 2 No A NoC)});
-      _ + "и"                              => makeNoun word g anim ZN0 ;
-      _ + #consonant + ("к"|"х"|"г") + "а" => makeNoun word g anim (ZN 3 Ast A NoC) ;
-      _ + ("к" | "х" | "г")                => makeNoun word g anim (ZN 3 No A NoC) ;
-      _ + ("к" | "х" | "г") + "а"          => makeNoun word g anim (ZN 3 No A NoC) ;
-      _ + "ца"                             => makeNoun word g anim (ZN 5 No A NoC) ;
-      _ + "й"                              => makeNoun word g anim (ZN 6 No A NoC) ;
-      _ + ("ж" | "ш" | "ч" | "щ")          => makeNoun word g anim (ZN 4 No A NoC) ;
-      _ + "ша"                             => makeNoun word g anim (ZN 4 No A NoC) ;
-      _ + ("ж" | "ш" | "ч" | "щ") + "а"    => makeNoun word g anim (ZN 4 No A NoC) ;
-      _ + "ц"                              => makeNoun word g anim (ZN 5 Ast A NoC) ;
-      _ + "о"                              => makeNoun word g anim (ZN 1 No A NoC) ;
-      _ + "а"                              => makeNoun word g anim (ZN 1 No A NoC) ;
-      _                                    => makeNoun word g anim (ZN 1 No A NoC)
+      _ + "и"                              => makeNoun word g anim rel rt ZN0 ;
+      _ + #consonant + ("к"|"х"|"г") + "а" => makeNoun word g anim rel rt (ZN 3 Ast A NoC) ;
+      _ + ("к" | "х" | "г")                => makeNoun word g anim rel rt (ZN 3 No A NoC) ;
+      _ + ("к" | "х" | "г") + "а"          => makeNoun word g anim rel rt (ZN 3 No A NoC) ;
+      _ + "ца"                             => makeNoun word g anim rel rt (ZN 5 No A NoC) ;
+      _ + "й"                              => makeNoun word g anim rel rt (ZN 6 No A NoC) ;
+      _ + ("ж" | "ш" | "ч" | "щ")          => makeNoun word g anim rel rt (ZN 4 No A NoC) ;
+      _ + "ша"                             => makeNoun word g anim rel rt (ZN 4 No A NoC) ;
+      _ + ("ж" | "ш" | "ч" | "щ") + "а"    => makeNoun word g anim rel rt (ZN 4 No A NoC) ;
+      _ + "ц"                              => makeNoun word g anim rel rt (ZN 5 Ast A NoC) ;
+      _ + "о"                              => makeNoun word g anim rel rt (ZN 1 No A NoC) ;
+      _ + "а"                              => makeNoun word g anim rel rt (ZN 1 No A NoC) ;
+      _                                    => makeNoun word g anim rel rt (ZN 1 No A NoC)
     } in
     noMinorCases nfb ;
 
@@ -146,7 +153,8 @@ oper
       sloc = base.sprep ;
       sptv = base.sgen ;
       svoc = base.snom ;
-      mayben = BothSgPl
+      mayben = BothSgPl ;
+      rt = base.rt ;
     } ;
 
   mkNAltPl : NounForms -> NounForms -> NounForms
@@ -195,11 +203,17 @@ oper
   ellNoun : NounForms -> NounForms
    = \n -> noMinorCases (immutableNounCases "" n.g n.anim) ;
 
+  orPol : Polarity -> Polarity -> Polarity = \p1,p2 ->
+      case p1 of {
+        Neg => Neg;
+        Pos => p2
+      } ;
+
   AgrTable = Agr => Str ;
   ComplTable = Polarity => Agr => Str ;
   PolarityTable = Polarity => Str ;
 
-  from2 = {s="из" ; c=Gen ; neggen=True ; hasPrep=True} ;
+  from2 = {s="из" ; c=Gen ; hasPrep=True} ;
 
   mkCompoundN : NounForms -> Str -> NounForms -> NounForms
     = \n1,link,n2 ->
@@ -219,8 +233,9 @@ oper
         pdat = n1.pdat ++ l ++ n2.pdat ;
         pacc = n1.pacc ++ l ++ n2.pacc ;
         pins = n1.pins ++ l ++ n2.pins ;
-        pprep = n1.pprep ++ l ++ n2.pprep
+        pprep = n1.pprep ++ l ++ n2.pprep ;
       } ;
+
 
 ---------------------------
 -- Adjectives -- Прилагательные
@@ -229,16 +244,18 @@ oper
 
   Adjective : Type = {
     s : AdjTable ;
-    short : AgrTable ;
+    short : GenNum => Str ;
     preferShort : ShortFormPreference
     } ;
 
   pronToAdj : PronForms -> AdjForms
     = \base -> base ** {
-      sm = base.msnom ; -- these are incorrect, but empty causes parsing problems
-      sf = base.fsnom ;
-      sn = base.nsnom ;
-      sp = base.pnom ;
+      short = table {
+                GSg Masc => base.msnom ; -- these are incorrect, but empty causes parsing problems
+                GSg Fem  => base.fsnom ;
+                GSg Neut => base.nsnom ;
+                GPl      => base.pnom
+              } ;
       comp = base.nsnom ;
       preferShort = PreferFull ;
       p = False
@@ -251,15 +268,12 @@ oper
 
   mkAltShort : AdjForms -> AdjForms -> AdjForms
     = \full, short -> full ** {
-      sm =  short.sm ;
-      sf =  short.sf ;
-      sn =  short.sn ;
-      sp =  short.sp
+      short =  short.short
     } ;
 
   adjFormsAdjective : AdjForms -> Adjective
     = \forms -> {
-      short = adjFormsToShort forms ;
+      short = forms.short ;
       s = table {
         GSg Fem => table {
           (Inanimate|Animate) => table {
@@ -336,8 +350,6 @@ oper
           }
         }
       } ;
-      g = forms.g ;
-      -- a = forms.a ;
       preferShort = forms.preferShort
     } ;
 
@@ -390,6 +402,8 @@ oper
   the_most = guessAdjectiveForms "самый" ;
   utmost_Adv = makeAdverb "наиболее" ;
 
+
+
   -- [ISACHENKO],p.220 there are three forms in Russian: самый важный; наиболее важный/важен; важнее (всех, всего)
   -- here only first one:
   long_superlative : AdjForms -> AdjForms
@@ -407,12 +421,8 @@ oper
       fsins = the_most.fsins  ++ af.fsins ;
       pins  = the_most.pins   ++ af.pins  ;
       msprep= the_most.msprep ++ af.msprep;
-      sm    = the_most.sm     ++ af.sm    ;
-      sf    = the_most.sf     ++ af.sf    ;
-      sn    = the_most.sn     ++ af.sn    ;
-      sp    = the_most.sp     ++ af.sp    ;
+      short = \\gn => the_most.short ! gn ++ af.short ! gn ;
       comp  = the_most.comp   ++ af.comp  ;
-      g=af.g ;
       preferShort = PreferFull ;
       p = af.p
     } ;
@@ -432,12 +442,13 @@ oper
       fsins = pf.fsins ++ the_most.fsins  ++ af.fsins ;
       pins  = pf.pins  ++ the_most.pins   ++ af.pins  ;
       msprep= pf.msprep++ the_most.msprep ++ af.msprep;
-      sm    = pf.msnom ++ the_most.sm     ++ af.sm    ;
-      sf    = pf.fsnom ++ the_most.sf     ++ af.sf    ;
-      sn    = pf.nsnom ++ the_most.sn     ++ af.sn    ;
-      sp    = pf.pnom  ++ the_most.sp     ++ af.sp    ;
+      short = table {
+                GSg Masc => pf.msnom ++ the_most.short ! (GSg Masc) ++ af.short ! (GSg Masc) ;
+                GSg Fem  => pf.fsnom ++ the_most.short ! (GSg Fem)  ++ af.short ! (GSg Fem) ;
+                GSg Neut => pf.nsnom ++ the_most.short ! (GSg Neut) ++ af.short ! (GSg Neut) ;
+                GPl      => pf.pnom  ++ the_most.short ! GPl        ++ af.short ! GPl
+              } ;
       comp  = pf.msnom ++ the_most.comp   ++ af.comp  ;
-      g=af.g ;
       preferShort = PreferFull ;
       p = af.p
     } ;
@@ -496,6 +507,8 @@ oper
           sloc = af.fsgen ;
           sptv = af.fsgen ;
           svoc = af.fsnom ;
+          rel = af ;
+          rt = GenType ;
           g=g ;
           mayben=BothSgPl ;
           anim=anim
@@ -516,6 +529,8 @@ oper
           sloc = af.msprep ;
           sptv = af.msgen ;
           svoc = af.msnom ;
+          rel = af ;
+          rt = GenType ;
           g=g ;
           mayben=BothSgPl ;
           anim=anim
@@ -536,43 +551,36 @@ oper
           sloc = af.msprep ;
           sptv = af.msgen ;
           svoc = af.nsnom ;
+          rel = af ;
+          rt = GenType ;
           g=g ;
           mayben=BothSgPl ;
           anim=anim
         }
       } ;
 
-  adjFormsToShort : AdjForms -> AgrTable
-    = \af -> table {
-      Ag (GSg Fem) _ => af.sf ;
-      Ag (GSg Masc) _ => af.sm ;
-      Ag (GSg Neut) _ => af.sn ;
-      Ag GPl _ => af.sp
-    } ;
-
   mkCompoundA : AdjForms -> Str -> AdjForms -> AdjForms
     = \a1,link,a2 ->
       let l : Str=case link of {x+"-" => BIND ++ "-" ++ BIND ; _ => link} in
       a2 ** {
-      msnom = a1.sn ++ l ++ a2.msnom ;
-      fsnom = a1.sn ++ l ++ a2.fsnom ;
-      nsnom = a1.sn ++ l ++ a2.nsnom ;
-      pnom  = a1.sn ++ l ++ a2.pnom  ;
-      msgen = a1.sn ++ l ++ a2.msgen ;
-      fsgen = a1.sn ++ l ++ a2.fsgen ;
-      pgen  = a1.sn ++ l ++ a2.pgen  ;
-      msdat = a1.sn ++ l ++ a2.msdat ;
-      fsacc = a1.sn ++ l ++ a2.fsacc ;
-      msins = a1.sn ++ l ++ a2.msins ;
-      fsins = a1.sn ++ l ++ a2.fsins ;
-      pins  = a1.sn ++ l ++ a2.pins  ;
-      msprep= a1.sn ++ l ++ a2.msprep;
-      sm    = a1.sn ++ l ++ a2.sm    ;
-      sf    = a1.sn ++ l ++ a2.sf    ;
-      sn    = a1.sn ++ l ++ a2.sn    ;
-      sp    = a1.sn ++ l ++ a2.sp    ;
-      comp  = a1.sn ++ l ++ a2.comp  ;
+      msnom = a1.short ! GSg Neut ++ l ++ a2.msnom ;
+      fsnom = a1.short ! GSg Neut ++ l ++ a2.fsnom ;
+      nsnom = a1.short ! GSg Neut ++ l ++ a2.nsnom ;
+      pnom  = a1.short ! GSg Neut ++ l ++ a2.pnom  ;
+      msgen = a1.short ! GSg Neut ++ l ++ a2.msgen ;
+      fsgen = a1.short ! GSg Neut ++ l ++ a2.fsgen ;
+      pgen  = a1.short ! GSg Neut ++ l ++ a2.pgen  ;
+      msdat = a1.short ! GSg Neut ++ l ++ a2.msdat ;
+      fsacc = a1.short ! GSg Neut ++ l ++ a2.fsacc ;
+      msins = a1.short ! GSg Neut ++ l ++ a2.msins ;
+      fsins = a1.short ! GSg Neut ++ l ++ a2.fsins ;
+      pins  = a1.short ! GSg Neut ++ l ++ a2.pins  ;
+      msprep= a1.short ! GSg Neut ++ l ++ a2.msprep;
+      short = \\gn => a1.short ! GSg Neut ++ l ++ a2.short ! gn ;
+      comp  = a1.short ! GSg Neut ++ l ++ a2.comp  ;
       } ;
+
+
 
 ---------------------
 -- Verbs -- Глаголы
@@ -584,6 +592,81 @@ oper
 -- we can store the sya-schema and 'BIND++' as necessary.
 
 oper
+  VP : Type = {
+    adv : AgrTable ;  -- modals are in position of adverbials ones numgen gets fixed
+    verb : ResRus.VerbForms ;
+    dep : Str ;  -- dependent infinitives and such
+    compl : ComplTable ;
+    p : Polarity
+    } ;
+
+  VPSlash = {
+    adv : AgrTable ;  -- modals are in position of adverbials ones numgen gets fixed
+    verb : VerbForms ;
+    dep : Str ;  -- dependent infinitives and such
+    compl1 : ComplTable ;
+    compl2 : ComplTable ;
+    c : ComplementCase ;
+    isSimple : Bool ;    -- regulates the place of participle used as adjective
+    p : Polarity
+    } ; ----
+
+  slashV : VerbForms -> ComplementCase -> VPSlash = \verb,c -> {
+      verb     = verb ;
+      adv      = \\a => [];
+      compl1   = \\_,a => [] ;
+      compl2   = \\_,a => [] ;
+      dep      = [] ;
+      c        = c ;
+      p        = Pos ;
+      isSimple = True
+    } ;
+
+  insertSlashObjA : Adjective -> ComplementCase -> VPSlash -> VPSlash = \ap,c,slash -> {
+      verb     = slash.verb ;
+      adv     = slash.adv ;
+      compl1 = slash.compl1 ;
+      compl2 = \\p,a => case p of {
+           Pos => case ap.preferShort of {
+             PreferFull => slash.compl2 ! p ! a ++ ap.s ! agrGenNum a ! Animate ! slash.c.c ;
+             PrefShort => slash.compl2 ! p ! a ++ ap.short ! agrGenNum a
+             } ;
+           Neg => case ap.preferShort of {
+             PreferFull => case neggen slash.c of {
+                 False => slash.compl2 ! p ! a ++ ap.s ! agrGenNum a ! Animate ! slash.c.c ;
+                 True  => slash.compl2 ! p ! a ++ ap.s ! agrGenNum a ! Animate ! Gen
+              } ;
+             PrefShort => slash.compl2 ! p ! a ++ ap.short ! agrGenNum a
+             }
+           } ;
+      c = {s="" ; c=Acc ; hasPrep=False};
+      dep = slash.dep ;
+      isSimple = False ;
+      p = slash.p
+      } ;
+
+  insertSlashObj1 : (Polarity => Agr => Str) -> ComplementCase -> VPSlash -> VPSlash = \obj,c,slash -> {
+      verb     = slash.verb ;
+      adv     = slash.adv;
+      compl1 =\\p,a => slash.compl1 ! p ! a ++ obj ! p ! a;
+      compl2 = slash.compl2 ;
+      c     = slash.c ;
+      dep = slash.dep ;
+      isSimple = False ;
+      p = slash.p
+      } ;
+
+   insertSlashObj2 : (Polarity => Agr => Str) -> ComplementCase -> VPSlash -> VPSlash = \obj,c,slash -> {
+      verb     = slash.verb ;
+      adv     = slash.adv;
+      compl1 = slash.compl1 ;
+      compl2 =\\p,a => slash.compl2 ! p ! a ++ obj ! p ! a;
+      c     = slash.c ;
+      dep = slash.dep ;
+      isSimple = False ;
+      p = slash.p
+      } ;
+
 
   guessVerbForms : Aspect -> Transitivity -> Str -> Str -> Str -> VerbForms
     = \asp,tran,inf,sg1,sg3 ->
@@ -629,17 +712,21 @@ oper
         _ => passivateNonReflexive vf
       } ;
 
-  shortPastPassPart : VerbForms -> GenNum -> Str
-    = \vf,gn ->
-      case vf.refltran of {
-        Trans => case <vf.fut,gn> of {
-          <NormalFuture,GSg Masc> => vf.pppss ;
-          <NormalFuture,GSg Fem> => vf.pppss ++ BIND ++ "а" ;
-          <NormalFuture,GSg Neut> => vf.pppss ++ BIND ++ "о" ;
-          <NormalFuture,GPl> => vf.pppss ++ BIND ++ "ы" ;
-          _ => vf.pppss } ;
-        _ => variants {}
-        } ;
+  presActPart : VerbForms -> Adjective =
+    \v -> adjFormsAdjective (v.prap ** {
+              short = table {
+                        GSg Masc => v.prap.msnom;
+                        GSg Fem  => v.prap.fsnom;
+                        GSg Neut => v.prap.nsnom;
+                        GPl      => v.prap.pnom
+                      } ;
+              comp = [] ;
+              p = False ;
+              preferShort = PreferFull
+            }) ;
+
+  pastPassPart : VerbForms -> Adjective =
+    \v -> adjFormsAdjective (v.pppa ** {comp = []; p = False ; preferShort = PreferFull}) ;
 
   copula : VerbForms
     = {
@@ -657,8 +744,8 @@ oper
       isg2="будь";
       isg2refl="явись" ; -- ?
       ipl1="давайте будем";
-      ppps="явленн";   --*
-      pppss="явлен";   --*
+      prap=mkPresPartForms "являющ";
+      pppa=mkPastPassPartForms "явленн" "явлен";
       prtr="будучи";
       ptr="быв";
       asp=Imperfective;
@@ -722,8 +809,8 @@ oper
       isg2refl="будь способны" ;   -- *
       isg2="будь способен";  -- some improvisation here
       ipl1="давайте будем способны";   -- maybe, special like for future?
-      ppps=""; --*
-      pppss=""; --*
+      prap=mkPresPartForms "могущ";
+      pppa=mkPastPassPartForms "" "";
       prtr="могши";  --*
       ptr="могши";
       asp=Imperfective;
@@ -746,8 +833,8 @@ oper
       isg2="желай";
       isg2refl="желайся" ;
       ipl1="давайте будем хотеть";
-      ppps="хотим";  -- *
-      pppss="хотим";  -- *
+      prap=mkPresPartForms "хотящ";
+      pppa=mkPastPassPartForms "хотим" "хотим";
       prtr="хотя";
       ptr="хотев";
       asp=Imperfective;
@@ -760,10 +847,11 @@ oper
       prsg1, prsg2, prsg3, prpl1, prpl2, prpl3,
       psgm, psgs,
       isg2, isg2refl, ipl1,
-      ppps, pppss,
       prtr, ptr ="";
       fut=NullFuture ;
       asp=Imperfective;
+      prap=mkPresPartForms "";
+      pppa=mkPastPassPartForms "" "";
       refltran = Trans ; -- used to be refl=NonReflexive; tran=Transitive
     } ;
 
@@ -844,7 +932,7 @@ oper
         BeFuture => case <m,temp, pol.p> of {
           <Ind, Past, _> => subj ++ pol.s ++ adv ++ verbPastAgree vf a "" ;
           <Ind, Pres, Pos> => subj ++ pol.s ++ adv ++ verbPresAgree vf a ;
-          <Ind, Pres, Neg> => subj ++ "не" ++ adv ;
+          <Ind, Pres, Neg> => subj ++ pol.s ++ adv ;
           <Ind, Fut, _> => subj ++ pol.s ++ adv ++ verbFutAgree vf a ;
           <Ind, Cond, _> => subj ++ pol.s ++ adv ++ verbPastAgree vf a "бы" ;
           <Sbjv, _, _> => subj ++ pol.s ++ adv ++ verbPastAgree vf a "бы" ;
@@ -1206,10 +1294,10 @@ oper
     = \ch, a, anim -> {  -- "ч", "нич"
       a = a ;
       anim=anim ;
-      nom, voc = ch + "то" ;
-      gen, acc, ptv = ch + "его" ;
+      nom = ch + "то" ;
+      gen, acc = ch + "его" ;
       dat = ch + "ему" ;
-      prep, loc = ch + "ём" ;
+      prep = ch + "ём" ;
       ins = ch + "ем" ;
       poss = {
         msnom = ch + "ей" ;
@@ -1233,10 +1321,10 @@ oper
       let subPoss = (Predef.tk 1 ch) + "ч" in {
       a = a ;
       anim=anim ;
-      nom, voc = ch + "то" ;
-      gen, acc, ptv = ch + "ого" ;
+      nom = ch + "то" ;
+      gen, acc = ch + "ого" ;
       dat = ch + "ому" ;
-      prep, loc = ch + "ом" ;
+      prep = ch + "ом" ;
       ins = ch + "ем" ;
       poss = (doChPron subPoss a anim).poss
       } ;
@@ -1314,12 +1402,11 @@ oper
       pacc=n.s ! Pl ! Acc ;
       pins=n.s ! Pl ! Ins ;
       pprep=n.s ! Pl ! Pre ;
-      ploc=n.s ! Pl ! Loc ;
-      pptv=n.s ! Pl ! Ptv ;
-      pvoc=n.s ! Pl ! VocRus ;
       g=n.g ;
       mayben=n.mayben ;
-      anim=n.anim
+      anim=n.anim ;
+      rel=n.rel ;
+      rt =n.rt ;
     } ;
 
   caseTableToRecord : (Case => Str) -> Agr -> Animacy -> IPronounForms
@@ -1364,15 +1451,21 @@ oper
     pins  = "тех" ;
     msprep = "том" ;
     preferShort = PreferFull ;
+    short = table {
+              GSg Masc => "тот" ;
+              GSg Fem => "та" ;
+              GSg Neut => "то" ;
+              GPl => "те"
+            } ;
     comp = [] ;
     p = False
     } ;
 
   this_forms = {
-    msnom, sm = "этот" ;
-    fsnom, sf = "эта" ;
-    nsnom, sn = "это" ;
-    pnom, sp = "эти" ;
+    msnom = "этот" ;
+    fsnom = "эта" ;
+    nsnom = "это" ;
+    pnom = "эти" ;
     msgen = "этого" ;
     fsgen = "этой" ;
     pgen  = "этих" ;
@@ -1383,15 +1476,21 @@ oper
     pins  = "этими" ;
     msprep = "этом" ;
     preferShort = PreferFull ;
+    short = table {
+              GSg Masc => "этот" ;
+              GSg Fem  => "эта" ;
+              GSg Neut => "это" ;
+              GPl      => "эти"
+            } ;
     comp = [] ;
     p = False
     } ;
 
   a_forms = { -- this pronoun is an approximate translation of indef article; preventing DetNP parsing problems
-    msnom, sm = "некий" ;
-    fsnom, sf = "некая" ;
-    nsnom, sn = "некое" ;
-    pnom, sp = "некие" ;
+    msnom = "некий" ;
+    fsnom = "некая" ;
+    nsnom = "некое" ;
+    pnom = "некие" ;
     msgen = "некого" ;
     fsgen = "некой" ;
     pgen  = "неких" ;
@@ -1402,6 +1501,12 @@ oper
     pins  = "неким" ;
     msprep = "некой" ;
     preferShort = PreferFull ;
+    short = table {
+              GSg Masc => "некий" ;
+              GSg Fem  => "некая" ;
+              GSg Neut => "некое" ;
+              GPl      => "некие"
+           } ;
     comp = [] ;
     p = False
     } ;
@@ -1438,6 +1543,12 @@ oper
     pins  = "данных" ;
     msprep = "данном" ;
     preferShort = PreferFull ;
+    short = table {
+              GSg Masc => "данный" ;
+              GSg Fem  => "данная" ;
+              GSg Neut => "данное" ;
+              GPl      => "данные"
+            } ;
     comp = [] ;
     p = False
     } ;
@@ -1465,7 +1576,9 @@ oper
 param DForm = unit | teen | ten | hund ;
 param Place = attr | indep ;
 oper
-  mille : Noun = nounFormsNoun ((guessNounForms "тысяча") ** {sins=variants {"тысячей" ; "тысячью"}});
+  mille : Noun = nounFormsNoun ((guessNounForms "тысяча" (doGuessAdjectiveForms "тысячный") AdjType) ** {sins=variants {"тысячей" ; "тысячью"}});
+  million : Noun = nounFormsNoun (guessNounForms "миллион" (doGuessAdjectiveForms "миллионный") AdjType) ;
+  milliard : Noun = nounFormsNoun (guessNounForms "миллиард" (doGuessAdjectiveForms "миллиардный") AdjType) ;
 
   ith_forms : Str -> AdjForms
     = \s -> {
@@ -1482,7 +1595,7 @@ oper
       fsins = s ++ BIND ++ "-й" ;
       pins  = s ++ BIND ++ "-ми" ;
       msprep= s ++ BIND ++ "-м" ;
-      sm, sf, sn, sp = s ;
+      short = \\_ => s ;
       comp = s ++ BIND ++ "-е" ; --*
       p = False ;
       preferShort=PreferFull
@@ -1495,6 +1608,7 @@ oper
 
   makeAdverb : Str -> Adverb
     = \word -> {s=word} ;
+
 
 --------------------------------
 -- combining nouns with numerals
@@ -1586,7 +1700,7 @@ oper
       ++ mfa.sacc ++ "," ++ ffa.sacc ++ "," ++ nfa.sacc ++ "," ++ mfa.pacc ++ ","
       ++ mf.sins  ++ "," ++ ff.sins  ++ "," ++ nf.sins  ++ "," ++ mf.pins  ++ ","
       ++ mf.sprep ++ "," ++ ff.sprep ++ "," ++ nf.sprep ++ "," ++ mf.pprep ++ ","
-      ++ af.sm    ++ "," ++ af.sf    ++ "," ++ af.sn    ++ "," ++ af.sp    ++ ","
+      ++ af.short ! (GSg Masc) ++ "," ++ af.short ! (GSg Fem) ++ "," ++ af.short ! (GSg Neut) ++ "," ++ af.short ! GPl ++ ","
       ++ af.comp
       ;
 
@@ -1594,8 +1708,8 @@ oper
     let fut : Agr=>Str = \\a => verbFutAgree v a in
     let pres : Agr=>Str = \\a => verbPresAgree v a in
     let past : Agr=>Str = \\a => verbPastAgree v a "" in
-    let imp : Agr=>Str = \\a => ((verbImperativeAgree v a).p1 ++ (verbImperativeAgree v a).p2) in
-    let ppp : GenNum=>Str = \\gn => shortPastPassPart v gn in
+    let imp : Agr=>Str = \\a => (verbImperativeAgree v a).p1 ++ (verbImperativeAgree v a).p2 in
+    let ppp : GenNum=>Str = variants {} {-(pastPassPart v).short-} in
     let inf = verbInf v in
     inf ++ "-"
       ++ inf ++ ","

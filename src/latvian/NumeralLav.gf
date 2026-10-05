@@ -1,6 +1,6 @@
 --# -path=.:abstract:common:prelude
 
-concrete NumeralLav of Numeral = CatLav [Numeral,Digits] ** open ResLav, ParadigmsLav, Prelude in {
+concrete NumeralLav of Numeral = CatLav [Numeral,Digits,Decimal] ** open ResLav, ParadigmsLav, Prelude in {
 
 flags coding = utf8 ;
 
@@ -12,6 +12,8 @@ lincat
   Sub100 = { s : CardOrd => Gender => Case => Str ; num : Number } ;
   Sub1000 = { s : CardOrd => Gender => Case => Str ; num : Number } ;
   Sub1000000 = { s : CardOrd => Gender => Case => Str ; num : Number } ;
+  Sub1000000000 = { s : CardOrd => Gender => Case => Str ; num : Number } ;
+  Sub1000000000000 = { s : CardOrd => Gender => Case => Str ; num : Number } ;
 
 lin
 
@@ -57,6 +59,8 @@ lin
 
   pot1as2 n = n ;
 
+  pot21 = {s = \\_,_,_ => "simts" ; num = Pl} ;
+
   -- FIXME: nav īsti labi, kārtas skaitlim ir jābūt 'trīssimtais' utml
   pot2 d = {
     s = \\o,g,c => d.s ! NCard ! Masc ! Nom ++ simts ! o ! g ! d.num ! c ;
@@ -70,6 +74,8 @@ lin
 
   pot2as3 n = n ;
 
+  pot31 = {s = \\_,_,_ => "tūkstotis" ; num = Pl} ;
+
   pot3 d = {
     s = \\o,g,c => d.s ! NCard ! Masc ! Nom ++ tuukstotis ! o ! g ! d.num ! c ;
     num = Pl
@@ -79,6 +85,32 @@ lin
     s = \\o,g,c => d.s ! NCard ! Masc ! Nom ++ tuukstotis ! NCard ! Masc ! d.num ! Nom ++ e.s ! o ! g ! c ;
     num = e.num
   } ;
+
+  pot3as4 n = n ;
+
+  pot3decimal d = {s = \\_,_,_ => d.s ! NCard ++ "tūkstoši" ; num = Pl} ;
+
+  pot41 = {s = \\_,_,_ => "miljons" ; num = Pl} ;
+  pot4 n = {
+    s = \\_,_,_ => n.s ! NCard ! Masc ! Nom ++ "miljoni" ; num = Pl
+  } ;
+  pot4plus n m = {
+    s = \\o,g,c => n.s ! NCard ! Masc ! Nom ++ "miljoni" ++ m.s ! o ! g ! c ;
+    num = m.num
+  } ;
+  pot4decimal d = {s = \\_,_,_ => d.s ! NCard ++ "miljoni" ; num = Pl} ;
+
+  pot4as5 n = n ;
+
+  pot51 = {s = \\_,_,_ => "miljards" ; num = Pl} ;
+  pot5 n = {
+    s = \\_,_,_ => n.s ! NCard ! Masc ! Nom ++ "miljardi" ; num = Pl
+  } ;
+  pot5plus n m = {
+    s = \\o,g,c => n.s ! NCard ! Masc ! Nom ++ "miljardi" ++ m.s ! o ! g ! c ;
+    num = m.num
+  } ;
+  pot5decimal d = {s = \\_,_,_ => d.s ! NCard ++ "miljardi" ; num = Pl} ;
 
 -- Numerals as sequences of digits:
 
@@ -103,6 +135,20 @@ lin
   D_7 = mkDig "7" ;
   D_8 = mkDig "8" ;
   D_9 = mkDig "9" ;
+
+  PosDecimal d = d ** {hasDot=False} ;
+  NegDecimal d = {
+    s = \\o => "-" ++ BIND ++ d.s ! o ;
+    num = Pl ;
+    hasDot=False
+  } ;
+  IFrac d i = {
+    s = \\o => d.s ! NCard ++
+               if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+               i.s ! o;
+    num = Pl ;
+    hasDot=True
+    } ;
 
 oper
   mkDig : Str -> Dig = \c -> mk2Dig c Pl ;

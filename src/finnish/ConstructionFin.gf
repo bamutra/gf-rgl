@@ -29,6 +29,9 @@ lin
   is_wrong_VP = mkVP (ParadigmsFin.mkAdv "väärässä") ;
 
   n_units_AP card cn a = mkAP (lin AdA (mkUtt (lin NP (mkNP <lin Card card : Card> (lin CN cn))))) (lin A a) ;
+  n_units_of_NP card cn np =
+    mkNP (mkNP <lin Card card : Card> (lin CN cn))
+         (SyntaxFin.mkAdv part_Prep (lin NP np)) ;
 
   bottle_of_CN np = mkCN (lin N2 (mkN2 (mkN "pullo") (mkPrep partitive)))  (lin NP np) |  mkCN (lin N2 (mkN2 (mkN "pullollinen") (mkPrep partitive)))  (lin NP np);
   cup_of_CN    np = mkCN (lin N2 (mkN2 (mkN "kuppi") (mkPrep partitive)))  (lin NP np) | mkCN (lin N2 (mkN2 (mkN "kupillinen") (mkPrep partitive)))  (lin NP np) ;
@@ -74,9 +77,10 @@ lin
   yearAdv y = SyntaxFin.mkAdv (prePrep nominative "vuonna") y ;
   dayMonthAdv d m = ParadigmsFin.mkAdv ((mkUtt d).s ++ BIND ++ "." ++ (mkUtt (mkNP m)).s) ;
   monthYearAdv m y = SyntaxFin.mkAdv in_Prep (mkNP (mkNP m) (SyntaxFin.mkAdv (casePrep nominative) y)) ;
-----  dayMonthYearAdv d m y =
-----    lin Adv {s = d.s ! R.NPCase R.Nom ++ BIND ++ "." ++ m.s ! R.NCase R.Sg R.Part ++ y.s ! R.NPCase R.Nom} ;
-
+  dayMonthYearAdv d m y =
+    ParadigmsFin.mkAdv ((mkUtt d).s ++ BIND ++ "." ++
+    (SyntaxFin.mkAdv part_Prep (mkNP m)).s ++
+    (SyntaxFin.mkAdv (casePrep nominative) y).s) ;
   intYear = symb ;
   intMonthday = symb ;
 

@@ -18,7 +18,7 @@ lin
 
   ImpVP vp = { s = \\pol,num => vp.v.s ! pol ! (VImp num) ++ vp.compl ! (AgrP2 num Masc) } ;
 
-  SlashVP np vp = mkClause np vp ** { prep = vp.rightVal } ;
+  SlashVP np vp = mkClause np (lin VP vp) ** { prep = vp.rightVal } ;
 
   AdvSlash slash adv = {
     s  = \\m,p => slash.s ! m ! p ++ adv.s ;
@@ -61,8 +61,15 @@ lin
 
   UseSlash t p slash = { s = t.s ++ p.s ++ slash.s ! (Ind t.a t.t) ! p.p ; prep = slash.prep } ;
 
-  -- FIXME: placeholder
-  AdvS a s = { s = NON_EXISTENT } ;
+  AdvS a s = { s = a.s ++ s.s } ;
+
+  ExtAdvS a s = {s = a.s ++ "," ++ s.s} ;
+
+  SSubjS s1 subj s2 = {s = s1.s ++ "," ++ subj.s ++ s2.s} ;
+
+  AdvImp adv imp = {
+    s = \\pol,num => adv.s ++ imp.s ! pol ! num
+  } ;
 
 oper
   -- TODO: PassV2 verbs jāsaskaņo ar objektu, nevis subjektu (by8means_Prep: AgP3 Sg Masc)

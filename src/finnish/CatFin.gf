@@ -66,12 +66,14 @@ concrete CatFin of Cat = CommonX ** open ResFin, StemFin, Prelude in {
     Predet = {s : Number => NPForm => Str} ;
     Quant  = {s1,sp : Number => Case => Str ; s2 : Harmony => Str ; isPoss : Bool ; isDef : Bool ; isNeg : Bool} ;
     Card   = {s : Number => Case => Str ; n : Number} ;
+    ACard  = {s : Number => Case => Str ; n : Number} ;
     Num    = {s : Number => Case => Str ; isNum : Bool ; n : Number} ;
 
 -- Numeral
 
     Numeral = {s : CardOrd => Str ; n : Number} ;
     Digits  = {s : CardOrd => Str ; n : Number} ;
+    Decimal  = {s : CardOrd => Str ; n : Number ; hasDot : Bool} ;
 
 -- Structural
 
@@ -96,11 +98,14 @@ concrete CatFin of Cat = CommonX ** open ResFin, StemFin, Prelude in {
     N2 = SNoun ** {c2 : Compl ; isPre : Bool ; postmod : Number => Str} ;
     N3 = SNoun ** {c2,c3 : Compl ; isPre,isPre2 : Bool} ;
     PN = SPN ;
+    LN = SPN ** {n : Number ; extCase : Bool} ; -- extCase=True -> Adessive, Ablative, Allative
+    GN = SPN ** {g : Sex} ;
+    SN = {s : Sex => SPN; pl : SPN} ;
 
   linref
     SSlash = \ss -> ss.s ++ ss.c2.s.p1  ;
     ClSlash = \cls -> cls.s ! Pres ! Simul ! Pos ++ cls.c2.s.p1 ;
-    NP = \np -> np.s ! NPAcc ; ----NPSep ;
+    NP = \np -> np.s ! NPCase Nom ; ----NPSep ;
     CN = cnRef ;
 
     VP = vpRef ;

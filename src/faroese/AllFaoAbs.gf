@@ -1,0 +1,4 @@
+abstract AllFaoAbs =
+  Lang,
+  Extend
+  ** {}

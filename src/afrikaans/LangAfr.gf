@@ -2,4 +2,7 @@
 
 concrete LangAfr of Lang = 
   GrammarAfr,
-  LexiconAfr ;
+  LexiconAfr
+  ,ConstructionAfr
+  ,DocumentationAfr --# notpresent
+ ;

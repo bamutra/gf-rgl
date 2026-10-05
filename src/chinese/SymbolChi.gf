@@ -11,19 +11,19 @@ concrete SymbolChi of Symbol = CatChi ** open Prelude, ResChi in {
   NumPN i = i ;
   CNIntNP cn i = {
     s = cn.s ++ i.s ;
-    c = cn.c
+    det = cn.c
     } ;
-  CNSymbNP det cn xs = ss (det.s ++ cn.s ++ xs.s) ; ----  
+  CNSymbNP det cn xs = {det = det.s ; s = cn.s ++ xs.s} ; ----
   CNNumNP cn i = {
     s = cn.s ++ i.s ;
-    c = cn.c
+    det = cn.c
     } ;
 
-  SymbS sy = sy ; 
+  SymbS sy = simpleS sy.s ;
   SymbNum sy = sy ;
   SymbOrd sy = sy ;
 
-lincat 
+lincat
 
   Symb, [Symb] = SS ;
 

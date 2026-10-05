@@ -38,11 +38,20 @@ oper
 
   SPN : Type = {s : Case  => Str} ;
 
-  snoun2spn : SNoun -> SPN = \n -> {s = \\c => n.s ! NCase Sg c} ;
+
+  snoun2spn : SNoun -> SPN = \n -> snoun2spnGen n Sg ;
+  snoun2spnGen : SNoun -> Number -> SPN = \n,nb -> {s = \\c => n.s ! NCase nb c} ;
 
   exceptNomSNoun : SNoun -> Str -> SNoun = \noun,nom -> {
       s = table {
         NCase Sg Nom => nom ;
+        f => noun.s ! f
+	} ;
+      h = noun.h
+      } ;
+  exceptPlGenSNoun : SNoun -> Str -> SNoun = \noun,plgen -> {
+      s = table {
+        NCase Pl Gen => plgen ;
         f => noun.s ! f
 	} ;
       h = noun.h
@@ -53,7 +62,7 @@ oper
 -- Adjectives --- could be made more compact by pressing comparison forms down to a few
 
 oper
-  SAForm : Type = AForm ;
+  SAForm : PType = AForm ;
 
 oper
   SAdj = {s : SAForm => Str ; h : Harmony} ;
@@ -67,7 +76,7 @@ oper
     let
       tuoree = init (tuore.s ! NCase Sg Gen) ;
       tuoreesti  = tuoree + "sti" ;
-      tuoreemmin =  init tuoree ;
+      tuoreemmin = init tuoree + "in" ;
     in {s = table {
          AN f => tuore.s ! f ;
          AAdv => if_then_Str isPos tuoreesti tuoreemmin
@@ -103,7 +112,7 @@ oper
 -- verbs
 
 oper
-  SVForm : Type = VForm ;
+  SVForm : PType = VForm ;
   SVerb : Type = {s : SVForm => Str ; h : Harmony} ;
 
   ollaSVerbForms : SVForm => Str = verbOlla.s ;
@@ -371,7 +380,8 @@ oper
       s = \\t,a,b =>
         let
           agrfin = case vp.sc of {
-                    SCNom => <agr,True> ;
+                    SCNom => <agr, True> ;
+		    SCAcc => <agrP3 Sg, True> ;
                     _ => <agrP3 Sg,False>      -- minun täytyy, minulla on
                     } ;
           verb  = vp.s ! VIFin t ! a ! b ! agrfin.p1 ;

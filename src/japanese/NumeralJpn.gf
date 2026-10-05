@@ -1,4 +1,4 @@
-concrete NumeralJpn of Numeral = CatJpn [Numeral,Digits] ** open ResJpn, ParadigmsJpn, Prelude in {
+concrete NumeralJpn of Numeral = CatJpn [Numeral,Digits,Decimal] ** open ResJpn, ParadigmsJpn, Prelude in {
 
 flags coding = utf8 ;
 
@@ -202,16 +202,26 @@ flags coding = utf8 ;
     D_7 = {s = "7" ; n = Pl ; is0 = False} ;
     D_8 = {s = "8" ; n = Pl ; is0 = False} ;
     D_9 = {s = "9" ; n = Pl ; is0 = False} ;
-    
+
+    PosDecimal d = d ** {hasDot=False} ;
+    NegDecimal d = {
+      s = "-" ++ BIND ++ d.s ;
+      n = Pl ;
+      tenPlus = d.tenPlus ;
+      hasDot=False
+      } ;
+    IFrac d i = {
+      s = d.s ++
+          if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+          i.s;
+      n = Pl ;
+      tenPlus = d.tenPlus ;
+      hasDot=True
+    } ;
+
   oper
     commaIf : DTail -> Str = \t -> case t of {
       T3 => "," ;
       _ => []
-      } ;
-
-    inc : DTail -> DTail = \t -> case t of {
-      T1 => T2 ;
-      T2 => T3 ;
-      T3 => T1
       } ;
 }

@@ -8,11 +8,10 @@
 -- Description of the Polish morphology
 
 resource MorphoPol = 
-    ResPol, 
     VerbMorphoPol, 
     PronounMorphoPol,
     AdjectiveMorphoPol,
-    NounMorphoPol ** {
+    NounMorphoPol ** open CatPol, ResPol in {
 
      flags  coding=utf8; 
 
@@ -23,14 +22,14 @@ oper
 
 -- Nouns used as functions need a preposition. The most common is with Genitive.
 
-  mkN2 : CommNoun -> CommNoun2 ;
+  mkN2 : N -> N2 ;
   mkN2 n = mkFun n nullPrep ;
 
-  mkFun  : CommNoun -> Complement -> CommNoun2;
-  mkFun f p = { s = f.s; g = f.g; c = { c = p.c; s=p.s} } ;
+  mkFun  : N -> Complement -> N2;
+  mkFun f c = lin N2 (f ** { c = c }) ;
 
-  mkN3 : CommNoun -> Complement -> Complement -> CommNoun3;
-  mkN3 f p r = { s = f.s; g = f.g; c = {s=p.s; c=p.c} ; c2 = {s=r.s; c=r.c} }; 
+  mkN3 : N -> Complement -> Complement -> N3;
+  mkN3 f c1 c2 = lin N3 (f ** { c1 = c1 ; c2 = c2}) ; 
 
 -- Prepositions   
 
@@ -61,6 +60,7 @@ oper
       nom = "wszyscy" ;
       voc = "wszyscy" ;
       dep = table {
+        NomPrep => "wszyscy";
         (GenNoPrep|GenPrep) => "wszystkich";
         (DatNoPrep|DatPrep) => "wszystkim";
         (AccNoPrep|AccPrep) => "wszystkich";
@@ -75,6 +75,7 @@ oper
       nom = "wszystko" ;
       voc = "wszystko" ;
       dep = table {
+        NomPrep => "wszystko";
         (GenNoPrep|GenPrep) => "wszystkiego";
         (DatNoPrep|DatPrep) => "wszystkiemu";
         (AccNoPrep|AccPrep) => "wszystko";
@@ -89,6 +90,7 @@ oper
       nom = "ktoś" ;
       voc = "ktosiu" ;
       dep = table {
+        NomPrep => "ktoś";
 	     (GenNoPrep|GenPrep) => "kogoś";
 	     (DatNoPrep|DatPrep) => "komuś";
 	     (AccNoPrep|AccPrep) => "kogoś";
@@ -103,6 +105,7 @@ oper
       nom = "coś" ;
       voc = "coś" ;
       dep = table {
+        NomPrep => "coś";
 	     (GenNoPrep|GenPrep) => "czegoś";
 	     (DatNoPrep|DatPrep) => "czemuś";
 	     (AccNoPrep|AccPrep) => "coś";
@@ -118,6 +121,7 @@ oper
       nom = "kto" ;
       voc = "kto" ;
       dep = table {
+        NomPrep => "kto";
 	     (GenNoPrep|GenPrep) => "kogo";
 	     (DatNoPrep|DatPrep) => "komu";
 	     (AccNoPrep|AccPrep) => "kogo";
@@ -132,6 +136,7 @@ oper
       nom = "co" ;
       voc = "co" ;
       dep = table {
+        NomPrep => "co";
 	     (GenNoPrep|GenPrep) => "czego";
 	     (DatNoPrep|DatPrep) => "czemu";
 	     (AccNoPrep|AccPrep) => "co";
@@ -217,6 +222,7 @@ oper
   oper niktNP : NounPhrase =
 	 { voc,nom="nikt";
 	   dep = table {
+	     NomPrep => "nikt";
 	     (GenNoPrep|GenPrep) => "nikogo";
 	     (DatNoPrep|DatPrep) => "nikomu";
 	     (AccNoPrep|AccPrep) => "nikogo";
@@ -231,6 +237,7 @@ oper
   oper nicNP : NounPhrase =
 	 { voc,nom="nic";
 	   dep = table {
+	     NomPrep => "nic";
 	     (GenNoPrep|GenPrep) => "niczego";
 	     (DatNoPrep|DatPrep) => "niczemu";
 	     (AccNoPrep|AccPrep) => "nic";

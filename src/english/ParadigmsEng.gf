@@ -4,12 +4,12 @@
 --
 -- Aarne Ranta 2003--2005
 --
--- This is an API for the user of the resource grammar 
+-- This is an API for the user of the resource grammar
 -- for adding lexical items. It gives functions for forming
 -- expressions of open categories: nouns, adjectives, verbs.
--- 
+--
 -- Closed categories (determiners, pronouns, conjunctions) are
--- accessed through the resource syntax API, $Structural.gf$. 
+-- accessed through the resource syntax API, $Structural.gf$.
 --
 -- The main difference with $MorphoEng.gf$ is that the types
 -- referred to are compiled resource grammar types. We have moreover
@@ -21,22 +21,22 @@
 -- regular cases. Then we give a worst-case function $mkC$, which serves as an
 -- escape to construct the most irregular words of type $C$.
 -- However, this function should only seldom be needed: we have a
--- separate module [``IrregEng`` ../../english/IrregEng.gf], 
+-- separate module [``IrregEng`` ../../english/IrregEng.gf],
 -- which covers irregular verbss.
 
-resource ParadigmsEng = open 
-  (Predef=Predef), 
-  Prelude, 
+resource ParadigmsEng = open
+  (Predef=Predef),
+  Prelude,
   MorphoEng,
   ResEng,
   CatEng
   in {
---2 Parameters 
+--2 Parameters
 --
 -- To abstract over gender names, we define the following identifiers.
 
 oper
-  Gender : Type ; 
+  Gender : Type ;
 
   human     : Gender ;
   nonhuman  : Gender ;
@@ -45,9 +45,9 @@ oper
 
 -- To abstract over number names, we define the following.
 
-  Number : Type ; 
+  Number : Type ;
 
-  singular : Number ; 
+  singular : Number ;
   plural   : Number ;
 
 -- To abstract over case names, we define the following.
@@ -74,10 +74,10 @@ oper
   mkN : overload {
 
 -- The regular function captures the variants for nouns ending with
--- "s","sh","x","z" or "y": "kiss - kisses", "flash - flashes"; 
+-- "s","sh","x","z" or "y": "kiss - kisses", "flash - flashes";
 -- "fly - flies" (but "toy - toys"),
 
-    mkN : (flash : Str) -> N ;  -- plural s, incl. flash-flashes, fly-flies 
+    mkN : (flash : Str) -> N ;  -- plural s, incl. flash-flashes, fly-flies
 
 -- In practice the worst case is to give singular and plural nominative.
 
@@ -91,7 +91,7 @@ oper
 
     mkN : Gender -> N -> N ;  -- default nonhuman
 
---3 Compound nouns 
+--3 Compound nouns
 --
 -- A compound noun is an uninflected string attached to an inflected noun,
 -- such as "baby boom", "chief executive officer".
@@ -106,17 +106,17 @@ oper
     verbalN : V -> N ; -- e.g. sing -> singing
 
 
---3 Relational nouns 
+--3 Relational nouns
 
   mkN2 : overload {
-    mkN2 : Str -> N2 ; -- reg. noun, prep. "of" --% 
+    mkN2 : Str -> N2 ; -- reg. noun, prep. "of" --%
     mkN2 : N -> N2 ; -- e.g. wife of (default prep. to)
     mkN2 : N -> Str -> N2 ; -- access to --%
     mkN2 : N -> Prep -> N2 ; -- e.g. access to
     mkN2 : Str -> Str -> N2 ; -- access to (regular noun) --%
   } ;
 
--- Use the function $mkPrep$ or see the section on prepositions below to  
+-- Use the function $mkPrep$ or see the section on prepositions below to
 -- form other prepositions.
 --
 -- Three-place relational nouns ("the connection from x to y") need two prepositions.
@@ -129,14 +129,63 @@ oper
 --
 -- Proper names, with a regular genitive, are formed from strings.
 
+oper
   mkPN : overload {
 
     mkPN : Str -> PN ;
+    mkPN : Str -> Gender -> PN ;
 
 -- Sometimes a common noun can be reused as a proper name, e.g. "Bank"
 
     mkPN : N -> PN --%
   } ;
+
+  mkLN = overload {
+    mkLN : Str -> LN = \s ->
+      lin LN {s = table {Gen => s + "'s" ; _ => s} ; 
+              prep = InPrep ;
+              art = False ;
+              n = Sg} ;
+
+    mkLN : Str -> Number -> LN = \s,n ->
+      lin LN {s = table {Gen => s + "'s" ; _ => s} ;
+              prep = InPrep ;
+              art = False ;
+              n = n} ;
+  } ;
+
+  defLN : LN -> LN = \n -> n ** {art = True} ;
+  onLN : LN -> LN = \n -> n ** {prep = OnPrep} ;
+  atLN : LN -> LN = \n -> n ** {prep = AtPrep} ;
+
+  mkGN = overload {
+    mkGN : Str -> GN = \s ->
+      lin GN {s = table {Gen => s + "'s" ; _ => s} ; 
+              g = Male} ;
+
+    mkGN : Str -> Sex -> GN = \s,g ->
+      lin GN {s = table {Gen => s + "'s" ; _ => s} ;
+              g = g} ;
+  } ;
+
+  mkSN = overload {
+    mkSN : Str -> SN = \s ->
+      lin SN {s = \\_ => table {Gen => s + "'s" ; _ => s} ;
+              p = table {Gen => s + "'s" ; _ => s}} ;
+    mkSN : Str -> Str -> Str -> SN = \male,female,pl ->
+      lin SN {s = table {
+                    Male  => table {Gen => male + "'s" ; _ => male} ;
+                    Female => table {Gen => female + "'s" ; _ => female}
+                  } ;
+              p = table {Gen => pl + "'s" ; _ => pl}
+             } ;
+  } ;
+
+-- To extract the number of a noun phrase
+
+    ifPluralNP : NP -> Bool
+      = \np -> case (fromAgr np.a).n of {Sg => False ; Pl => True} ;
+
 
 --3 Determiners and quantifiers
 
@@ -168,8 +217,8 @@ oper
     } ;
 
 -- Regular comparison is formed by "more - most" for words with two vowels separated
--- and terminated by some other letters. To force this or the opposite, 
--- the following can be used:  
+-- and terminated by some other letters. To force this or the opposite,
+-- the following can be used:
 
     compoundA : A -> A ; -- force comparison with more/most
     simpleA   : A -> A ; -- force comparison with -er,-est
@@ -179,7 +228,7 @@ oper
 --3 Two-place adjectives
 
   mkA2 : overload {
-    mkA2 : A -> Prep -> A2 ; -- absent from 
+    mkA2 : A -> Prep -> A2 ; -- absent from
     mkA2 : A -> Str -> A2 ; -- absent from --%
     mkA2 : Str -> Prep -> A2 ; -- absent from --%
     mkA2 : Str -> Str -> A2 -- absent from --%
@@ -235,7 +284,7 @@ oper
 
 -- The regular verb function recognizes the special cases where the last
 -- character is "y" ("cry-cries" but "buy-buys") or a sibilant
--- ("kiss-"kisses", "jazz-jazzes", "rush-rushes", "munch - munches", 
+-- ("kiss-"kisses", "jazz-jazzes", "rush-rushes", "munch - munches",
 -- "fix - fixes").
 
     mkV : (cry : Str) -> V ; -- regular, incl. cry-cries, kiss-kisses etc
@@ -247,13 +296,13 @@ oper
     mkV : (stop, stopped : Str) -> V ; -- reg. with consonant duplication
 
 -- There is an extensive list of irregular verbs in the module $IrregularEng$.
--- In practice, it is enough to give three forms, 
+-- In practice, it is enough to give three forms,
 -- e.g. "drink - drank - drunk".
 
     mkV : (drink, drank, drunk  : Str) -> V ; -- ordinary irregular
 
 -- Irregular verbs with duplicated consonant in the present participle.
- 
+
     mkV : (run, ran, run, running  : Str) -> V ; -- irregular with duplication --%
 
 -- Except for "be", the worst case needs five forms: the infinitive and
@@ -335,7 +384,10 @@ oper
     mkV2A : V -> Prep -> Prep -> V2A ; -- e.g. strike (NP) as (AP)
     } ;
   mkVQ  : V -> VQ ; -- e.g. wonder (QS)
-  mkV2Q : V -> Prep -> V2Q ; -- e.g. ask (NP) (QS)
+  mkV2Q : overload {
+    mkV2Q : V -> Prep -> V2Q ; -- e.g. ask (NP) (QS)
+    mkV2Q : V -> V2Q -- e.g. ask (NP) (QS)
+  } ;
 
   mkAS  : A -> AS ; --%
   mkA2S : A -> Prep -> A2S ; --%
@@ -353,6 +405,8 @@ oper
 mkSubj : Str -> Subj = \s -> lin Subj {s = s} ; --%
 mkInterj : Str -> Interj
   = \s -> lin Interj (ss s) ;
+mkVoc : Str -> Voc ; -- Any other vocative expression not coming from a NP or a preconstructed Voc
+mkVoc s = lin Voc (ss s) ;
 
 --.
 --2 Definitions of paradigms
@@ -360,13 +414,15 @@ mkInterj : Str -> Interj
 -- The definitions should not bother the user of the API. So they are
 -- hidden from the document.
 
-  Gender = ResEng.Gender ; 
+  Gender = ResEng.Gender ;
   Number = ResEng.Number ;
   Case = ResEng.NPCase ;
-  human = Masc ; 
+  human = Masc ;
   nonhuman = Neutr ;
   masculine = Masc ;
   feminine = Fem ;
+  male = Male ;
+  female = Female ;
   singular = Sg ;
   plural = Pl ;
   nominative = npNom ;
@@ -376,7 +432,7 @@ mkInterj : Str -> Interj
 
   Preposition : Type = Str ; -- obsolete
 
-  regN = \ray -> 
+  regN = \ray ->
     let rays = add_s ray
      in
        mk2N ray rays ;
@@ -392,12 +448,12 @@ mkInterj : Str -> Interj
 
   duplFinal : Str -> Str = \w -> case w of {
     _ + ("a" | "e" | "o") + ("a" | "e" | "i" | "o" | "u") + ? => w ; -- waited, needed
-    _ + ("a" | "e" | "i" | "o" | "u") + 
+    _ + ("a" | "e" | "i" | "o" | "u") +
       c@("b"|"d"|"g"|"m"|"n"|"p"|"r"|"t") => w + c ; -- omitted, manned
     _ => w
     } ;
 
-  mk2N = \man,men -> 
+  mk2N = \man,men ->
     let mens = case last men of {
       "s" => men + "'" ;
       _   => men + "'s"
@@ -405,17 +461,26 @@ mkInterj : Str -> Interj
     in
     mk4N man men (man + "'s") mens ;
 
-  mk4N = \man,men,man's,men's -> 
+  mk4N = \man,men,man's,men's ->
     lin N (mkNoun man man's men men's ** {g = Neutr}) ;
 
   genderN g man = lin N {s = man.s ; g = g} ;
 
   compoundN s n = lin N {s = \\x,y => s ++ n.s ! x ! y ; g=n.g} ;
 
-  verbalN v = regN (v.s ! VPresPart) ;
+  -- NB. this only works when constructing lexicon, not applied to runtime arguments
+  verbalN v =
+    let switching : Str = v.s ! VPresPart ;
+        on : Str = v.p ;
+     in particleN (regN switching) on ;
+
+  particleN : N -> Str -> N = \n,str -> n ** {
+    s = \\num,cas => n.s ! num ! cas ++ str
+    } ;
 
   mkPN = overload {
     mkPN : Str -> PN = regPN ;
+    mkPN : Str -> Gender -> PN = regGenPN ;
     mkPN : N -> PN = nounPN
   } ;
 
@@ -424,7 +489,7 @@ mkInterj : Str -> Interj
     mkN2 : N -> Str -> N2 = \n,s -> prepN2 n (mkPrep s);
     mkN2 : Str -> Str -> N2 = \n,s -> prepN2 (regN n) (mkPrep s);
     mkN2 : N -> N2         = \n -> prepN2 n (mkPrep "of") ;
-    mkN2 : Str -> N2       = \s -> prepN2 (regN s) (mkPrep "of") 
+    mkN2 : Str -> N2       = \s -> prepN2 (regN s) (mkPrep "of")
   } ;
 
   prepN2 = \n,p -> lin N2 (n ** {c2 = p.s}) ;
@@ -453,21 +518,21 @@ mkInterj : Str -> Interj
     mkQuant : (no_sg, no_pl, none_sg, non_pl : Str) -> Quant = \sg,pl,sg',pl' -> mkQuantifier sg pl sg' pl' sg' pl';
   } ;
 
-  mkQuantifier : Str -> Str -> Str -> Str -> Str -> Str -> Quant = 
+  mkQuantifier : Str -> Str -> Str -> Str -> Str -> Str -> Quant =
    \sg,pl,sg1',pl1',sg2',pl2' -> lin Quant {
     s = \\_    => table { Sg => sg ; Pl => pl } ;
     sp = \\g,_ => table {
-      Sg => \\c => regGenitiveS (case g of {Masc=>sg1'; Fem=>sg1'; Neutr=>sg2'}) ! npcase2case c ; 
+      Sg => \\c => regGenitiveS (case g of {Masc=>sg1'; Fem=>sg1'; Neutr=>sg2'}) ! npcase2case c ;
       Pl => \\c => regGenitiveS (case g of {Masc=>pl1'; Fem=>pl1'; Neutr=>pl2'}) ! npcase2case c} ;
     isDef = True
     } ;
 
   mkOrd : Str -> Ord = \x -> lin Ord { s = regGenitiveS x};
 
-  mk2A a b = mkAdjective a a a b ;
+  mk2A a b = lin A (mkAdjective a a a b) ;
   regA a = case a of {
-    _ + ("a" | "e" | "i" | "o" | "u" | "y") + ? + _ + 
-        ("a" | "e" | "i" | "o" | "u" | "y") + ? + _  => 
+    _ + ("a" | "e" | "i" | "o" | "u" | "y") + ? + _ +
+        ("a" | "e" | "i" | "o" | "u" | "y") + ? + _  =>
          lin A (compoundADeg (regADeg a)) ;
     _ => lin A (regADeg a)
     } ;
@@ -476,9 +541,9 @@ mkInterj : Str -> Interj
 
   ADeg = A ; ----
 
-  mkADeg a b c d = mkAdjective a b c d ;
+  mkADeg a b c d = lin A (mkAdjective a b c d) ;
 
-  regADeg happy = 
+  regADeg happy =
     let
       happ = init happy ;
       y    = last happy ;
@@ -488,7 +553,7 @@ mkInterj : Str -> Interj
         _   => duplFinal happy + "e"
         } ;
     in mkADeg happy (happie + "r") (happie + "st") (adj2adv happy) ;
-    
+
   adj2adv : Str -> Str = \happy ->
     case happy of {
       _ + "ble" => init happy + "y" ;
@@ -497,13 +562,14 @@ mkInterj : Str -> Interj
       _         => happy + "ly"
       } ;
 
-  duplADeg fat = 
-    mkADeg fat 
+  duplADeg fat =
+    mkADeg fat
     (fat + last fat + "er") (fat + last fat + "est") (adj2adv fat) ;
 
   compoundADeg a =
-    let ad = (a.s ! AAdj Posit Nom) 
-    in mkADeg ad ("more" ++ ad) ("most" ++ ad) (a.s ! AAdv) ;
+    let ad : Str = a.s ! AAdj Posit Nom ;
+        a' : Adjective = mkADeg ad nonExist nonExist (a.s ! AAdv) ;
+    in lin A (a' ** {isMost = True}) ;
 
   adegA a = a ;
 
@@ -514,13 +580,18 @@ mkInterj : Str -> Interj
 
   mkCAdv sp sn p = lin CAdv {s = table Polarity [sp;sn]; p = p} ;
 
-  mkPrep p = lin Prep {s=p; isPre=True} ;
-  mkPost p = lin Prep {s=p; isPre=False} ;
+  mkPrep p = lin Prep {
+    s = p ;           -- the string: "with", "in front of"
+    isPre = True ;    -- default case: it is a preposition, not postposition
+    } ;
+  mkPost p = mkPrep p ** {
+    isPre = False -- postposition: e.g. "ago"
+    } ;
   noPrep = mkPrep [] ;
 
   mk5V a b c d e = lin V (mkVerb a b c d e ** {s1 = []}) ;
 
-  regV cry = 
+  regV cry =
     let
       cries = (regN cry).s ! Pl ! Nom ; -- !
       cried : Str = case cries of {
@@ -531,7 +602,7 @@ mkInterj : Str -> Interj
       crying : Str = case cry of {
         _  + "ee" => cry + "ing" ;
         d  + "ie" => d  + "ying" ;
-        us + "e"  => us + "ing" ; 
+        us + "e"  => us + "ing" ;
         ent + "er" => ent + "ering" ;
         _         => duplFinal cry + "ing"
         }
@@ -539,14 +610,14 @@ mkInterj : Str -> Interj
 
   reg2V fit fitted =
    let fitt = Predef.tk 2 fitted ;
-   in 
+   in
      if_then_else V (pbool2bool (Predef.eqStr (last fit) (last fitt)))
-       (mk5V fit (fit + "s") (fitt + "ed") (fitt + "ed") (fitt + "ing")) 
+       (mk5V fit (fit + "s") (fitt + "ed") (fitt + "ed") (fitt + "ing"))
        (regV fit) ;
 
-  regDuplV fit = 
+  regDuplV fit =
     case last fit of {
-      ("a" | "e" | "i" | "o" | "u" | "y") => 
+      ("a" | "e" | "i" | "o" | "u" | "y") =>
         Predef.error (["final duplication makes no sense for"] ++ fit) ;
       t =>
        let fitt = fit + t in
@@ -559,8 +630,8 @@ mkInterj : Str -> Interj
   irreg4V x y z w = let reg = (regV x).s in
     mk5V x (reg ! VPres) y z w ** {s1 = []} ;
 
-  irregDuplV fit y z = 
-    let 
+  irregDuplV fit y z =
+    let
       fitting = (regDuplV fit).s ! VPresPart
     in
     mk5V fit (fit + "s") y z fitting ;
@@ -571,13 +642,15 @@ mkInterj : Str -> Interj
   us_britishV : Str -> V = \s -> case s of {
     _ + ("el" | "al" | "ol") => regV s | mkV s (s + "s") (s + "led") (s + "led") (s + "ling") ;
     _ + "or" => regV s | regV (Predef.tk 2 s + "our") ;
+    _ + "ise" => regV (Predef.tk 2 s + "ze") | regV s ;
+    _ + "ize" => regV s | regV (Predef.tk 2 s + "se") ;
     _ => regV s
     } ;
 
   prepV2 v p = lin V2 {s = v.s ; p = v.p ; c2 = p.s ; isRefl = v.isRefl} ;
   dirV2 v = prepV2 v noPrep ;
 
-  prepPrepV3 v p q = 
+  prepPrepV3 v p q =
     lin V3 {s = v.s ; p = v.p ; c2 = p.s ; c3 = q.s ; isRefl = v.isRefl} ;
   dirV3 v p = prepPrepV3 v noPrep p ;
   dirdirV3 v = dirV3 v noPrep ;
@@ -585,22 +658,21 @@ mkInterj : Str -> Interj
   mkVS  v = lin VS v ;
   mkVV  v = lin VV {
     s = table {VVF vf => v.s ! vf ; _ => v.s ! VInf} ;
-    p = v.p ; 
+    p = v.p ;
     typ = VVInf
     } ;
   auxVV, infVV = \v -> lin VV {
     s = table {
-          VVF vf => v.s ! vf ; 
-          VVPresNeg => v.s ! VPres ++ "not" ; 
-          VVPastNeg => v.s ! VPast ++ "not" ; --# notpresent
-          _ => v.s ! VInf
+          VVF vf => v.s ! vf ;
+          VVPresNeg => v.s ! VPres ++ "not"
+          ; VVPastNeg => v.s ! VPast ++ "not"  --# notpresent
           } ;
-    p = v.p ; 
+    p = v.p ;
     typ = VVAux
     } ;
   ingVV  v = lin VV {
     s = table {VVF vf => v.s ! vf ; _ => v.s ! VInf} ;
-    p = v.p ; 
+    p = v.p ;
     typ = VVPresPart
     } ;
   mkVQ  v = lin VQ v ;
@@ -625,7 +697,12 @@ mkInterj : Str -> Interj
     mkV2A : V -> Prep -> V2A = \v,p -> lin V2A (dirV3 v p) ;
     mkV2A : V -> Prep -> Prep -> V2A = \v,p1,p2 -> lin V2A (prepPrepV3 v p1 p2) ;
     } ;
-  mkV2Q v p = lin V2Q (prepV2 v p) ;
+  mkV2Q = overload {
+    mkV2Q : V -> Prep -> V2Q = \v,p -> lin V2Q (prepV2 v p) ;
+    mkV2Q : V -> V2Q = \v -> lin V2Q (dirV2 v) ;
+    mkV2Q : V2 -> V2Q = \v2 -> lin V2Q v2 ;
+    mkV2Q : Str -> V2Q = \s -> lin V2Q (dirV2 (regV s)) ;
+  } ;
 
   mkAS  v = v ;
   mkA2S v p = lin A (prepA2 v p) ;
@@ -649,7 +726,7 @@ mkInterj : Str -> Interj
     mkN : Str -> N -> N = compoundN
     } ;
 
--- Relational nouns ("daughter of x") need a preposition. 
+-- Relational nouns ("daughter of x") need a preposition.
 
   prepN2 : N -> Prep -> N2 ;
 
@@ -662,21 +739,24 @@ mkInterj : Str -> Interj
   regA : Str -> A ;
 
   mkA = overload {
-    mkA : Str -> A = regA ;
-    mkA : (fat,fatter : Str) -> A = \fat,fatter -> 
-      mkAdjective fat fatter (init fatter + "st") (adj2adv fat) ;
+    mkA : Str -> A = \s -> lin A (regA s) ;
+    mkA : (fat,fatter : Str) -> A = \fat,fatter ->
+      lin A (mkAdjective fat fatter (init fatter + "st") (adj2adv fat)) ;
     mkA : (good,better,best,well : Str) -> A = \a,b,c,d ->
-      mkAdjective a b c d
+      lin A (mkAdjective a b c d)
     } ;
 
-  invarA s = mkAdjective s s s s ;
+  invarA s = lin A {
+    s = \\_ => s ;
+    isPre = True ;
+    isMost = False} ;
 
   compoundA = compoundADeg ;
-  simpleA a = 
-    let ad = (a.s ! AAdj Posit Nom) 
+  simpleA a =
+    let ad = (a.s ! AAdj Posit Nom)
     in regADeg ad ;
-    
-  irregAdv a adv = lin A {s = table {AAdv => adv; aform => a.s ! aform}; isPre = a.isPre} ;
+
+  irregAdv a adv = a ** {s = table {AAdv => adv; aform => a.s ! aform}} ;
 
   prepA2 : A -> Prep -> A2 ;
 
@@ -718,7 +798,7 @@ mkInterj : Str -> Interj
     mkV2  : V -> Str -> V2 = \v,p -> prepV2 v (mkPrep p) ;
     mkV2  : Str -> Prep -> V2 = \v,p -> prepV2 (regV v) p ;
     mkV2  : Str -> Str -> V2 = \v,p -> prepV2 (regV v) (mkPrep p)
-  }; 
+  };
 
   prepPrepV3 : V -> Prep -> Prep -> V3 ;
   dirV3 : V -> Prep -> V3 ;
@@ -740,18 +820,20 @@ mkInterj : Str -> Interj
     mkConj : Str -> Str -> Number -> Conj = mk2Conj ;
   } ;
 
-  mk2Conj : Str -> Str -> Number -> Conj = \x,y,n -> 
+  mk2Conj : Str -> Str -> Number -> Conj = \x,y,n ->
     lin Conj (sd2 x y ** {n = n}) ;
+
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False} ;
 
 ---- obsolete
 
--- Comparison adjectives may two more forms. 
+-- Comparison adjectives may two more forms.
 
   ADeg : Type ;
 
   mkADeg : (good,better,best,well : Str) -> ADeg ;
 
--- The regular pattern recognizes two common variations: 
+-- The regular pattern recognizes two common variations:
 -- "-e" ("rude" - "ruder" - "rudest") and
 -- "-y" ("happy - happier - happiest - happily")
 
@@ -772,7 +854,7 @@ mkInterj : Str -> Interj
   adegA : ADeg -> A ;
 
 
-  regPN    : Str -> PN ;          
+  regPN    : Str -> PN ;
   regGenPN : Str -> Gender -> PN ;     -- John, John's
 
 -- Sometimes you can reuse a common noun as a proper name, e.g. "Bank".

@@ -1,6 +1,6 @@
 --# -path=.:../abstract:../common:../../prelude
 
-concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude in {
+concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, ParamX, Prelude in {
 
   flags optimize=all_subs ;
 
@@ -10,7 +10,11 @@ concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude
         case det.useGen of {
           NoGen => \\c => det.s ++ cn.s ! det.n ! c ;
           YesGen a => \\c => det.s ++ cn.gen ! det.n ! a ;
-          UseIndef => \\c => det.s ++ cn.s ! det.n ! c
+          UseIndef => \\c => let c' = case c of {
+                                        Acc => Nom ;
+                                        c   => c
+                                      }
+                             in det.s ++ cn.s ! det.n ! c'
         } ;
       h   = cn.h ;
       a = agrP3 det.n
@@ -19,9 +23,9 @@ concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude
     UsePron p = p ;
 
     UsePN pn = { 
-      s = \\c => pn.s ! Sg ! c;
+      s = \\c => pn.s ! c;
       h = pn.h;
-      a = {n = Sg; p = P3}
+      a = {n = pn.n; p = P3}
     } ;
 
     PossPron p = {s = []; useGen = YesGen p.a} ;
@@ -61,51 +65,14 @@ concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude
     MassNP cn = {
       s = cn.s ! Sg;
       h = cn.h;
-      a = { n = Sg; p = P1 }
+      a = { n = Sg; p = P3 }
     } ;
 
-    ComplN2 f x =
-        case f.c.c of {
-          Nom => {
-            s = \\n, c => x.s ! Gen ++ f.s ! n ! Acc;
-            gen = \\_, _ => "TODO";
-            h = f.h
-          };
-          Acc => {
-            s = \\_,_ => "TODO";
-            gen = \\_, _ => "TODO";
-            h = f.h};
-          Gen => {
-            s =
-              \\n, c =>
-                x.s ! Gen ++ f.gen ! n ! {n = Sg; p = P3}
-                ++ BIND ++ (caseSuffixes ! c).st ! f.h.con ! f.h.vow;
-            gen = \\_, _ => "TODO";
-            h = f.h
-          };
-          Dat => {
-            s = \\n, c =>
-              x.s ! Gen ++ f.gen ! n ! {n = Sg; p = P3}
-                ++ datSuffixN.st ! f.h.con ! f.h.vow;
-            gen = \\_, _ => "TODO";
-            h = f.h
-          };
-          Loc => {
-            s = \\_,_ => "TODO";
-            gen = \\_, _ => "TODO";
-            h = f.h
-          };
-          Ablat => {
-            s = \\_,_ => "TODO";
-            gen = \\_, _ => "TODO";
-            h = f.h
-          };
-          Abess _ => {
-            s = \\_,_ => "TODO";
-            gen = \\_, _ => "TODO";
-            h = f.h
-          }
-        };
+    ComplN2 f x = {
+      s = \\n,c => x.s ! f.c.c ++ f.c.s ++ f.s ! n ! c ;
+      gen = \\n,a => x.s ! f.c.c ++ f.c.s ++ f.gen ! n ! a ;
+      h = f.h
+    } ;
 
 
     AdjCN ap cn = {
@@ -163,7 +130,7 @@ concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude
     DetNP det = {
       s = \\c => det.s ;
       h = {vow=I_Har; con=SCon Soft} ;  -- to be fixed
-      a = {n = det.n ; p = P1}
+      a = {n = det.n ; p = P3}
     } ;
 
     ExtAdvNP np adv = {
@@ -176,12 +143,18 @@ concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude
       s = n.s ! NCard ; n = n.n
     } ;
 
+    NumDecimal n = {
+      s = n.s ! NCard ; n = n.n
+    } ;
+
     OrdNumeralSuperl n a = {
       s = \\num,cs => (n.s ! NOrd ! Sg ! cs) ++ a.s ! Sg ! cs
     } ;
 
     PPartNP np v2 = {
-      s = \\c => np.s ! c ++ v2.s ! (VPast np.a);
+      s = \\c => np.s ! c
+                 ++ mkVerbForms v2 ! Perf ! VFin Past Simul Pos np.a   --# notpresent
+                 ;
       h = np.h ;
       a = np.a
     } ;
@@ -197,8 +170,8 @@ concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude
     } ;
 
     PossNP cn np = {
-      s   = \\n,c => np.s ! Gen ++ cn.s ! n ! c ;
-      gen = cn.gen ;
+      s   = \\n,c => np.s ! Gen ++ cn.gen ! n ! np.a ;
+      gen = \\n,a => np.s ! Gen ++ cn.gen ! n ! a ;
       h   = cn.h
     } ;
 
@@ -211,24 +184,26 @@ concrete NounTur of Noun = CatTur ** open ResTur, SuffixTur, HarmonyTur, Prelude
     } ;
 
     SentCN cn sc = {
-      s   = \\n,c => "(TODO: SentCN)" ;
-      gen = cn.gen ;
+      s   = \\n,c => sc.s ++ cn.s ! n ! c ;
+      gen = \\n,a => sc.s ++ cn.gen ! n ! a ;
       h   = cn.h
     } ;
 
-    -- TODO: currently not able to generate trees.
     RelCN cn rs = {
-      s   = \\n,c => "(TODO: RelCN)" ;
-      gen = cn.gen ;
+      s   = \\n,c => rs.s ! {n=n; p=P3} ++ cn.s ! n ! c ;
+      gen = \\n,c => rs.s ! {n=n; p=P3} ++ cn.gen ! n ! c ;
       h   = cn.h
     } ;
 
     RelNP np rs = {
-      s   = \\c => "(TODO: RelNP)" ;
-      gen = np.gen ;
+      s   = \\c => rs.s ! np.a ++ np.s ! c ;
       h   = np.h ;
-      a   = np.a ;
-      c   = np.c
+      a   = np.a
     } ;
 
+    QuantityNP n m = {
+      s = \\c => preOrPost m.isPre m.s (n.s ! NCard ! Sg ! Nom) ;
+      h = mkHar I_Har SVow ; -- guessed
+      a = agrP3 n.n
+    } ;
 }

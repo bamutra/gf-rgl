@@ -48,17 +48,19 @@ concrete CatDut of Cat =
 
     Pron = Pronoun ;
 
-    Det = Determiner ;
+    Det, DAP = Determiner ;
     Quant = Quantifier ;
     Predet = {s : Number => Gender => Str} ;
     Num = {s : Str ; n : Number ; isNum : Bool} ;
     Card = {s : Gender => Case => Str ; n : Number} ;
+    ACard = {s : Str} ;
     Ord = {s : AForm => Str} ;
 
 -- Numeral
 
     Numeral = {s : CardOrd => Str ; n : Number } ;
     Digits = {s : CardOrd => Str ; n : Number } ;
+    Decimal = {s : CardOrd => Str ; n : Number ; hasDot : Bool} ;
 
 -- Structural
 
@@ -82,5 +84,8 @@ concrete CatDut of Cat =
     N2 = {s : NForm => Str ; g : Gender} ** {c2 : Preposition} ;
     N3 = {s : NForm => Str ; g : Gender} ** {c2,c3 : Preposition} ;
     PN = {s : NPCase => Str} ;
+    GN = {s : NPCase => Str; g : Sex} ;
+    SN = {s : Sex => NPCase => Str; pl : NPCase => Str} ;
+    LN = {s : Adjf => NPCase => Str ; hasArt : Bool ; n : Number} ;
 
 }

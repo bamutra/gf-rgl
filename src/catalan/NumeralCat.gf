@@ -1,4 +1,4 @@
-concrete NumeralCat of Numeral = CatCat [Numeral,Digits] ** 
+concrete NumeralCat of Numeral = CatCat [Numeral,Digits,Decimal] ** 
   open CommonRomance, ResRomance, MorphoCat, Prelude in {
 
   flags coding=utf8 ;
@@ -12,6 +12,8 @@ lincat
   Sub100 = {s : CardOrd => Str ; n : Number} ;
   Sub1000 = {s : CardOrd => Str ; n : Number} ;
   Sub1000000 = {s : CardOrd => Str ; n : Number} ;
+  Sub1000000000 = {s : CardOrd => Str ; n : Number} ;
+  Sub1000000000000 = {s : CardOrd => Str ; n : Number} ;
 
 	
 -- Auxiliaries
@@ -125,7 +127,17 @@ lin
 	pot3plus n m = 
 		{s= \\co => (table {Sg => []; Pl => (n.s ! co)} ! n.n) ++ "mil" ++ (m.s !co);
 		n= Pl} ;
-	
+
+	pot3as4 n = n ;
+	pot41 = {s = \\co => cardOrd1 co "un milió" "un milió" "milionès" ; n = Sg} ;
+	pot4 n = {s = \\co => n.s ! NCard Masc ++ "milions" ; n = Pl} ;
+	pot4plus n m = {s = \\co => n.s ! NCard Masc ++ "milions" ++ m.s ! co ; n = Pl} ;
+	pot4decimal d = {s = \\co => d.s ! NCard Masc ++ "milions" ; n = Pl} ;
+	pot4as5 n = n ;
+	pot51 = {s = \\co => case co of {NCard _ => "mil milions" ; _ => "mil milionèsim"} ; n = Pl} ;
+	pot5 n = {s = \\co => n.s ! NCard Masc ++ "mil milions" ; n = Pl} ;
+	pot5plus n m = {s = \\co => n.s ! NCard Masc ++ "mil milions" ++ m.s ! co ; n = Pl} ;
+	pot5decimal d = {s = \\co => d.s ! NCard Masc ++ "mil milions" ; n = Pl} ;
 
 param
 	DForm = unit | teen | ten | tenplus | Aunit | OrdF ;
@@ -136,11 +148,12 @@ param
     Dig = TDigit ;
 
   lin
-    IDig d = d ;
+    IDig d = d ** {tail = T1} ;
 
     IIDig d i = {
-      s = \\o => d.s ! NCard Masc ++ BIND ++ i.s ! o ;
-      n = Pl
+      s = \\o => d.s ! NCard Masc ++ spaceIf i.tail ++ i.s ! o ;
+      n = Pl ;
+      tail = inc i.tail
     } ;
 
     D_0 = mkDig "0" ;
@@ -153,6 +166,26 @@ param
     D_7 = mkDig "7" ;
     D_8 = mkDig "8" ;
     D_9 = mkDig "9" ;
+
+    PosDecimal d = d ** {hasDot=False} ;
+    NegDecimal d = {
+      s = \\o => "-" ++ BIND ++ d.s ! o ;
+      n = Pl ;
+      hasDot=False
+      } ;
+    IFrac d i = {
+     s = \\o => d.s ! NCard Masc ++
+                if_then_Str d.hasDot BIND (BIND++","++BIND) ++
+                i.s ! o ;
+     n = Pl ;
+     hasDot=True
+     } ;
+
+  oper
+    spaceIf : DTail -> Str = \t -> case t of {
+      T3 => SOFT_SPACE ;
+      _  => BIND
+      } ;
 
   oper
     mk2Dig : Str -> Str -> TDigit = \c,o -> mk3Dig c o Pl ;

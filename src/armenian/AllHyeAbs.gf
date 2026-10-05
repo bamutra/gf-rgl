@@ -1,0 +1,4 @@
+abstract AllHyeAbs =
+  Lang,
+  Extend
+  ** {}

@@ -84,7 +84,8 @@ lincat
    Num  = {s : Str ; sp : RCase => Str ; n : Number ; isNum : Bool} ; 
    Card = {s : Str ; sp : RCase => Str ; n : Number} ;
    Numeral = {s : CardOrd => Str; n : Number} ;
-   Digits = {s : CardOrd => Str ; n : Number} ; 
+   Digits = {s : CardOrd => Str ; n : Number} ;
+   Decimal = {s : CardOrd => Str ; n : Number; hasDot : Bool} ;
 
 -- Structural
 
@@ -106,7 +107,8 @@ lincat
    N2 = Noun ** {c2 : Complement} ;
    N3 = Noun ** {c2,c3 : Complement} ;
    PN = {s : RCase => Str} ;
-   
+   LN,GN,SN = {s : Str} ;
+
    Temp = {s : Str ; t : ClTense ; a : Anteriority} ;
    Tense = {s : Str ; t : ClTense} ;
 }

@@ -44,6 +44,7 @@ oper
 
   utrum     : Gender ;  -- the "en" gender
   neutrum   : Gender ;  -- the "ett" gender
+  neuter    : Gender ;  -- synonym of neutrum 
 
 -- To abstract over number names, we define the following.
 
@@ -151,6 +152,27 @@ oper
     mkPN : (jesus,jesu : Str) -> Gender -> PN -- irregular genitive
     } ;
 
+    geoPN : Str -> PN ;  -- neuter, with identical genitive if ends in a vowel
+
+  mkLN = overload {
+    mkLN : Str -> LN = \s -> lin LN (regPN s) ** {n=Sg};   -- default gender utrum
+    mkLN : Str -> Gender -> LN = \s,g -> lin LN (regGenPN s g) ** {n=Sg} ; -- set other gender
+    mkLN : Str -> Gender -> Number -> LN = \s,g,n -> lin LN (regGenPN s g) ** {n=n} ; -- set other gender and number
+    } ;
+
+  mkGN = overload {
+    mkGN : Str -> GN = \s -> lin GN {s = \\c => mkCase c s ; g = Male};   -- default gender utrum
+    mkGN : Str -> Sex -> GN = \s,g -> lin GN {s = \\c => mkCase c s ; g = g} ; -- set other gender
+    } ;
+
+  mkSN = overload {
+    mkSN : Str -> SN = \s -> lin SN {s = \\_,c => mkCase c s; pl = \\c => mkCase c s};   -- default gender utrum
+    mkSN : Str -> Str -> Str -> SN = 
+      \male,female,pl -> lin SN {s  = table {Male => \\c => mkCase c male;
+                                             Female => \\c => mkCase c female} ;
+                                 pl = \\c => mkCase c pl
+                                } ;
+    } ;
 
 --2 Adjectives
 
@@ -348,6 +370,9 @@ oper
   Case = CommonScand.Case ;
   utrum = Utr ; 
   neutrum = Neutr ;
+  neuter = Neutr ;
+  male = Male ;
+  female = Female ;
   singular = Sg ;
   plural = Pl ;
   nominative = Nom ;
@@ -524,6 +549,14 @@ oper
     mkPN : (jesus,jesu : Str) -> Gender -> PN = \jesus,jesu,g -> 
       {s = table {Nom => jesus ; Gen => jesu} ; g = g ; lock_PN = <>} ;
     } ;
+
+  geoPN name =
+    let names : Str = case name of {
+      _ + ("a"|"e"|"i"|"o"|"u"|"y"|"å"|"ä"|"ö") => name ;
+      _ + "s" => name ;
+      _ => name + "s"
+    } in
+    mkPN name names neutrum ;
 
   regPN n = regGenPN n utrum ;
   regGenPN n g = {s = \\c => mkCase c n ; g = g} ** {lock_PN = <>} ;
@@ -810,5 +843,6 @@ oper
 
   dirV2 : V -> V2 ;
 
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False} ;
 
 } ;

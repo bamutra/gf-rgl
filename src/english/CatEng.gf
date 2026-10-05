@@ -28,14 +28,14 @@ concrete CatEng of Cat = CommonX - [Pol,CAdv] ** open ResEng, Prelude in {
 
     QCl = {s : ResEng.Tense => Anteriority => CPolarity => QForm => Str} ;
     IP = {s : NPCase => Str ; n : Number} ;
-    IComp = {s : Str} ;    
+    IComp = {s : Str} ;
     IDet = {s : Str ; n : Number} ;
     IQuant = {s : Number => Str} ;
 
 -- Relative
 
     RCl = {
-      s : ResEng.Tense => Anteriority => CPolarity => Agr => Str ; 
+      s : ResEng.Tense => Anteriority => CPolarity => Agr => Str ;
       c : NPCase
       } ;
     RP = {s : RCase => Str ; a : RAgr} ;
@@ -44,11 +44,11 @@ concrete CatEng of Cat = CommonX - [Pol,CAdv] ** open ResEng, Prelude in {
 
     VP = ResEng.VP ;
     VPSlash = ResEng.SlashVP ;
-    Comp = {s : Agr => Str} ; 
+    Comp = {s : Agr => Str} ;
 
 -- Adjective
 
-    AP = {s : Agr => Str ; isPre : Bool} ; 
+    AP = {s : Agr => Str ; isPre : Bool} ;
 
 -- Noun
 
@@ -81,12 +81,16 @@ concrete CatEng of Cat = CommonX - [Pol,CAdv] ** open ResEng, Prelude in {
 
     Numeral = {s : Bool => CardOrd => Case => Str ; n : Number} ;
     Digits  = {s : CardOrd => Case => Str ; n : Number ; tail : DTail} ;
+    Decimal = {s : CardOrd => Case => Str ; n : Number ; hasDot : Bool} ;
 
 -- Structural
 
     Conj = {s1,s2 : Str ; n : Number} ;
     Subj = {s : Str} ;
-    Prep = {s : Str; isPre : Bool} ;
+    Prep = {
+        s : Str ;       -- "with", "ago"
+        isPre : Bool ;  -- whether it's pre- or postposition: "with"=True, "ago"=False
+        } ;
     CAdv = {s : Polarity => Str; p : Str} ;
 
 -- Open lexical classes, e.g. Lexicon
@@ -97,13 +101,20 @@ concrete CatEng of Cat = CommonX - [Pol,CAdv] ** open ResEng, Prelude in {
     VV = {s : VVForm => Str ; p : Str ; typ : VVType} ;
     V2V = Verb ** {c2,c3 : Str ; typ : VVType} ;
 
-    A = {s : AForm => Str ; isPre : Bool} ;
-    A2 = {s : AForm => Str ; c2 : Str ; isPre : Bool} ;
+    A = ResEng.Adjective ;
+    A2 = ResEng.Adjective ** {c2 : Str} ;
 
     N = {s : Number => Case => Str ; g : Gender} ;
     N2 = {s : Number => Case => Str ; g : Gender} ** {c2 : Str} ;
     N3 = {s : Number => Case => Str ; g : Gender} ** {c2,c3 : Str} ;
     PN = {s : Case => Str ; g : Gender} ;
+    GN = {s : Case => Str ; g : Sex} ;
+    SN = {s : Sex => Case => Str; p : Case => Str} ;
+    LN = {s  : Case => Str;
+          prep : LNPrep;   -- preposition "in Scandinavia", "on the Balkans", "at the South Pole"
+          art : Bool; -- plain name "United States" vs "the United States"
+          n  : Number;
+         } ;
 
   lindef
     SSlash = \s -> {s = s; c2 = ""} ;
@@ -118,8 +129,8 @@ concrete CatEng of Cat = CommonX - [Pol,CAdv] ** open ResEng, Prelude in {
     VV = \s -> {s = \\_ => s; p = ""; isRefl = False; typ = VVInf} ;
     V2V = \s -> {s = \\_ => s; p = ""; isRefl = False; c2,c3="" ; typ = VVInf} ;
 
-    A = \s -> {s = \\_ => s; isPre = True} ;
-    A2 = \s -> {s = \\_ => s; c2 = ""; isPre = True} ;
+    A = \s -> {s = \\_ => s; isPre = True ; isMost = False} ;
+    A2 = \s -> {s = \\_ => s; c2 = ""; isPre = True ; isMost = False} ;
 
     N = \s -> {s = \\_,_ => s; g = Neutr} ;
     N2 = \s -> {s = \\_,_ => s; c2 = ""; g = Neutr} ;

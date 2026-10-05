@@ -62,7 +62,7 @@ concrete StructuralFin of Structural = CatFin **
   less_CAdv = X.mkCAdv "vähemmän" "kuin" ;
   many_Det = MorphoFin.mkDet Sg (snoun2nounBind (mkN "moni" "monia")) ;
   more_CAdv = X.mkCAdv "enemmän" "kuin" ;
-  most_Predet = {s = \\n,c => (nForms2N (dSuurin "useinta")).s ! NCase n (npform2case n c)} ;
+  most_Predet = {s = \\n,c => (nForms2N (dSuurin "usein")).s ! NCase n (npform2case n c)} ;
   much_Det = MorphoFin.mkDet Sg (snoun2nounBind (exceptNomN (mkN "paljo") "paljon")) ** {isNum = True} ; --Harmony not relevant, it's just a CommonNoun
   must_VV = mkVV (caseV genitive (mkV "täytyä")) ;
   no_Utt = ssp "INTERJ" "ei" ;
@@ -89,13 +89,13 @@ concrete StructuralFin of Structural = CatFin **
     } ;
   somePl_Det = heavyDet {
     s1 = jokuPron ! Pl ;
-    s2 = \\_ => [] ; isNum,isPoss = False ; isNeg = False ; isDef = True ;
+    s2 = \\_ => [] ; isNum,isPoss = False ; isDef = True ;
     n = Pl ; isNeg = False
     } ;
   something_NP = {
     s = \\c => jokinPron ! Sg ! npform2case Sg c ;
     a = agrP3 Sg ;
-    isPron = False ; isNeg = False ; isNeg = False
+    isPron = False ; isNeg = False
     } ;
   somewhere_Adv = ssp "ADV" "jossain" ;
   that_Quant = heavyQuant {
@@ -215,6 +215,21 @@ oper
         c   => mi.s ! NCase Sg c
         }
       } ;
+
+  kukinInt : MorphoFin.Number => MorphoFin.Case => Str =
+    let ku : Noun = nForms2N (dUkko "ku" "kun")
+     in table {
+          Sg => table {
+            Part => "kutakin" ;
+            Illat => "kuhunkin" ;
+            c   => ku.s ! NCase Sg c + "kin"
+          } ;
+          Pl => table {
+            Gen => "kuidenkin" ;
+            Part => "kuitakin" ;
+            c   => ku.s ! NCase Pl c + "kin"
+            }
+          } ;
 
   kukaInt : MorphoFin.Number => (MorphoFin.Case) => Str =
     let

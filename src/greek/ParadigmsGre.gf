@@ -68,8 +68,15 @@ oper
       mkPN = overload {
         mkPN : (anna : Str) -> PN
             = \p -> lin PN (regName p)  ;
+        mkPN : (anna : Str) -> Gender -> PN
+            = \p, g -> lin PN (regName p ** {g = g})   ;
         mkPN : (nm,gm,am,vm,pn,pa : Str)  -> Gender -> PN 
             = \ nm,gm,am,vm,pn,pa, g -> lin PN (mkName  nm  gm  am  vm pn pa g) ;
+        } ; 
+
+      mkLN = overload {
+        mkLN : Str -> LN
+            = \s -> lin LN {s=s} ;
         } ; 
 
       makeNP = overload {
@@ -310,7 +317,13 @@ oper
 
 
 
-
-
+  mkGN : Str -> GN = \s -> lin GN {s = s} ;
+  mkSN : Str -> SN = \s -> lin SN {s = s} ;
+  mkAdv : Str -> Adv = \s -> lin Adv {s = s} ;
+  mkAdV : Str -> AdV = \s -> lin AdV {s = s} ;
+  mkAdA : Str -> AdA = \s -> lin AdA {s = s} ;
+  mkAdN : Str -> AdN = \s -> lin AdN {s = s} ;
+  mkInterj : Str -> Interj = \s -> lin Interj {s = s} ;
+  mkVoc : Str -> Voc = \s -> lin Voc {s = s} ;
       
-  }
+}

@@ -249,12 +249,28 @@ resource ParadigmsIce = open
 			in lin N (nForms2Noun nfs (nForms2Suffix nfs gend) gend) ;
 
 		mkPN = overload {
-
 			-- this should be merged or swithced with N -> Gender
-			mkPN : Str -> Gender -> PN = 
-				\name,g	-> regPN name g ;	
-
+			mkPN : Str -> Gender -> PN 
+				= \name,g	-> case name of {
+						head + " " + suf => suffixPN (regPN head g) suf ; -- fallback: use explicit constructors for more precision
+						_ => regPN name g } ;
+      mkPN : PN -> Str -> PN -- mkPN (mkPN "Annar" ) "í jólum"
+			  = suffixPN ;
+      mkPN : Str -> PN -> PN -- mkPN "Sameinuðu" (mkPN "þjóðirnar")
+			  = prefixPN
 		} ;
+
+		foreignPN : Str -> PN = \name -> lin PN {s = \\_ => name ; g = Masc} ;
+		prefixPN : Str -> PN -> PN = \prefix,pn -> pn ** {
+			s = \\c => prefix ++ pn.s ! c
+			} ;
+		suffixPN : PN -> Str -> PN = \pn,suffix -> pn ** {
+			s = \\c => pn.s ! c ++ suffix
+		} ;
+
+        oper mkLN : Str -> LN = \s -> lin LN {s=s} ;
+        oper mkGN : Str -> GN = \s -> lin GN {s=s} ;
+        oper mkSN : Str -> SN = \s -> lin SN {s=s} ;
 
 		mkN2 : N -> Preposition -> N2 = \n,prep -> lin N2 (n ** {c2 = prep}) ;
 
@@ -399,7 +415,7 @@ resource ParadigmsIce = open
 
 		addAdv : A -> Str -> A = \a,adv -> a ** {adv = adv} ;
 
-  		mkA2 : A -> Prep -> A2 = \adj,prep -> adj ** {c2 = prep} ;
+  		mkA2 : A -> Prep -> A2 = \adj,prep -> lin A2 (adj ** {c2 = prep}) ;
 
 		--2 Verbs
 
@@ -442,6 +458,8 @@ resource ParadigmsIce = open
 				sgNeutNom sgNeutAcc sgNeutDat sgNeutGen plMascNom plMascAcc plMascDat plMascGen 
 				plFemNom plFemAcc plFemDat plFemGen plNeutNom plNeutAcc plNeutDat plNeutGen 
 				weakSgMascNom weakSgMascAccDatGen weakSgFemNom weakSgFemAccDatGen weakSgNeut weakPl flogið) ;
+
+            mkV : V -> Str -> V = \v,part -> v ;
 		};
 
 		depV : V -> V = \verb -> lin V (deponentVerb verb) ;
@@ -460,6 +478,18 @@ resource ParadigmsIce = open
 
 		mk5V : (_,_,_,_,_ : Str) -> V = \telja,tel,taldi,talinn,talið ->
 			lin V (vForms2Verb telja (indsub3 telja tel taldi) (impSg taldi) (impPl telja) (presPart telja) talið (weakPP talinn) (strongPP talinn)) ;
+
+
+        oper mkVQ : V -> VQ = \v -> lin VQ v ;
+        oper mkVV : V -> VV = \v -> lin VV (v ** {c2 = mkPrep "" accusative}) ;
+        oper mkVS : V -> VS = \v -> lin VS v ;
+        oper mkVA : V -> VA = \v -> lin VA v ;
+        oper mkV2V : V -> V2V = \v -> lin V2V (v ** {c2 = mkPrep "" accusative; c3 = mkPrep "" accusative}) ;
+        oper mkV2S : V -> V2S = \v -> lin V2S (v ** {c2 = mkPrep "" accusative}) ;
+        oper mkV2A : V -> V2A = \v -> lin V2A (v ** {c2 = mkPrep "" accusative}) ;
+
+        oper reflV : V -> V = \v -> v;
+
 
 		indsub1 : Str -> MForms = \inf -> case inf of {
 			stem@(front + "e" + c) + "ja"	=> cTelja inf stem (ðiditi (front + "a" + c)) ; 
@@ -726,9 +756,9 @@ resource ParadigmsIce = open
 		-- Two-place verbs need a preposition, except the special case with direct object.
 		-- (transitive verbs).
 
-		prepV2 : V -> Preposition -> V2 = \v,prep -> v  ** {c2 = prep} ;
+		prepV2 : V -> Preposition -> V2 = \v,prep -> lin V2 (v  ** {c2 = prep}) ;
 
-		prepV3 : V -> Preposition -> Preposition -> V3 = \v,p1,p2 -> v ** {c2 = p1 ; c3 = p2} ;
+		prepV3 : V -> Preposition -> Preposition -> V3 = \v,p1,p2 -> lin V3 (v ** {c2 = p1 ; c3 = p2}) ;
 		
 		accPrep : Preposition = {s = []; c = Acc} ;
 
@@ -792,7 +822,7 @@ resource ParadigmsIce = open
 
 		regPN : Str -> Gender -> PN = \name,g -> case <name,g> of {
 				<base + "i",Masc>	=> lin PN {s = caseList name (base + "a") (base + "a") (base + "a") ; g = Masc} ;
-				<base + "a",Masc>	=> lin PN {s = caseList name (base + "u") (base + "u") (base + "u") ; g = Masc} ;
+				<base + "a",g>	=> lin PN {s = caseList name (base + "u") (base + "u") (base + "u") ; g = g} ;
 				<base + "ur",Masc>	=> lin PN {s = caseList name base (base + "i") (base + "s") ; g = Masc} ;
 				<base + "l",Masc>	=> lin PN {s = caseList name name name (name + "s") ; g = Masc} ;
 				<base + "s",Masc>	=> lin PN {s = caseList name name (name + "i") (name + "ar") ; g = Masc} ;
@@ -807,7 +837,10 @@ resource ParadigmsIce = open
 
 		mkAdA : Str -> AdA = \x -> lin AdA (ss x) ;
 
-		mkAdN : CAdv -> AdN = \cadv -> lin AdN {s = cadv.s ++ cadv.p } ;
+		mkAdN = overload {
+          mkAdN : Str -> AdN = \s -> lin AdN {s = s} ;
+          mkAdN : CAdv -> AdN = \cadv -> lin AdN {s = cadv.s ++ cadv.p }
+        } ;
 
 		mkAdV : Str -> AdV = \x -> lin AdV (ss x) ;
 
@@ -826,4 +859,8 @@ resource ParadigmsIce = open
 
 		mk2Conj : Str -> Str -> Number -> Conj = \x,y,n ->
 			lin Conj (sd2 x y ** {n = n}) ;
+
+        mkInterj : Str -> Interj = \s -> lin Interj {s=s} ;
+        mkVoc : Str -> Voc = \s -> lin Voc {s=s} ;
+
 } ;

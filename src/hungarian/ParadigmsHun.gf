@@ -25,11 +25,21 @@ oper
     mkN : (unoka : Str) -> (testvér : N) -> N ; -- Compound noun. Use: `mkN "unoka" (mkN "testvér")` (would give wrong harmony with `mkN "unokatestvér"`)
   } ;
 
+  humanN : N -> N = \n -> n ** {g = Human} ;
+
   mkPN : overload {
     mkPN : Str -> PN ; -- Singular PN out of a string
     mkPN : Str -> Number -> PN -- PN with a given number
     -- mkPN : N -> Number -> PN ;
     } ;
+
+  mkLN : overload {
+    mkLN : Str -> PN ; -- Singular PN out of a string
+    mkLN : Str -> Number -> PN -- PN with a given number
+    } ;
+
+  mkGN : Str -> GN ; -- GN out of a string
+  mkSN : Str -> SN ; -- SN out of a string
 
 --2 Adjectives
 
@@ -50,6 +60,7 @@ oper
   -- Verbs
   mkV : overload {
     mkV : (sg3 : Str) -> V ;    -- Predictable verb. Takes singular P3 form in present tense.
+    mkV : (x1,_,_,_,_,_,_,_,_,_,_,_,x13 : Str) -> V ; -- Full present, past, and infinitive forms.
     -- mkV : (nore : Str) -> (hada : V) -> V ; -- Add a prefix to an existing verb, e.g. 노래+하다
   } ;
 
@@ -109,6 +120,9 @@ oper
 
   mkAdA : Str -> AdA
     = \s -> lin AdA {s = s} ;
+
+  mkAdN : Str -> AdN
+    = \s -> lin AdN {s = s} ;
 
 
 --.
@@ -184,6 +198,14 @@ oper
     -- mkPN : N -> Number -> PN ;
     } ;
 
+  mkLN = overload {
+    mkLN : Str -> LN = \s -> lin LN (defNP s Sg) ;
+    mkLN : Str -> Number -> LN = \s,n -> lin LN (defNP s n) ;
+    } ;
+
+  mkGN s = lin GN (defNP s Sg) ;
+  mkSN s = lin SN (defNP s Sg) ;
+
   mkA = overload {
     mkA : (sgnom : Str) -> A = \s -> lin A (mkAdj s) ;
     mkA : (sgnom,sgacc : Str) -> A = \nom,acc ->
@@ -194,7 +216,7 @@ oper
     } ;
 
   mkA2 = overload {
-    mkA2 : A -> A2 = \a -> a ** {c2 = casePrep Nom ; isPost = False} ;
+    mkA2 : A -> A2 = \a -> lin A2 (a ** {c2 = casePrep Nom ; isPost = False}) ;
     mkA2 : Str -> Prep -> A2 = \s,p ->
       lin A2 ((mkAdj s) ** {c2 = p ; isPost = False}) ;
     mkA2 : Str -> Case -> A2 = \s,c ->
@@ -208,22 +230,65 @@ oper
     -- mkV : (nore : Str) -> (hada : V) -> V = \nore,hada -> hada ** {
     --   s = \\vf => nore + hada.s ! vf} ;
     mkV : (x1,_,_,_,_,_,x7 : Str) -> V = \sg1,sg2,sg3,pl1,pl2,pl3,inf ->
-      lin V (mkVerbFull sg1 sg2 sg3 pl1 pl2 pl3 inf) ;
+      lin V (mkVerbPres sg1 sg2 sg3 pl1 pl2 pl3 inf) ;
+    mkV : (x1,_,_,_,_,_,_,_,_,_,_,_,_,_,x15 : Str) -> V =
+      \sg1,sg2,sg3,pl1,pl2,pl3,pastSg1,pastSg2,pastSg3,pastPl1,pastPl2,pastPl3,inf,ppart,apart ->
+        lin V (mkVerbFull sg1 sg2 sg3 pl1 pl2 pl3
+                          pastSg1 pastSg2 pastSg3 pastPl1 pastPl2 pastPl3
+                          inf ppart apart) ;
   } ;
 
-  copula = ResHun.copula ;
+  copula = lin V ResHun.copula ;
+
+  mkVS = overload {
+    mkVS : Str -> VS = \v -> lin VS (mkVerb v) ;
+    mkVS : V -> VS = \v -> lin VS v ;
+    } ;
+
+  mkVQ = overload {
+    mkVQ : Str -> VQ = \v -> lin VQ (mkVerb v) ;
+    mkVQ : V -> VQ = \v -> lin VQ v ;
+    } ;
+
+  mkVA = overload {
+    mkVA : Str -> VA = \v -> lin VA (mkVerb v) ;
+    mkVA : V -> VA = \v -> lin VA v ;
+    } ;
 
   mkV2 = overload {
     mkV2 : (plain : Str) -> V2 = \v2 -> lin V2 (mkVerb2 v2) ;
-    mkV2 : V -> V2 = vtov2 ;
+    mkV2 : V -> V2 = \v -> lin V2 (vtov2 v) ;
+    } ;
+
+  mkVV = overload {
+    mkVV : Str -> VV = \v -> lin VV (mkVerb2 v) ;
+    mkVV : V -> VV = \v -> lin VV (vtov2 v) ;
+    } ;
+
+  mkV2A = overload {
+    mkV2A : Str -> V2A = \v -> lin V2A (mkVerb2 v) ;
+    mkV2A : V -> V2A = \v -> lin V2A (vtov2 v) ;
+    } ;
+
+  mkV2V = overload {
+    mkV2V : Str -> V2V = \v -> lin V2V (mkVerb2 v) ;
+    mkV2V : V -> V2V = \v -> lin V2V (vtov2 v) ;
+    } ;
+
+  mkV2S = overload {
+    mkV2S : Str -> V2S = \v -> lin V2S (mkVerb2 v) ;
+    mkV2S : V -> V2S = \v -> lin V2S (vtov2 v) ;
+    } ;
+
+  mkV2Q = overload {
+    mkV2Q : Str -> V2Q = \v -> lin V2Q (mkVerb2 v) ;
+    mkV2Q : V -> V2Q = \v -> lin V2Q (vtov2 v) ;
     } ;
 
   mkV3 = overload {
     mkV3 : (plain : Str) -> V3 = \v3 -> lin V3 (mkVerb3 v3) ;
+    mkV3 : V -> V3 = \v -> lin V3 (v2tov3 (vtov2 v)) ;
     } ;
-  --
-  -- mkVV = overload {
-  --  } ;
 
   mkPrep = overload {
     mkPrep : (e : Str) -> Prep
@@ -234,6 +299,9 @@ oper
 
   casePrep : Case -> Prep
     = \c -> lin Prep (ResHun.caseAdp c) ;
---------------------------------------------------------------------------------
+
+  mkInterj : Str -> Interj = \s -> lin Interj {s = s} ;
+
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False} ;
 
 }

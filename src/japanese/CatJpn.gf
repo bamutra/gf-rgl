@@ -54,6 +54,7 @@ flags coding = utf8 ;
     DAP = Det ;
     Numeral = {s : Str ; n : Number ; tenPlus : Bool} ;
     Digits  = {s : Str ; n : Number ; tenPlus : Bool ; tail : DTail} ;
+    Decimal = {s : Str ; n : Number ; tenPlus : Bool ; hasDot : Bool} ;
     Conj = Conjunction ;          -- {s : Str ; null : Str ; type : ConjType} ;
     Subj = Subjunction ;          -- {s : Str ; type : SubjType} ;
     Prep = Preposition ;          -- {s : Str ; null : Str} ;
@@ -82,6 +83,6 @@ flags coding = utf8 ;
                                   --  counter : Str ; counterReplace : Bool ; counterTsu : Bool} ;
     N2 = Noun ** {prep : Str; object : Style => Str} ;
     N3 = Noun ** {prep1 : Str; prep2 : Str} ;
-    PN = PropNoun ;               -- {s : Style => Str ; anim : Animateness} ;
+    PN,LN,GN,SN = PropNoun ;               -- {s : Style => Str ; anim : Animateness} ;
 
 }

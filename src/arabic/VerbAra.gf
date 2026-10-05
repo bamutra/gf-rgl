@@ -43,6 +43,10 @@ concrete VerbAra of Verb = CatAra ** open Prelude, ResAra, ParamX in {
       } ;
 
     SlashV2a = slashV2 ;
+
+    -- The adjective is a secondary predicate of the missing object.
+    -- Keeping it in `pred` lets ComplSlash supply the agreement features.
+    SlashV2A v ap = slashV2 v ** {pred = CompAP ap} ;
     Slash2V3 v np = insertObj np (slashV2 v) ** {c2 = v.c3 ; agrObj = \\_ => []};
 
     Slash3V3 v np =
@@ -108,6 +112,10 @@ concrete VerbAra of Verb = CatAra ** open Prelude, ResAra, ParamX in {
     AdVVP adv = insertStr adv.s ;
     AdVVPSlash adv vps = vps ** insertStr adv.s vps ;
 
+    AdvVPSlash vps adv = vps ** insertStr adv.s vps ;
+
+    ExtAdvVP vp adv = insertStr adv.s vp ;
+
     -- : VPSlash -> VP ;         -- love himself
     ReflVP vps = vps ** {
       s = \\pgn,vf => vps.s ! pgn ! vf
@@ -130,6 +138,6 @@ concrete VerbAra of Verb = CatAra ** open Prelude, ResAra, ParamX in {
     CompNP np = {s = \\_,_ => [] ;
                  obj = {s = np.s ! Nom ; a = agrLite np.a} ;
                  isNP = True} ;
---
+
 --
 }

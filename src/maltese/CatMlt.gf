@@ -60,6 +60,9 @@ concrete CatMlt of Cat = CommonX - [Adv] ** open ResMlt, Prelude in {
     Pron = Pronoun ;
 
     Det = Determiner ;
+    DAP = Determiner ** {
+      adj : GenNum => Str
+      } ;
     Predet = {s : Str} ;
     Quant = Quantifier ;
 
@@ -83,6 +86,10 @@ concrete CatMlt of Cat = CommonX - [Adv] ** open ResMlt, Prelude in {
       s : NumCase => Str ;
       n : NumForm ;
       } ;
+    ACard = {
+      s : NumCase => Str ;
+      n : NumForm ;
+      } ;
 
 -- Numeral
 
@@ -97,6 +104,11 @@ concrete CatMlt of Cat = CommonX - [Adv] ** open ResMlt, Prelude in {
       s : NumCase => Str ;      -- No need for CardOrd, i.e. no 1st, 2nd etc in Maltese
       n : NumForm ;
       tail : DTail ;
+    } ;
+    Decimal = {
+      s : NumCase => Str ;      -- No need for CardOrd, i.e. no 1st, 2nd etc in Maltese
+      n : NumForm ;
+      hasDot : Bool ;
     } ;
 
 -- Structural
@@ -118,14 +130,10 @@ concrete CatMlt of Cat = CommonX - [Adv] ** open ResMlt, Prelude in {
     N  = Noun ;
     N2 = Noun ** {c2 : Compl} ;
     N3 = Noun ** {c2, c3 : Compl} ;
-    PN = ProperNoun ;
+    GN, SN, LN, PN = ProperNoun ;
 
 -- Overridden from CommonX
 
-    Adv = {
-      s : Str ;
-      joinsVerb : Bool ; -- Adv "for us" completely integrates into verb at VP level
-      a : Agr ; -- when joinsVerb, this is important
-      } ;
+    Adv = Adverb ;
 
 }

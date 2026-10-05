@@ -1,11 +1,11 @@
-concrete RelativeGer of Relative = CatGer ** open ResGer in {
+concrete RelativeGer of Relative = CatGer ** open ResGer, Prelude in {
 
   flags optimize=all_subs ;
 
   lin
 
-    RelCl cl = {
-      s = \\m,t,a,b,_ => "derart" ++ conjThat ++ cl.s ! m ! t ! a ! b ! Sub ;
+    RelCl cl = {  --- no comma before derart
+      s = \\m,t,a,b,_ => "derart" ++ Predef.BIND ++ "," ++ conjThat ++ cl.s ! m ! t ! a ! b ! Sub ;
       c = Nom
       } ;
 
@@ -18,9 +18,10 @@ concrete RelativeGer of Relative = CatGer ** open ResGer in {
 	    } ;
           agr = case rp.a of {
             RNoAg => agrP3 (numGenNum gn) ;
-            RAg n p => Ag Neutr n p
-            } ;
-          cl = mkClause (rp.s ! rgn ! Nom) agr vp
+            RAg Sg p  => AgSgP3 Neutr ;
+            RAg Pl p  => AgPl p
+          } ;  -- subject may be non-nom, e.g. an dem gezweifelt wird
+          cl = mkClause (appPrep vp.c1 (rp.s ! rgn)) agr vp
         in
         cl.s ! m ! t ! ant ! b ! Sub ;
       c = Nom
@@ -28,13 +29,12 @@ concrete RelativeGer of Relative = CatGer ** open ResGer in {
 
     RelSlash rp slash = {
       s = \\m,t,a,p,gn => 
-          appPrep slash.c2 (\\k => usePrepC k (\c -> rp.s ! gn ! c)) ++ 
-          slash.s ! m ! t ! a ! p ! Sub ;
-      c = (prepC slash.c2.c).c
+        (appPrep (toSPrep slash.c2) rp) ! gn ++ slash.s ! m ! t ! a ! p ! Sub ;
+      c = Obj slash.c2.c
       } ;
 
     FunRP p np rp = {
-      s = \\gn,c => np.s ! NPC c ++ appPrep p (\\k => usePrepC k (\c -> rp.s ! gn ! c)) ;
+      s = \\gn,c => np.s ! False ! c ++ appPrep (toSPrep p) (rp.s ! gn) ;
       a = RAg (numberAgr np.a) (personAgr np.a)
       } ;
 

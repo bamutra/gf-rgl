@@ -1,6 +1,6 @@
 concrete DocumentationChi of Documentation = CatChi ** open
   ResChi,
-  HTML 
+  HTML
 in {
 
 lincat
@@ -19,10 +19,10 @@ lin
   InflectionA, InflectionA2 = \adj -> {
     t  = "a" ;
     s1 = heading1 "Adjective" ;
-    s2 = adj.s
+    s2 = adj.s!Attr
     } ;
-    
-  InflectionAdv adv = {
+
+  InflectionAdv, InflectionAdV, InflectionAdA, InflectionAdN = \adv -> {
     t  = "adv" ;
     s1 = heading1 "Adverb" ;
     s2 = paragraph adv.s
@@ -109,6 +109,30 @@ lin
     s1 = heading1 "Verb" ++
          paragraph (pp "subject" ++ verb.s ++ pp "adjective") ;
     s2 = inflVerb verb
+    } ;
+
+  InflectionPN = \n -> {
+    t  = "pn" ;
+    s1 = heading1 "Proper Name" ;
+    s2 = n.s
+    } ;
+
+  InflectionLN = \n -> {
+    t  = "pn" ;
+    s1 = heading1 "Location Name" ;
+    s2 = n.s
+    } ;
+
+  InflectionGN = \n -> {
+    t  = "pn" ;
+    s1 = heading1 "Given Name" ;
+    s2 = n.s
+    } ;
+
+  InflectionSN = \n -> {
+    t  = "pn" ;
+    s1 = heading1 "Family Name" ;
+    s2 = n.s
     } ;
 
 oper

@@ -176,7 +176,7 @@ lin
       Dat => "kuram" ;
       Acc => "kuru" ;
       Loc => "kurā" ;
-      ResLav.Voc => NON_EXISTENT
+      ResLav.Voc => nonExist
     } ;
     num = Sg
   } ;
@@ -188,7 +188,7 @@ lin
       Dat => "kuriem" ;
       Acc => "kurus" ;
       Loc => "kuros" ;
-      ResLav.Voc => NON_EXISTENT
+      ResLav.Voc => nonExist
     } ;
     num = Pl
   } ;
@@ -200,7 +200,7 @@ lin
       Dat => "kam" ;
       Acc => "ko" ;
       Loc => "kur" ;
-      ResLav.Voc => NON_EXISTENT
+      ResLav.Voc => nonExist
     } ;
     num = Sg
   } ;
@@ -212,7 +212,7 @@ lin
       Dat => "kam" ;
       Acc => "ko" ;
       Loc => "kur" ;
-      ResLav.Voc => NON_EXISTENT
+      ResLav.Voc => nonExist
     } ;
     num = Pl
   } ;
@@ -266,17 +266,17 @@ lin
   can8know_VV = mkVV (mkV "varēt" third_conjugation) ;
   must_VV = mkVV (mkV "vajadzēt" third_conjugation Dat) ;
 
-  please_Voc = ss "lūdzu" ;
+  please_Voc = ss ", lūdzu" ;
 
 oper
   
   reflPron : Case => Str = table {
-    Nom => NON_EXISTENT ;
+    Nom => nonExist ;
     Gen => "sevis" ;
     Dat => "sev" ;
     Acc => "sevi" ;
     Loc => "sevī" ;
-    ResLav.Voc => NON_EXISTENT
+    ResLav.Voc => nonExist
   } ;
 
   lai_Subj = ss "lai" ;

@@ -73,11 +73,15 @@ lincat
 
   Ord = {s : Gender => Case => Str} ;
 
+  -- A determiner phrase without an overt noun ("these", "the larger ones").
+  DAP = {s : Gender => Case => Str ; num : Number ; pol : Polarity} ;
+
   -- Numerals
 
   Numeral = {s : CardOrd => Gender => Case => Str ; num : Number} ;
 
   Digits = {s : CardOrd => Str ; num : Number} ;
+  Decimal = {s : CardOrd => Str ; num : Number ; hasDot : Bool} ;
 
   -- Structural words
 
@@ -109,12 +113,33 @@ lincat
 
   N3 = Noun ** {prep1, prep2 : Preposition ; isPre1, isPre2 : Bool} ;
 
-  PN = ProperNoun ;
+  -- TODO Make most proper nouns more similar to nouns:
+  -- (1) given names GN should have both numbers (to fit with Tēzaurs and to be
+  --     able to express that there are multiple people in the room with the
+  --     same name)
+  -- (2) family names SN being inflected on gender doesn't fit neither with
+  --     Tēzaurs, nor with the fact that for some masc surnames there are
+  --     multiple legaly valid fem variants
+  -- (3) if PN is meant to be generic proper noun, it might also be inflected
+  --     in number
+  -- In general Latvian tends to make every noun inflectable in all cases/numbers,
+  -- the plural-only placenames like "Cēsis" is the one very stable exception.
+  PN,LN = ProperNoun ; 
+  GN = {s : Case => Str ; gend : Gender} ;
+  SN = {s : Gender => Case => Str; pl : Case => Str} ;
 
   -- Overriden from CommonX
 
   Adv = {s : Str ; isPron : Bool} ;
 
   CAdv = {s, prep : Str ; deg : Degree} ;
+  
+lindef
+  V2 = \s -> {s=\\_,_=>s; leftVal=Nom; rightVal={s=[]; c=\\_ => Acc}} ;
+  V3 = \s -> {s=\\_,_=>s; leftVal=Nom; rightVal1={s=[]; c=\\_ => Acc}; rightVal2={s=[]; c=\\_ => Dat}} ;
+
+linref
+  V2 = \v -> v.s ! Pos ! VInf ++ v.rightVal.s ;
+  V3 = \v -> v.s ! Pos ! VInf ++ v.rightVal1.s ++ v.rightVal2.s ;
 
 }

@@ -9,7 +9,7 @@ resource ParadigmsSwa = open
   in {
 
 oper
-  Gender : Type ; 
+  Gender : PType ;
   a_wa   : Gender ; --m-wa
   u_i    : Gender ; --m-mi
   li_ya  : Gender ; --ji-ma
@@ -26,14 +26,14 @@ oper
 
 -- To abstract over number names, we define the following.
 
-  Number : Type ; 
+  Number : PType ;
 
   singular : Number ; 
   plural   : Number ;
 
 -- To abstract over case names, we define the following.
 
-  Case : Type ; --%
+  Case : PType ; --%
 
   nominative : Case ; --%
   locative   : Case ; --%
@@ -126,7 +126,7 @@ oper dfltGender : Gender = G1 ;
 --2 Prepositions
 
   mkPrep : overload {
-   mkPrep : Str -> Prep  ;
+    mkPrep : Str -> Prep  ;
     mkPrep : (Gender => Number => Str) -> Prep ;
   } ;
   
@@ -292,13 +292,13 @@ mkN2 = overload {
   mkPrep = overload {
     mkPrep : Str -> Prep = \str -> lin Prep {s = \\n,g => str } ;
     mkPrep : (Number => Gender =>  Str) -> Prep = \t ->lin Prep {s = t} ;
-  } ;
-
-   noPrep = mkPrep []  ;
-  {-} mkPrep : Str -> Str -> Prep = \p,q -> lin Prep 
+    mkPrep : Str -> Str -> Prep = \p,q -> lin Prep 
         {s = table{Sg => table{G1 => p; _=> "" }; 
               Pl => table{G1 => q; _=> ""}}} ; 
- prepV2 : V -> Prep -> V2 ;
+  } ;
+
+  noPrep = mkPrep []  ;
+  prepV2 : V -> Prep -> V2 ;
   prepV2 = \v,p -> lin V2 (v ** {c2 = p.s!Sg!G1}) ;
   dirV2 : V -> V2 = \v -> prepV2 v noPrep ;
 
@@ -349,7 +349,7 @@ mkN2 = overload {
         V0 : Type ;
         V0 : Type = V;
         mkV0  v = v ** {lock_V0 = <>} ;
--}
+
 -- pre-overload API and overload definitions
 
  -- regN : Str ->Gender -> N ;
@@ -388,13 +388,12 @@ mkN2 = overload {
   } ;
 
   
-  regV=MorphoSwa.regV ;
-{-
-  mkV = overload {
-    mkV :  Str -> V =\v ->lin V(regV v) ;
-   mkV : Str -> V -> V = prefixV
-  };
+  regV : Str -> V = \v -> lin V (MorphoSwa.regV v) ;
 
+  mkV = overload {
+    mkV : Str -> V = \v ->lin V(regV v) ;
+    mkV : Str -> V -> V = prefixV
+  };
  
   prefixV : Str -> V -> V = \p,v -> lin V { s = \\b,vform => p + v.s! b ! vform } ;
   mkV2 = overload {
@@ -418,7 +417,7 @@ mkN2 = overload {
     mkV3 : V -> V3 = dirdirV3 ;
     mkV3 : Str -> V3 = \v -> dirdirV3 (regV v) ;
   } ;
--}
+
   mkConj = overload {
     mkConj : Str -> Conj = \y -> mk2Conj [] y plural ;
     mkConj : Str -> Number -> Conj = \y,n -> mk2Conj [] y n ;
@@ -432,6 +431,7 @@ mkN2 = overload {
   regPN    : Str ->Gender -> PN ;          
    nounPN : N -> PN ;
 
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False} ;
 
 
 } 

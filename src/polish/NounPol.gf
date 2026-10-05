@@ -41,18 +41,9 @@ concrete NounPol of Noun = CatPol ** open ResPol, Prelude, PronounMorphoPol, Mor
       gn = cast_gennum! <piwo.g, Sg>;
       p = P3 ;
     } ;
-    
-    UsePron p = {
-      nom = p.nom;
-      voc = p.voc;
-      dep = p.dep;
-      gn = cast_gennum! <case p.g of {
-        PGen x => x;
-        _ => Masc Personal
-      }, p.n>;
-      p = p.p;
-    };
-    
+
+    UsePron p = p ;
+
     AdjCN mily facet = {
       s = \\n,c => case mily.isPost of {
         True =>  (facet.s ! n ! c) ++ (mily.s ! AF (cast_gennum!<facet.g,n>) c) ;
@@ -76,9 +67,40 @@ concrete NounPol of Noun = CatPol ** open ResPol, Prelude, PronounMorphoPol, Mor
       p = np.p
     };
 
+    ExtAdvNP np a = {
+      nom = np.nom ++ "," ++ a.s;
+      voc = np.voc ++ "," ++ a.s;
+      dep = \\c => np.dep ! c ++ "," ++ a.s;
+      gn = np.gn;
+      p = np.p
+    };
+
+--     PossNP : CN -> NP -> CN ;    -- house of Paris
+-- Polish nominal possessors follow the head noun and are genitive.
+    PossNP cn np = {
+      s = \\n,c => cn.s ! n ! c ++ np.dep ! GenNoPrep;
+      g = cn.g
+    };
+
+-- Partitives have a genitive complement: "szklanka wody", "kromka chleba".
+    PartNP cn np = {
+      s = \\n,c => cn.s ! n ! c ++ np.dep ! GenNoPrep;
+      g = cn.g
+    };
+
+-- Determiner-headed partitives: "kilku z nich", "niektórzy z uczniów".
+    CountNP det np = {
+      nom = det.s ! Nom ! (genGenNum np.gn) ++ "z" ++ np.dep ! GenPrep;
+      voc = det.s ! VocP ! (genGenNum np.gn) ++ "z" ++ np.dep ! GenPrep;
+      dep = \\cc => let c = extract_case ! cc in
+        det.s ! c ! (genGenNum np.gn) ++ "z" ++ np.dep ! GenPrep;
+      gn = accom_gennum ! <det.a, genGenNum np.gn, det.n>;
+      p = P3
+    };
+
 -- surface structures of NP formed with MassNP, DefArt and IndefArt are identical
-    DefArt =   {s = \\_=>[] ; sp = (demPronTen "ten").sp ; c=Nom; g = PNoGen }; 
-    IndefArt = {s = \\_=>[] ; sp = jaki ;                  c=Nom; g = PNoGen };
+    DefArt =   {s = \\_=>[] ; sp = (demPronTen "ten").sp }; 
+    IndefArt = {s = \\_=>[] ; sp = jaki                  };
 
     UseN  sb = {
       s = \\n,c => sb.s ! SF n c; 
@@ -120,9 +142,9 @@ concrete NounPol of Noun = CatPol ** open ResPol, Prelude, PronounMorphoPol, Mor
       g = n2.g
     };
     
-    ComplN3 n3 np = {
+    ComplN3 n3 np = lin N2 {
       s =
-        \\sf => n3.s ! sf ++ n3.c.s ++ np.dep ! n3.c.c ;
+        \\sf => n3.s ! sf ++ n3.c1.s ++ np.dep ! n3.c1.c ;
       c = n3.c2;
       g = n3.g
     };
@@ -135,7 +157,7 @@ concrete NounPol of Noun = CatPol ** open ResPol, Prelude, PronounMorphoPol, Mor
     Use2N3 n3 = {
       s = n3.s;
       g = n3.g;
-      c = n3.c
+      c = n3.c1
     };
 
     Use3N3 n3 = {
@@ -172,6 +194,8 @@ concrete NounPol of Noun = CatPol ** open ResPol, Prelude, PronounMorphoPol, Mor
     
 --     NumDigits  : Digits  -> Card ;  -- 51
     NumDigits n =  { s=\\_,_ => n.s; a=n.a; n=n.n };
+
+    NumDecimal n =  { s=\\_,_ => n.s; a=n.a; n=n.n };
     
 --     NumCard : Card -> Num ;
     NumCard c = c ** { hasCard = True };
@@ -214,4 +238,23 @@ concrete NounPol of Noun = CatPol ** open ResPol, Prelude, PronounMorphoPol, Mor
         s= \\n,c=> cn.s!n!c ++ sc.s;
         g= cn.g
     };
+
+    DetDAP d = d ;
+
+-- In the pronominal use of a determiner the adjective supplies the lexical
+-- material: "ten obecny", "trzej mniejsi".
+    AdjDAP dap ap = dap ** {
+      s = \\c,g => dap.s ! c ! g ++
+        ap.s ! AF (cast_gennum ! <g,dap.n>) (accom_case ! <dap.a,c,g>);
+      sp = \\c,g => dap.sp ! c ! g ++
+        ap.s ! AF (cast_gennum ! <g,dap.n>) (accom_case ! <dap.a,c,g>)
+    };
+
+    QuantityNP n m = {
+      nom,voc = preOrPost m.isPre m.s n.s;
+      dep = \\cc => preOrPost m.isPre m.s n.s ;
+      gn = OthersPl;
+      p = P3
+      } ;
+
 }

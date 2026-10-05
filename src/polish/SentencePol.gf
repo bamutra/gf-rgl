@@ -71,10 +71,17 @@ lin
             (imperative_form vp.verb vp.imienne pol (cast_gennum!<Masc Personal, num>) P2) ++ 
             vp.sufix !pol !MascAniSg 
     };
+
+    AdvImp adv imp = {
+      s = \\pol,num => adv.s ++ imp.s ! pol ! num
+    };
     
 --     AdvS     : Adv -> S  -> S ;            -- today, I will go home
     AdvS adv s = { s = adv.s ++ s.s };
     ExtAdvS adv s = { s = adv.s ++ "," ++ s.s };
+
+--     SSubjS   : S -> Subj -> S -> S ;       -- I go home, if she comes
+    SSubjS a subj b = { s = a.s ++ "," ++ subj.s ++ b.s };
     
 --     SlashPrep : Cl -> Prep -> ClSlash ;         -- (with whom) he walks 
     SlashPrep c p = { s=c.s; c=p };
@@ -88,7 +95,7 @@ lin
 --     EmbedVP   : VP -> SC ;               -- to go
     EmbedVP vp = {
         s = vp.prefix ++
-            (infinitive_form vp.verb vp.imienne Pos) ++ 
+            (infinitive_form vp.verb vp.imienne Pos MascPersSg) ++ 
             vp.sufix !Pos !MascPersSg 
     };
 

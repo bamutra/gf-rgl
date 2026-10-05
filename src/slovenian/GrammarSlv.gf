@@ -8,13 +8,14 @@ concrete GrammarSlv of Grammar =
   NumeralSlv,
   SentenceSlv,
   QuestionSlv,
-{-  RelativeSlv,-}
+  RelativeSlv,
   ConjunctionSlv,
   PhraseSlv,
   TextX - [Pol,PPos,PNeg],
   StructuralSlv,
   IdiomSlv,  ----AR
-  TenseX
+  TenseX,
+  NamesSlv
   ** {
 
 flags startcat = Phr ; unlexer = text ; lexer = text ;

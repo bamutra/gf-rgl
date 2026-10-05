@@ -161,6 +161,10 @@ resource ResAmh =  PatternsAmh** open Prelude,MorphoAmh,ParamX in {
                             s : CardOrd=>Gender=>Number=>Species=>Case => Str ; 
                             tail : DTail
                           } ;
+    		Decimal  = {
+                            s : CardOrd=>Gender=>Number=>Species=>Case => Str ; 
+                            hasDot : Bool
+                          } ;
 
  		Ord =  {s : Gender=>Number=>Species=>Case => Str} ;
 
@@ -991,8 +995,8 @@ pronNP : (N,A,G,D : Str) -> PerNumGen -> NP = \N,A,G,D,png-> {
     {     
       s = \\c =>case c of
 		{
-		Gen|Dat => affix!c + word;
-		   _    => word + affix!c 
+		Gen|Dat => affix!c ++ Predef.BIND ++ word;
+		   _    => word ++ Predef.BIND ++ affix!c 
 		};
       a = {png = Per3 n Masc ; isPron = False };
       lock_NP = <>

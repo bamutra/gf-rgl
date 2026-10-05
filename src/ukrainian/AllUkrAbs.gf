@@ -1,0 +1,4 @@
+abstract AllUkrAbs =
+  Lang,
+  Extend
+  ** {}

@@ -60,6 +60,11 @@ oper
 			<Pl,Masc> => pmp ;
 			<Pl,Fem> => pfp } ; lock_Pron = <>};
   demoPN : Str -> Str -> Str -> Quant = \s1,s2,s3 -> let n = makeDemonPronForm s1 s2 s3 in {s = n.s ; a = defaultAgr ; lock_Quant = <>};
+
+  mkLN : Str -> LN = \s -> lin LN {s=s} ;
+  mkSN : Str -> SN = \s -> lin SN {s=s} ;
+  mkGN : Str -> GN = \s -> lin GN {s=s} ;
+
   mkDet : Str -> Str -> Str -> Str -> Number -> Det = \s1,s2,s3,s4,nb -> let dt = makeDet s1 s2 s3 s4 nb in {s = dt.s ; n = nb ; lock_Det = <>};
   mkIP : (x1,x2,x3:Str) -> Number -> Gender -> IP = \s1,s2,s3,n,g -> let p = mkIntPronForm s1 s2 s3 in { s = p.s ; n = n ; g = g ;  lock_IP = <>}; 
 
@@ -78,7 +83,7 @@ oper
   
 -- compound Adjectives
   mkCompoundA : Str -> Str -> A ; -- e.g dra hwa
-  mkCompoundA s1 s2 = compoundAdj s1 s2 ;
+  mkCompoundA s1 s2 = lin A (compoundAdj s1 s2) ;
 
 --2 Verbs
 
@@ -110,6 +115,8 @@ oper
      = \s,v -> {s = \\vf => v.s ! vf ; cvp = s ; lock_V = <>} ;
    };
  
+oper mkVA  : V -> VA = \v -> lin VA v ;
+oper mkV2S  : V -> V2S = \v -> lin V2S v ** {c2={s = [] ; c = VTrans}} ;
 
 ----2 Adverbs
 mkAdv = overload {
@@ -118,6 +125,8 @@ mkAdv = overload {
   mkAdv : Str -> Str -> Adv
     = \m,f -> {s = table {Masc => m ; Fem => f} ; lock_Adv = <>};
     };
+
+mkAdV : Str -> AdV = \s -> lin AdV {s=s} ;
 
 ----2 Prepositions
 
@@ -135,7 +144,7 @@ mkAdv = overload {
 --    mkQuant : Pron -> Quant = \p -> {s = \\_,_,c => p.s!c ;a = p.a ; lock_Quant = <>};
 --    mkQuant : (no_sg, no_pl, none_sg, non_pl : Str) -> Quant = mkQuantifier;
 --  } ;
-  mkIQuant : Str -> IQuant = \s -> makeIQuant s ;
+  mkIQuant : Str -> IQuant = \s -> lin IQuant (makeIQuant s) ;
   
 
 --2 Conjunctions
@@ -157,7 +166,7 @@ mkAdv = overload {
 
 --  mkV0  : V -> V0 ;
   mkVS  : V -> VS; -- e.g drna
-  mkVS v = v ;
+  mkVS v = lin VS v ;
 --  mkV2S : V -> Prep -> V2S ;
   mkVV  : V -> VV = -- e.g cahna
      \v ->  lin VV (v ** {isAux = False});
@@ -172,7 +181,7 @@ mkAdv = overload {
 --  mkVA  : V -> VA ;
 --  mkV2A : V -> Prep -> V2A ;
   mkVQ  : V -> VQ ; -- e.g janna
-  mkVQ v = v ;
+  mkVQ v = lin VQ v ;
 --  mkV2Q : V -> Prep -> V2Q ;
 --
 --  mkAS  : A -> AS ;
@@ -186,6 +195,10 @@ mkAdv = overload {
 --  V0 : Type ;
 --  AS, A2S, AV, A2V : Type ;
 --
+
+  mkInterj : Str -> Interj
+    = \s -> lin Interj {s = s} ;
+
 ----.
 ----2 Definitions of paradigms
 ----

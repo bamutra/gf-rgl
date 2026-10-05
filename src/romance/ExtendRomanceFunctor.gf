@@ -2,8 +2,7 @@ incomplete concrete ExtendRomanceFunctor of Extend =
   Cat ** open Grammar, ResRomance in {
 
   lincat
-    RNP = Grammar.NP ;
-    RNPList = Grammar.ListNP ;
+    RNP = {s : Agr => Case => Str} ;
 
   ---- these come from ExtraRomance: how to avoid the repetition?
   ---- can't seem to be able to use two functors
@@ -27,6 +26,7 @@ incomplete concrete ExtendRomanceFunctor of Extend =
       let denp = (np.s ! ResRomance.genitive).ton in {
         s = \\_,_,_,_ => [] ;
         sp = \\_,_,_ => denp ;
+        spn= \\_ => denp ;
         s2 = denp ;
         isNeg = False ;
       } ;
@@ -68,6 +68,18 @@ incomplete concrete ExtendRomanceFunctor of Extend =
       } ;
     ConjVPS = conjunctDistrTable3 Mood Agr Bool ;
 
+    RelVPS rp vpi = {
+      s = \\m, agr => rp.s ! False ! complAgr agr ! Nom ++ vpi
+                      .s ! m ! (Ag rp.a.g rp.a.n P3) ! False ;
+      c = Nom
+      } ;
+
+    SubjunctRelCN cn rs = let g = cn.g in {
+      s = \\n => cn.s ! n ++ rs.s ! Conjunct ! agrP3 g n ; --- mood
+      g = g
+      } ;
+
+
     MkVPI vp = variants {} ;     -- Temp -> Pol -> VP -> VPI ; -- to sleep / hasn't slept
     ConjVPI = variants {} ;     -- Conj -> [VPI] -> VPI ; -- has walked and won't sleep
     ComplVPIVV = variants {} ;     -- VV -> VPI -> VP ; -- want to sleep and to walk
@@ -104,7 +116,7 @@ incomplete concrete ExtendRomanceFunctor of Extend =
     EmbedPresPart = variants {} ;     -- VP -> SC ; -- looking at Mary (is fun)
 
     PresPartAP vp = {
-      s = \\af => gerVP vp (aform2aagr af ** {p = P3}) ;
+      s = \\af => gerVP vp RPos (aform2aagr af ** {p = P3}) ;
       isPre = False ;
       copTyp = serCopula
       } ;
@@ -126,7 +138,7 @@ incomplete concrete ExtendRomanceFunctor of Extend =
     ExistPluralCN cn = ExistNP (DetCN (DetQuant IndefArt NumPl) cn) ;
     AdvIsNP adv np = mkClause adv.s False False np.a (UseComp_estar (CompNP np)) ;
     AdvIsNPAP adv np ap = -- <aquí:Adv> está <documentada:AP> <la examinación:NP>
-      let emptyN : N = lin N {s = \\_ => [] ; g = np.a.g} ; -- To match the gender of the N
+      let emptyN : N = lin N {s = \\_ => [] ; relType = NRelNoPrep ; g = np.a.g} ; -- To match the gender of the N
           indef : Quant = IndefArt ** {s = \\b,n,g,c => []} ;
           det : Det = case np.a.n of {Sg => DetQuant indef NumSg ; Pl => DetQuant indef NumPl} ;
           apAsNP : NP = DetCN det (AdjCN ap (UseN emptyN)) ; -- NP where the string comes only from AP
@@ -142,18 +154,27 @@ incomplete concrete ExtendRomanceFunctor of Extend =
     PredAPVP ap vp = ImpersCl (UseComp (CompAP (SentAP ap (EmbedVP vp)))) ; -- DEFAULT it is (good to walk)
 
     AdjAsCN ap = {
-      s =\\n => ap.s ! (genNum2Aform Masc n) ;
+      s = \\n => ap.s ! genNum2Aform Masc n ;
       g = Masc
       } ;
 
     AdjAsNP ap = heavyNP {
-      s = \\_c => ap.s ! ASg Masc APred ;
+      s = \\_c => ap.s ! genNum2Aform Masc Sg ;
       a = Ag Masc Sg P3
       } ;
 
   lin
-    ReflRNP = variants {} ;     -- VPSlash -> RNP -> VP ; -- love my family and myself
-    ReflPron = variants {} ;     -- RNP ; -- myself
+    ReflRNP v rnp =      -- VPSlash -> RNP -> VP ; -- love my family and myself
+      case v.c2.isDir of {
+        True  => insertRefl v ;
+        False => insertComplement
+                   (\\a => let agr = verbAgr a in v.c2.s ++ rnp.s ! agr ! v.c2.c) v
+      } ;
+
+    ReflPron = {         -- RNP ; -- myself
+      s = \\agr,c => reflPron agr.n agr.p c
+    } ;
+
     ReflPoss = variants {} ;     -- Num -> CN -> RNP ; -- my car(s)
     PredetRNP = variants {} ;     -- Predet -> RNP -> RNP ; -- all my brothers
     ConjRNP = variants {} ;     -- Conj -> RNPList -> RNP ; -- my family, John and myself
@@ -165,19 +186,28 @@ incomplete concrete ExtendRomanceFunctor of Extend =
     ComplGenVV = variants {} ;     -- VV -> Ant -> Pol -> VP -> VP ; -- want not to have slept
     ComplSlashPartLast = ComplSlash ;
 
-    CompoundN = variants {} ;     -- N -> N -> N ; -- control system / controls system / control-system
+    CompoundN a b = lin N {
+      s = \\n => b.s ! n ++
+                 case b.relType of {
+                   NRelPrep p => prepCase (CPrep p) ;  -- tasa de suicidio
+                   NRelNoPrep => []                    -- connessione internet = internet connection
+                 } ++
+                 a.s ! Sg ;
+      g = b.g ;
+      relType = b.relType
+      } ;
     CompoundAP = variants {} ;     -- N -> A -> AP ; -- language independent / language-independent
 
   lin
     GerundNP vp = let
       neutrAgr = Ag Masc Sg P3
       in heavyNP {
-        s = \\_ => gerVP vp neutrAgr ;
+        s = \\_ => gerVP vp RPos neutrAgr ;
         a = neutrAgr
       } ;
 
     GerundCN vp = {
-      s = \\n => gerVP vp {g = Masc ; n = n ; p = P3} ;
+      s = \\n => gerVP vp RPos {g = Masc ; n = n ; p = P3} ;
       g = Masc
       } ;
 
@@ -187,7 +217,7 @@ incomplete concrete ExtendRomanceFunctor of Extend =
 
   lin
     PurposeVP vp = {
-      s = infVP vp (Ag Masc Sg P3)
+      s = infVP vp RPos (Ag Masc Sg P3)
       } ;
 
     WithoutVP = variants {} ;     -- VP -> Adv ; -- without publishing the document
@@ -214,7 +244,7 @@ incomplete concrete ExtendRomanceFunctor of Extend =
       } ;
     UttAdV av = av ;
     PositAdVAdj a = {
-      s = a.s ! Posit ! AA
+      s = a.s ! AA
       } ;
 
   lin
@@ -222,10 +252,8 @@ incomplete concrete ExtendRomanceFunctor of Extend =
     CompQS = variants {} ;     -- QS -> Comp ; -- (the question is) who sleeps
 
     --TODO: actually use ant
-    CompVP ant p vp = let
-      neg = negation ! p.p
-      in {
-        s = \\agr => ant.s ++ p.s ++ "de" ++ neg.p1 ++ infVP vp agr ;
+    CompVP ant p vp = {
+        s = \\agr => ant.s ++ p.s ++ "de" ++ infVP vp p.p agr ;
         cop = serCopula
       } ;
 
@@ -237,6 +265,35 @@ incomplete concrete ExtendRomanceFunctor of Extend =
         n = det.n
       in heavyNPpol det.isNeg {
            s = det.sp ! g ;
+           a = agrP3 g n ;
+           hasClit = False
+           } ;
+
+
+    UseDAP = \dap ->
+      let
+        g = Masc ;
+        n = dap.n
+      in heavyNPpol dap.isNeg {
+        s = dap.spn ;
+        a = agrP3 g n ;
+        hasClit = False
+        } ;
+    UseDAPMasc = \dap ->
+      let
+        g = Masc ;
+        n = dap.n
+      in heavyNPpol dap.isNeg {
+        s = dap.sp ! g ;
+        a = agrP3 g n ;
+        hasClit = False
+        } ;
+    UseDAPFem dap =
+      let
+        g = Fem ;
+        n = dap.n
+      in heavyNPpol dap.isNeg {
+           s = dap.sp ! g ;
            a = agrP3 g n ;
            hasClit = False
            } ;
@@ -260,19 +317,21 @@ incomplete concrete ExtendRomanceFunctor of Extend =
     UttDatIP ip = UttAccIP (lin IP ip) ; -- whom (dative) ; DEFAULT who
     UttVPShort = UttVP ;
 
+    TPastSimple = {s = []} ** {t = RPasse} ;   --# notpresent
+
   oper
     quoted : Str -> Str = \s -> "\"" ++ s ++ "\"" ; ---- TODO bind ; move to Prelude?
 
   oper
     gerundStr : VP -> Str ;
-    gerundStr vp = gerVP vp (Ag Masc Sg P3) ;
+    gerundStr vp = gerVP vp RPos (Ag Masc Sg P3) ;
 
     infStr : VP -> Str ;
-    infStr vp = infVP vp (Ag Masc Sg P3) ;
+    infStr vp = infVP vp RPos (Ag Masc Sg P3) ;
 
     pastPartAP : VPSlash -> Str -> AP ;
     pastPartAP vps agent = lin AP {
-      s = \\af => vps.comp ! (aform2aagr af ** {p = P3}) ++ vps.s.s ! VPart (aform2gender af) (aform2number af) ++ agent ;
+      s = \\af => vps.s.s ! VPart (aform2gender af) (aform2number af) ++ vps.comp ! (aform2aagr af ** {p = P3}) ++ agent ;
       isPre = False ;
       copTyp = serCopula
       } ;
@@ -281,10 +340,10 @@ incomplete concrete ExtendRomanceFunctor of Extend =
     passVPSlash vps agent = let
       auxvp = predV auxPassive
       in
-      vps ** {
+      lin VP vps ** {
         s = auxvp.s ;
         agr = auxvp.agr ;
-        comp  = \\a => vps.comp ! a ++ (let agr = complAgr a in vps.s.s ! VPart agr.g agr.n) ++ agent ;
+        comp  = \\a => (let agr = complAgr a in vps.s.s ! VPart agr.g agr.n) ++ vps.comp ! a ++ agent ;
       } ;
 
 } ;

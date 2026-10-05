@@ -34,6 +34,11 @@ lin
     s = \\mood,pol => buildVerb (mkV "būt") mood pol np.agr np.pol Pos ++ np.s ! Nom
   } ;
 
+  ExistNPAdv np adv = {
+    s = \\mood,pol => buildVerb (mkV "būt") mood pol np.agr np.pol Pos ++
+                       np.s ! Nom ++ adv.s
+  } ;
+
   ExistIP ip = {
     s = \\mood,pol => ip.s ! Nom ++ buildVerb (mkV "būt") mood pol (AgrP3 ip.num Masc) Pos Pos
   } ;
@@ -57,7 +62,7 @@ lin
   } ;
 
   -- FIXME: placeholder
-  CleftNP np rs = { s = \\_,_ => NON_EXISTENT } ;
-  CleftAdv ad s = { s = \\_,_ => NON_EXISTENT } ;
+  CleftNP np rs = { s = \\_,_ => nonExist } ;
+  CleftAdv ad s = { s = \\_,_ => nonExist } ;
 
 }

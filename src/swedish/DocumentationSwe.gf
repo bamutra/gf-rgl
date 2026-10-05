@@ -32,6 +32,39 @@ lin
            )
      } ;
 
+  InflectionLN = \n -> {
+    t  = "nm" ;
+    s1 = heading1 ("Platsnamn" ++ case n.g of {
+                                    Utr   => "(utr)" ;
+                                    Neutr => "(neutr)"
+                                  }) ;
+    s2 = frameTable (
+           tr (th "nom" ++ td (n.s ! Nom)) ++
+           tr (th "gen" ++ td (n.s ! Gen))
+           ) ;
+     } ;
+
+  InflectionGN = \pn -> {
+    t  = "fnm" ;
+    s1 = heading1 ("Förnamn" ++ case pn.g of {
+                                  Male   => "(man)" ;
+                                  Female => "(kvinna)"
+                                }) ;
+    s2 = frameTable (
+           tr (th "nom" ++ td (pn.s ! Nom)) ++
+           tr (th "gen" ++ td (pn.s ! Gen))
+           )
+     } ;
+
+  InflectionSN = \pn -> {
+    t  = "enm" ;
+    s1 = heading1 "Efternamn" ;
+    s2 = frameTable (
+           tr (th "nom" ++ td (pn.s ! Male ! Nom)) ++
+           tr (th "gen" ++ td (pn.s ! Male ! Gen))
+           )
+     } ;
+
   InflectionA, InflectionA2 = \adj -> { 
     t  = "a" ;
     s1 = heading1 "Adjektiv" ;
@@ -66,7 +99,7 @@ lin
               td (adj.s ! (AF (APosit (Weak Pl)) c))) ;
     } ;
 
-  InflectionAdv adv = {
+  InflectionAdv, InflectionAdV, InflectionAdA, InflectionAdN = \adv -> {
     t  = "adv" ;
     s1 = heading1 "Adverb" ;
     s2 = paragraph adv.s
@@ -76,6 +109,21 @@ lin
     t  = "prep" ;
     s1 = heading1 "Preposition" ;
     s2 = paragraph p.s
+    } ;
+
+  InflectionCl = \cl -> {
+    t  = "sats" ;
+    s1 = heading1 "Sats" ;
+    s2 = frameTable (
+           tr (intagAttr "th" "colspan=3" "Enkla tempus" ++
+               intagAttr "th" "colspan=3" "Perfekta tempus") ++
+           tr (th "tempus" ++ th "påstående" ++ th "fråga" ++
+               th "tempus" ++ th "påstående" ++ th "fråga") ++
+           inflClauseTense "presens" "perfekt" SPres cl ++
+           inflClauseTense "preteritum" "pluskvamperfekt" SPast cl ++
+           inflClauseTense "framtid" "framtid perfekt" SFut cl ++
+           inflClauseTense "konditionalis" "konditionalis perfekt" SCond cl
+         )
     } ;
 
   InflectionV v = {
@@ -190,6 +238,18 @@ lin
   MkTag i = {s = i.t} ;
 
 oper
+  inflClauseTense : Str -> Str -> STense -> Cl -> Str = \simple,perfect,tense,cl ->
+    tr (intagAttr "th" "rowspan=2" simple ++
+        td (cl.s ! tense ! Simul ! Pos ! Main) ++
+        td (cl.s ! tense ! Simul ! Pos ! Inv) ++
+        intagAttr "th" "rowspan=2" perfect ++
+        td (cl.s ! tense ! Anter ! Pos ! Main) ++
+        td (cl.s ! tense ! Anter ! Pos ! Inv)) ++
+    tr (td (cl.s ! tense ! Simul ! Neg ! Main) ++
+        td (cl.s ! tense ! Simul ! Neg ! Inv) ++
+        td (cl.s ! tense ! Anter ! Neg ! Main) ++
+        td (cl.s ! tense ! Anter ! Neg ! Inv)) ;
+
   inflVerb : Verb -> Str = \verb ->
     frameTable (
       tr (th "" ++ th "active" ++ th "passive") ++

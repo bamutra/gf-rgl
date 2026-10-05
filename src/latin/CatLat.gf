@@ -1,4 +1,4 @@
-concrete CatLat of Cat = CommonX-[Adv] ** open ResLat, ParamX, Prelude in {
+concrete CatLat of Cat = CommonX-[Adv] ** open ResLat, Prelude in {
 
   flags optimize=all_subs ;
 
@@ -15,7 +15,7 @@ concrete CatLat of Cat = CommonX-[Adv] ** open ResLat, ParamX, Prelude in {
 ---- Sentence
 --
     Cl = Clause ;
-    ClSlash = Clause ;
+    ClSlash = Clause ** {c2 : Preposition} ;
     Imp = {s : Polarity => VImpForm => Str} ;
 --
 ---- Question
@@ -57,12 +57,16 @@ concrete CatLat of Cat = CommonX-[Adv] ** open ResLat, ParamX, Prelude in {
     Ord = { s : Gender => Number => Case => Str } ;
     Num  = {s : Gender => Case => Str ; n : Number} ;
     Card = {s : Gender => Case => Str ; n : Number} ;
+    ACard = {s : Str} ;
     Quant = Quantifier ;
+    DAP = Determiner ;
+    SSlash = Sentence ** {c2 : Preposition} ;
 --
 ---- Numeral
 --
     Numeral = ResLat.TNumeral ;
     Digits  = {s : Str ; unit : Unit} ;
+    Decimal = {s : Str ; unit : Unit ; hasDot : Bool} ;
 --
 ---- Structural
 --
@@ -84,10 +88,13 @@ concrete CatLat of Cat = CommonX-[Adv] ** open ResLat, ParamX, Prelude in {
     N = Noun ;
     N2 = Noun ** { c : Prep } ;
     N3 = Noun ** { c : Prep ; c2 : Prep } ;
-    PN = { s : Case => Str ; n : Number ; g : Gender } ;
+    PN, LN = { s : Case => Str ; n : Number ; g : Gender } ;
+    GN = { s : Str ; g : Sex } ;
+    SN = { s : Sex => Str ; pl : Str } ;
     A2 = Adjective ** { c : Prep} ;
 
   linref
+    Cl = \cl -> defaultSentence (combineClause "" cl Pres Simul Pos VQFalse) ! SOV ;
     NP = \np -> combineNounPhrase np ! PronNonDrop ! APreN ! DPostN ! Nom ; 
     VP = \vp -> vp.adv ++ vp.inf !  VInfActPres ++ vp.obj ++ vp.compl ! Ag Masc Sg Nom ;
     S = \s -> defaultSentence s ! SOV ;

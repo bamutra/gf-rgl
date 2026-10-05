@@ -107,6 +107,18 @@ concrete NounMlt of Noun = CatMlt ** open ResMlt, Prelude, Maybe in {
       isDefn = True ;
       } ;
 
+    -- DAP -> AP -> DAP
+    -- the large one
+    AdjDAP dap ap = dap ** {
+      adj = \\gn => dap.adj ! gn ++ ap.s ! gn
+      } ;
+
+    -- Det -> DAP
+    -- this one
+    DetDAP det = det ** {
+      adj = \\_ => []
+      } ;
+
     -- Quant
     DefArt = {
       s  = \\_ => artDef ;
@@ -189,6 +201,8 @@ concrete NounMlt of Noun = CatMlt ** open ResMlt, Prelude, Maybe in {
     -- 51
     NumDigits d = {s = d.s ; n = d.n} ;
 
+    NumDecimal d = {s = d.s ; n = d.n} ;
+
     -- Digits -> Ord
     -- 51st
     OrdDigits d = {s = d.s} ;
@@ -211,8 +225,8 @@ concrete NounMlt of Noun = CatMlt ** open ResMlt, Prelude, Maybe in {
     -- warmest
     OrdSuperl a = {
       s = \\c => case a.hasComp of {
-        True => a.s ! ASuperl ;
-        False => "l-iktar" ++ a.s ! APosit (GSg Masc) --- should agree
+        True => a.s ! ACompar ;
+        False => "iktar" ++ a.s ! APosit (GSg Masc) --- should agree
         }
       } ;
 
@@ -307,6 +321,13 @@ concrete NounMlt of Noun = CatMlt ** open ResMlt, Prelude, Maybe in {
       isPron = False ;
       isDefn = np.isDefn ;
       } ;
+
+    QuantityNP n m = {   -- quessed
+      s = \\c => preOrPost m.isPre m.s (n.s ! NumNom) ;
+      a = agrP3 (numform2num n.n) Masc ;
+      isPron = False ;
+      isDefn = False ;
+    } ;
 
   oper
     -- Overwrite the s field in an NP

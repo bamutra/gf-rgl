@@ -1,6 +1,7 @@
 --# -path=.:../abstract:../common
 concrete DocumentationEng of Documentation = CatEng ** open
   ResEng,
+  Prelude,
   HTML in {
 
 lincat
@@ -24,20 +25,79 @@ lin
          )
     } ;
 
+  InflectionPN = \pn -> {
+    t  = "pn" ;
+    s1 = heading1 ("Proper Name" ++
+                    case pn.g of {
+                      Neutr => "";
+                      Masc  => "(masc)";
+                      Fem   => "(fem)"
+                    }) ;
+    s2 = frameTable (
+           tr (th "nom"        ++ th "gen") ++
+           tr (td (pn.s ! Nom) ++ td (pn.s ! Gen))
+         )
+    } ;
+
+  InflectionLN = \n -> {
+    t  = "ln" ;
+    s1 = heading1 ("Location Name" ++
+                    case n.n of {
+                      Sg => "";
+                      Pl => "(plural)"
+                    }) ;
+    s2 = frameTable (
+           tr (th "nom"        ++ th "gen") ++
+           tr (td (n.s ! Nom) ++ td (n.s ! Gen))
+         ) ++
+         heading1 ("Adverb") ++
+         paragraph (case n.prep of {
+                      InPrep => "in" ;
+                      OnPrep => "on" ;
+                      AtPrep => "at"
+                    } ++ 
+                    case n.art of {
+                      True  => "the" ++ n.s ! Nom ;
+                      False => n.s ! Nom
+                    }) ;
+    } ;
+
+  InflectionGN = \gn -> {
+    t  = "gn" ;
+    s1 = heading1 ("Given Name" ++
+                    case gn.g of {
+                      Male   => "(male)";
+                      Female => "(female)"
+                    }) ;
+    s2 = frameTable (
+           tr (th "nom"        ++ th "gen") ++
+           tr (td (gn.s ! Nom) ++ td (gn.s ! Gen))
+         )
+    } ;
+
+  InflectionSN = \pn -> {
+    t  = "sn" ;
+    s1 = heading1 "Secondary Name" ;
+    s2 = frameTable (
+           tr (th "nom"        ++ th "gen") ++
+           tr (td (pn.s ! Male ! Nom) ++ td (pn.s ! Male ! Gen))
+         )
+    } ;
+
   InflectionA, InflectionA2 = \adj -> {
     t  = "a" ;
     s1 = heading1 "Adjective" ;
     s2 = frameTable (
            tr (th ""       ++ th "nom" ++ th "gen") ++
            tr (th "posit"  ++ td (adj.s ! AAdj Posit  Nom) ++ td (adj.s ! AAdj Posit  Gen)) ++
-           tr (th "compar" ++ td (adj.s ! AAdj Compar Nom) ++ td (adj.s ! AAdj Compar Gen)) ++
-           tr (th "superl" ++ td (adj.s ! AAdj Superl Nom) ++ td (adj.s ! AAdj Superl Gen))
+           tr (th "compar" ++ td (getCompar Nom adj) ++ td (getCompar Gen adj)) ++
+           tr (th "superl" ++ td (getSuperl Nom adj) ++ td (getSuperl Gen adj))
          ) ++
          heading1 "Adverb" ++
          paragraph (adj.s ! AAdv)
     } ;
 
-  InflectionAdv = \adv -> {
+  InflectionAdv, InflectionAdV, InflectionAdA, InflectionAdN = \adv -> {
     t = "adv" ;
     s1= heading1 "Adverb" ;
     s2= paragraph (adv.s) ;
@@ -50,6 +110,27 @@ lin
     s2= paragraph (prep.s) ;
     s3= ""
     } ;
+
+{-
+-}  --# notpresent
+
+  InflectionCl = \cl -> {
+    t  = "cl" ;
+    s1 = heading1 "Clause" ;
+    s2 = frameTable (
+           tr (intagAttr "th" "colspan=\"3\"" "Simple tenses" ++
+               intagAttr "th" "colspan=\"3\"" "Perfect tenses") ++
+           tr (th "tense" ++ th "declarative" ++ th "interrogative" ++
+               th "tense" ++ th "declarative" ++ th "interrogative") ++
+           inflClauseTense "present"     "present perfect"     Pres cl ++
+           inflClauseTense "past"        "past perfect"        Past cl ++
+           inflClauseTense "future"      "future perfect"      Fut  cl ++
+           inflClauseTense "conditional" "conditional perfect" Cond cl
+         )
+    } ;
+
+{-  --# notpresent
+-}
 
   InflectionV v = {
     t = "v" ;
@@ -69,7 +150,7 @@ lin
 
   InflectionV3 v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    v.c2 ++ pp "arg1" ++
@@ -79,7 +160,7 @@ lin
 
   InflectionV2V v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    v.c2 ++ pp "object" ++
@@ -93,7 +174,7 @@ lin
 
   InflectionV2S v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    v.c2 ++ pp "object" ++
@@ -103,7 +184,7 @@ lin
 
   InflectionV2Q v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    pp "question") ;
@@ -112,7 +193,7 @@ lin
 
   InflectionV2A v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    v.c2 ++ pp "object" ++
@@ -122,7 +203,7 @@ lin
 
   InflectionVV v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VVF VInf ++ v.p ++
                    case v.typ of {
@@ -131,7 +212,7 @@ lin
                      VVPresPart => pp "verb+ing"
                    }) ;
     s2= frameTable (
-          tr (th "infitive"      ++ td (v.s ! VVF VInf)) ++
+          tr (th "infinitive"    ++ td (v.s ! VVF VInf)) ++
           tr (th "present"       ++ td (v.s ! VVF VPres ++ "&#160;" ++ v.s ! VVPresNeg)) ++
           tr (th "past"          ++ td (v.s ! VVF VPast ++ "&#160;" ++ v.s ! VVPastNeg)) ++ --# notpresent
           tr (th "past part."    ++ td (v.s ! VVF VPPart)) ++
@@ -141,7 +222,7 @@ lin
 
   InflectionVS v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    "that" ++ pp "sentence") ;
@@ -150,7 +231,7 @@ lin
 
   InflectionVQ v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    pp "question") ;
@@ -159,7 +240,7 @@ lin
 
   InflectionVA v = {
     t = "v" ;
-    s1= heading1 "Verb" ++ 
+    s1= heading1 "Verb" ++
         paragraph (pp "subject" ++
                    v.s ! VInf ++ v.p ++
                    pp "adjective") ;
@@ -167,9 +248,28 @@ lin
     } ;
 
 oper
+
+{-
+-}  --# notpresent
+
+  inflClauseTense : Str -> Str -> ResEng.Tense -> Cl -> Str = \simple,perfect,tense,cl ->
+    tr (intagAttr "th" "rowspan=\"2\"" simple ++
+        td (cl.s ! tense ! Simul ! CPos       ! ODir False) ++
+        td (cl.s ! tense ! Simul ! CPos       ! OQuest) ++
+        intagAttr "th" "rowspan=\"2\"" perfect ++
+        td (cl.s ! tense ! Anter ! CPos       ! ODir False) ++
+        td (cl.s ! tense ! Anter ! CPos       ! OQuest)) ++
+    tr (td (cl.s ! tense ! Simul ! CNeg True  ! ODir False) ++
+        td (cl.s ! tense ! Simul ! CNeg True  ! OQuest) ++
+        td (cl.s ! tense ! Anter ! CNeg True  ! ODir False) ++
+        td (cl.s ! tense ! Anter ! CNeg True  ! OQuest)) ;
+
+{-  --# notpresent
+-}
+
   inflVerb : Verb -> Str = \verb ->
     frameTable (
-      tr (th "infitive"      ++ td (verb.s ! VInf)) ++
+      tr (th "infinitive"    ++ td (verb.s ! VInf)) ++
       tr (th "present"       ++ td (verb.s ! VPres)) ++
       tr (th "past"          ++ td (verb.s ! VPast)) ++ --# notpresent
       tr (th "past part."    ++ td (verb.s ! VPPart)) ++

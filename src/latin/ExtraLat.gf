@@ -58,24 +58,24 @@ concrete ExtraLat of ExtraLatAbs =
     UttS_VInS s = { s = combineSentence s ! SAPreS ! APreV ! DPostN ! VInS ! CPostV ! SVO } ;
 
     TestRCl t p cl = {
-      s = \\g,n => combineSentence (combineClause (cl.s ! g ! n) (lin Tense t) t.a (lin Pol p) VQFalse) ;
+      s = \\g,n => combineSentence (combineClause (t.s++p.s) (cl.s ! g ! n) t.t t.a p.p VQFalse) ;
       } ;
     
     -- UseRCl_OSV : Temp -> Pol -> RCl -> RS ;
     UseRCl_OSV t p cl = {
-      s = \\g,n => combineSentence (combineClause (cl.s ! g ! n) (lin Tense t) t.a (lin Pol p) VQFalse) ! SAPreO ! APreV ! DPreN ! VReg ! CPostV ! OSV ;
+      s = \\g,n => combineSentence (combineClause (t.s++p.s) (cl.s ! g ! n) t.t t.a p.p VQFalse) ! SAPreO ! APreV ! DPreN ! VReg ! CPostV ! OSV ;
     } ;
     -- UseRCl_OVS : Temp -> Pol -> RCl -> RS ;
     UseRCl_OVS t p cl = {
-      s = \\g,n => combineSentence (combineClause (cl.s ! g ! n) (lin Tense t) t.a (lin Pol p) VQFalse) ! SAPreO ! APreV ! DPreN ! VReg ! CPostV ! OVS  ; -- SAPreO APreV DPreN VReg CPostV OVS
+      s = \\g,n => combineSentence (combineClause (t.s++p.s) (cl.s ! g ! n) t.t t.a p.p VQFalse) ! SAPreO ! APreV ! DPreN ! VReg ! CPostV ! OVS  ; -- SAPreO APreV DPreN VReg CPostV OVS
       } ;
     -- UseRCl_SOV : Temp -> Pol -> RCl -> RS ;
     UseRCl_SOV t p cl = {
-      s = \\g,n => combineSentence (combineClause (cl.s ! g ! n) (lin Tense t) t.a (lin Pol p) VQFalse) ! SAPreS ! APreV ! DPreN ! VReg ! CPostV ! SOV  ;
+      s = \\g,n => combineSentence (combineClause (t.s++p.s) (cl.s ! g ! n) t.t t.a p.p VQFalse) ! SAPreS ! APreV ! DPreN ! VReg ! CPostV ! SOV  ;
     } ;
     -- UseRCl_SVO : Temp -> Pol -> RCl -> RS ;
     UseRCl_SVO t p cl = {
-      s = \\g,n => combineSentence (combineClause (cl.s ! g ! n) (lin Tense t) t.a (lin Pol p) VQFalse) ! SAPreS ! APreV ! DPreN ! VReg ! CPostV ! SVO  ;
+      s = \\g,n => combineSentence (combineClause (t.s++p.s) (cl.s ! g ! n) t.t t.a p.p VQFalse) ! SAPreS ! APreV ! DPreN ! VReg ! CPostV ! SVO  ;
     } ;
     --  PrepNP_DPostN : Prep -> NP -> Adv ;        -- in the house
     PrepNP_DPostN prep np =
@@ -122,7 +122,7 @@ concrete ExtraLat of ExtraLatAbs =
 
     --  SlashVP_VP_Ellipsis  : NP -> VPSlash -> ClSlash ;      -- (whom) he sees
     SlashVP_VP_Ellipsis np = 
-      mkClause np emptyVP ;
+      mkClause np emptyVP ** {c2 = mkPreposition "" Acc} ;
 
     -- FunRP_RP_Ellipsis : Prep -> NP -> RP ;
     FunRP_RP_Ellipsis p np = FunRP p np (lin RP { s = \\_ => "" }) ;

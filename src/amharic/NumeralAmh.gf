@@ -1,5 +1,5 @@
 
-concrete NumeralAmh of Numeral = CatAmh [Numeral,Digits] ** open ResAmh,ParamX,Prelude in {
+concrete NumeralAmh of Numeral = CatAmh [Numeral,Digits,Decimal] ** open ResAmh,ParamX,Prelude in {
 flags coding = utf8;
 lincat 
 
@@ -91,17 +91,24 @@ lin pot3plus n m = {
     D_8 = mkDig "8" ;
     D_9 = mk2Dig "9" "9ኛ";
 
+    PosDecimal d = d ** {hasDot=False} ;
+    NegDecimal d = {
+      s = \\o,g,n,s,c => "-" ++ BIND ++ d.s !o!g!n!s!c ;
+      hasDot=False
+    } ;
+    IFrac d i = {
+      s = \\o,g,n,s,c => d.s!NCard!Masc!Sg!Indef!c ++
+                         if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+                         i.s ! o ! g ! n ! s ! c;
+      hasDot=True
+      } ;
+
   oper
     commaIf : DTail -> Str = \t -> case t of {
       T3 => BIND++","++BIND ;
       _  => BIND
       } ;
 
-    inc : DTail -> DTail = \t -> case t of {
-      T1 => T2 ;
-      T2 => T3 ;
-      T3 => T1
-      } ;
 ------------------ :) what a releif 
 
     mk2Dig : Str -> Str -> TDigit = \c,o -> mk3Dig c o  ;

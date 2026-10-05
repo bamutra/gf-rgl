@@ -4,12 +4,12 @@
 --
 -- Aarne Ranta 2001 - 2006
 --
--- This is an API for the user of the resource grammar 
+-- This is an API for the user of the resource grammar
 -- for adding lexical items. It gives functions for forming
 -- expressions of open categories: nouns, adjectives, verbs.
--- 
+--
 -- Closed categories (determiners, pronouns, conjunctions) are
--- accessed through the resource syntax API, $Structural.gf$. 
+-- accessed through the resource syntax API, $Structural.gf$.
 --
 -- The main difference with $MorphoFre.gf$ is that the types
 -- referred to are compiled resource grammar types. We have moreover
@@ -24,30 +24,30 @@
 -- separate module [``IrregFre`` ../../french/IrregFre.gf],
 -- which covers all irregularly inflected verbs.
 
-resource ParadigmsFre = 
-  open 
-    (Predef=Predef), 
-    Prelude, 
-    MorphoFre, 
+resource ParadigmsFre =
+  open
+    (Predef=Predef),
+    Prelude,
+    MorphoFre,
     BeschFre,
     CatFre in {
 
   flags optimize=all ;
     coding=utf8 ;
 
---2 Parameters 
+--2 Parameters
 --
 -- To abstract over gender names, we define the following identifiers.
 
 oper
-  Gender : Type ; 
+  Gender : PType ;
 
   masculine : Gender ;
   feminine  : Gender ;
 
 -- To abstract over number names, we define the following.
 
-  Number : Type ;  --%
+  Number : PType ;  --%
 
   singular : Number ; --%
   plural   : Number ; --%
@@ -72,9 +72,9 @@ oper
   mkN : overload {
 
 -- The regular function uses heuristics to compute the
--- plural and the gender from the singular. The plural 
+-- plural and the gender from the singular. The plural
 -- heuristic currently
--- covers the cases "pas-pas", "prix-prix", "nez-nez", 
+-- covers the cases "pas-pas", "prix-prix", "nez-nez",
 -- "bijou-bijoux", "cheveu-cheveux", "plateau-plateaux", "cheval-chevaux".
 -- The gender heuristic is less reliable: it treats as feminine all
 -- nouns ending with "e" and "ion", all others as masculine.
@@ -85,30 +85,30 @@ oper
 
     mkN : (foie : Str) -> Gender -> N ; --%
 
--- In the worst case, both singular and plural forms and the gender are needed. 
+-- In the worst case, both singular and plural forms and the gender are needed.
 
     mkN : (oeil,yeux : Str) -> Gender -> N ; -- worst-case noun
 
---3 Compound nouns 
+--3 Compound nouns
 --
 -- Some nouns are ones where the first part is inflected as a noun but
--- the second part is not inflected. e.g. "numéro de téléphone". 
+-- the second part is not inflected. e.g. "numéro de téléphone".
 -- They could be formed in syntax, but we give a shortcut here since
 -- they are frequent in lexica.
 
     mkN : N -> Str -> N -- compound noun, e.g. numéro + de téléphone
-  } ; 
+  } ;
 
 
 
 
---3 Relational nouns 
--- 
--- Relational nouns ("fille de x") need a case and a preposition. 
+--3 Relational nouns
+--
+-- Relational nouns ("fille de x") need a case and a preposition.
 
   mkN2 : N -> Prep -> N2 ; -- e.g. fille + genitive
 
--- The most common cases are the genitive "de" and the dative "à", 
+-- The most common cases are the genitive "de" and the dative "à",
 -- with the empty preposition.
 
   deN2 : N -> N2 ; --%
@@ -126,7 +126,7 @@ oper
 -- $N3$ are purely lexical categories. But you can use the $AdvCN$
 -- and $PrepNP$ constructions to build phrases like this.
 
--- 
+--
 --3 Proper names and noun phrases
 --
 -- Proper names need a string and a gender. If no gender is given, the
@@ -138,6 +138,41 @@ oper
     mkPN : N -> PN ; -- gender inherited from noun
     } ;
 
+  mkGN = overload {
+    mkGN : (Anna : Str) -> GN = \s -> lin GN (regPN s) ; -- feminine for "-a", otherwise masculine
+    mkGN : (Pilar : Str) -> Gender -> GN = \s,g -> lin GN (mk2PN s g) ; -- force gender
+    } ;
+
+  mkSN = overload {
+    mkSN : Str -> SN = \s -> lin SN {s = \\_ => s; pl = s} ;
+    mkSN : Str -> Str -> Str -> SN = \male,female,pl -> lin SN {s = table {Masc=>male; Fem=>female}; pl = pl} ;
+    } ;
+
+  mkLN = overload {
+    mkLN : Str -> LN = \s ->
+      lin LN {s = s ;
+              onPrep=False ;
+              art = NoArt ;
+              g = Masc ;
+              num = Sg} ;
+    mkLN : Str -> Gender -> LN = \s,g ->
+      lin LN {s = s ;
+              onPrep=False ;
+              art = NoArt ;
+              g = g ;
+              num = Sg} ;
+    mkLN : Str -> Gender -> Number -> LN = \s,g,num ->
+      lin LN {s = s ;
+              onPrep=False ;
+              art = NoArt ;
+              g = g ;
+              num = num} ;
+  } ;
+
+
+  defLN : LN -> LN = \n -> n ** {art = AlwaysArt} ;
+  useDefLN : LN -> LN = \n -> n ** {art = UseArt} ;
+  enLN : LN -> LN = \n -> n ** {onPrep = True} ;
 
 
 --2 Adjectives
@@ -146,7 +181,7 @@ oper
 
 -- For regular adjectives, all forms are derived from the
 -- masculine singular. The heuristic takes into account certain
--- deviant endings: "banal-banale-banaux", "chinois-chinoise-chinois", 
+-- deviant endings: "banal-banale-banaux", "chinois-chinoise-chinois",
 -- "heureux-heureuse-heureux", "italien-italienne", "jeune-jeune",
 -- "amer-amère", "carré- - -carrément", "joli- - -joliment".
 
@@ -165,7 +200,7 @@ oper
     mkA : (banal,banale,banaux,banalement : Str) -> A ; -- almost worst-case adjective
 
 -- This is the worst-case paradigm for the positive forms, used for "vieux/vieil".
-    mkA : (vieux,vieil,vieille,vieuxs,vieuxment : Str) -> A ; -- worst-case adjetive
+    mkA : (vieux,vieil,vieille,vieux,vieillement : Str) -> A ; -- worst-case adjetive
 
 -- If comparison forms are irregular (i.e. not formed by "plus", e.g.
 -- "bon-meilleur"), the positive and comparative can be given as separate
@@ -174,7 +209,7 @@ oper
     mkA : A -> A -> A ; -- irregular comparison, e.g. bon-meilleur
 
     mkA : A -> CopulaType -> A -- force copula type
-      
+
   } ;
 
 -- The functions create by default postfix adjectives. To switch
@@ -195,7 +230,7 @@ oper
 --2 Adverbs
 
 -- Adverbs are not inflected. Most lexical ones have position
--- after the verb. 
+-- after the verb.
 
   mkAdv : Str -> Adv ; -- ordinary adverb
 
@@ -210,10 +245,10 @@ oper
 
 --2 Verbs
 --
--- Irregular verbs are given in the module $IrregFre$. 
+-- Irregular verbs are given in the module $IrregFre$.
 -- If a verb should be missing in that list, the module
 -- $BeschFre$ gives all the patterns of the "Bescherelle" book.
--- 
+--
 -- Regular verbs are ones with the infinitive "er" or "ir", the
 -- latter with plural present indicative forms as "finissons".
 -- The regular verb function in the first conjugation recognizes
@@ -222,7 +257,7 @@ oper
 --
 -- Sometimes, however, it is not predictable which variant of the "er"
 -- conjugation is to be selected. Then it is better to use the function
--- that gives the third person singular present indicative and future 
+-- that gives the third person singular present indicative and future
 -- (("il") "jette", "jettera") as second argument.
 
   mkV : overload {
@@ -249,7 +284,7 @@ oper
   } ;
 
 -- The function $mkV$ gives the default compound auxiliary "avoir".
--- To change it to "être", use the following function. 
+-- To change it to "être", use the following function.
 
   etreV : V -> V ; -- force auxiliary to be être (default avoir)
 
@@ -261,13 +296,13 @@ oper
 --3 Two-place verbs
 --
 -- Two-place verbs need a preposition, except the special case with direct object.
--- (transitive verbs). 
+-- (transitive verbs).
 
   mkV2 = overload {
     mkV2 : Str -> V2  --%
     = \s -> dirV2 (regV s) ;
     mkV2 : V -> V2  -- direct transitive
-    = dirV2 ;  
+    = dirV2 ;
     mkV2 : V -> Prep -> V2 -- e.g. se fier + genitive
     = mmkV2
   } ;
@@ -279,7 +314,7 @@ oper
 -- the first one or both can be absent.
 
   mkV3 : overload {
-    mkV3 : V -> V3 ;                -- donner (+ accusative + dative)    
+    mkV3 : V -> V3 ;                -- donner (+ accusative + dative)
     mkV3 : V -> Prep -> V3 ;        -- placer (+ accusative) + dans
     mkV3 : V -> Prep -> Prep -> V3  -- parler + dative + genitive
     } ;
@@ -319,7 +354,7 @@ oper
   mkA2V : A -> Prep -> Prep -> A2V ; --%
 
 -- Notice: categories $AS, A2S, AV, A2V$ are just $A$,
--- and the second argument is given as an adverb. Likewise 
+-- and the second argument is given as an adverb. Likewise
 -- $V0$ is just $V$.
 
   V0 : Type ; --%
@@ -332,10 +367,12 @@ oper
 -- hidden from the document.
 
 
-  Gender = MorphoFre.Gender ; 
+  Gender = MorphoFre.Gender ;
   Number = MorphoFre.Number ;
-  masculine = Masc ;
-  feminine = Fem ;
+  masculine, male = Masc ;
+  feminine, female = Fem ;
+  male = Masc ;
+  female = Fem ;
   singular = Sg ;
   plural = Pl ;
 
@@ -356,23 +393,23 @@ oper
   regGenN : Str -> Gender -> N ;
   regN : Str -> N ;
   mk2N  : (oeil,yeux : Str) -> Gender -> N ;
-  mk2N x y g = mkCNomIrreg x y g ** {lock_N = <>} ;
+  mk2N x y g = mkCNomIrreg x y g ** {relType = NRelPrep P_de; lock_N = <>} ;
   regN x = regGenN x g where {
     g = case <x : Str> of {
      _ + ("e" | "ion") => Fem ;
      _ => Masc
-     } 
+     }
     } ;
-  regGenN x g = mkNomReg x g ** {lock_N = <>} ;
+  regGenN x g = mkNomReg x g ** {relType = NRelPrep P_de; lock_N = <>} ;
   compN : N -> Str -> N ;
-  compN x y = {s = \\n => x.s ! n ++ y ; g = x.g ; lock_N = <>} ;
+  compN x y = {s = \\n => x.s ! n ++ y ; g = x.g ; relType = NRelPrep P_de ; lock_N = <>} ;
 
   mkN = overload {
     mkN : Str -> N = regN ;
-    mkN : Str -> Gender -> N = regGenN ; 
+    mkN : Str -> Gender -> N = regGenN ;
     mkN : (oeil,yeux : Str) -> Gender -> N = mk2N ;
-    mkN : N -> Str -> N = compN 
-  } ; 
+    mkN : N -> Str -> N = compN
+  } ;
 
 
   mkN2 = \n,p -> n ** {lock_N2 = <> ; c2 = p} ;
@@ -394,24 +431,53 @@ oper
     } ;
 
   mk4A masc fem mascpl aa = mk5A masc masc fem mascpl aa ;
-  mk5A masc mascv fem mascpl aa = compADeg {s = \\_ => (mkAdj' masc mascv fem mascpl aa).s ; isPre = False ; copTyp = serCopula ; lock_A = <>} ;
-  regA a = compADeg {s = \\_ => (mkAdjReg a).s ; isPre = False ; copTyp = serCopula ; lock_A = <>} ;
-  prefA a = {s = a.s ; isPre = True ; copTyp = a.copTyp ; lock_A = <>} ;
+  mk5A masc mascv fem mascpl aa = compADeg (mkAdj' masc mascv fem mascpl aa) ;
+  regA a = compADeg (mkAdjReg a);
+  prefA a = a ** {isPre = True} ;
   adjCopula a cop = a ** {copTyp = cop} ;
 
   mkA2 a p = a ** {c2 = p ; lock_A2 = <>} ;
 
   mkA = overload {
     mkA : Str -> A = regA ;
-    mkA : (sec,seche : Str) -> A = \sec,seche -> mk4A sec seche (sec + "s") (seche + "ment") ; 
-    mkA : (banal,banale,banaux : Str) -> A = \sec,seche,secs -> mk4A sec seche secs (seche + "ment") ; 
+    mkA : (sec,seche : Str) -> A = \sec,seche ->
+      let a = regA sec
+      in a ** {
+        s = table {
+	  AF Fem Sg => seche ;
+	  AF Fem Pl => seche  + "s" ;
+	  AA => case seche of {
+	    _ + "ée" => init seche + "ment" ;
+	    _ => seche + "ment"
+	    } ;
+	  c => a.s ! c
+	  }
+	} ;
+
+    mkA : (banal,banale,banaux : Str) -> A = \sec,seche,secs ->
+      let sechement : Str = case seche of {
+	    _ + "ée" => init seche + "ment" ;
+	    _ => seche + "ment"
+	    }
+      in mk4A sec seche secs sechement ;
     mkA : (banal,banale,banaux,banalement : Str) -> A = mk4A ;
     mkA : (vieux,vieil,vieille,vieuxs,vieuxment : Str) -> A = mk5A ;
     mkA : A -> A -> A = mkADeg ;
     mkA : A -> CopulaType -> A = adjCopula ;
   };
 
-  prefixA a = {s = a.s ; isPre = True ; copTyp = a.copTyp ; lock_A = <>} ;
+  prefixA = prefA ;
+
+  invarA : (sud : Str) -> A = \sud -> compADeg {
+    s = table {
+          AF _ _ => sud;
+          AAttrMasc => sud;
+          AA     => case sud of {
+	                  _ + "ée" => init sud + "ment" ;
+	                  _ => sud + "ment"
+	                }
+        } ;
+  } ;
 
   mkAdv x = ss x ** {lock_Adv = <>} ;
   mkAdV x = ss x ** {lock_AdV = <>} ;
@@ -437,7 +503,7 @@ oper
   A2S, A2V : Type = A2 ;
 
   mkV0  v = v ** {lock_V0 = <>} ;
-  mkVS  v = v ** {m = \\_ => Indic ; lock_VS = <>} ; 
+  mkVS  v = v ** {m = \\_ => Indic ; lock_VS = <>} ;
   subjVS  v = v ** {m = \\_ => Conjunct ; lock_VS = <>} ;
 
   mkV2S = overload {
@@ -471,13 +537,13 @@ oper
 
 --------------------------- obsolete
 
-  makeNP : Str -> Gender -> Number -> NP ; 
+  makeNP : Str -> Gender -> Number -> NP ;
   makeNP x g n = {s = (pn2np {s=x;g= g}).s; a = agrP3 g n ; hasClit = False ; isPol = False ; isNeg = False ; lock_NP = <>} ;
-  regPN : Str -> PN ; 
+  regPN : Str -> PN ;
   mk2PN : Str -> Gender -> PN = \x,g -> {s = x ; g = g} ** {lock_PN = <>} ;
 
   mkADeg : A -> A -> A ;
-  compADeg : A -> A ;
+  compADeg : Adj -> A ;
 
   regA : Str -> A ;
   mk4A : (banal,banale,banaux,banalement : Str) -> A ;
@@ -486,31 +552,34 @@ oper
   prefA : A -> A ;
   adjCopula : A -> CopulaType -> A ;
 
-  mkADeg a b = 
-    {s = table {Posit => a.s ! Posit ; _ => b.s ! Posit} ; isPre = a.isPre ; copTyp = a.copTyp ; lock_A = <>} ;
-  compADeg a = 
-    {s = table {Posit => a.s ! Posit ; _ => \\f => "plus" ++ a.s ! Posit ! f} ; 
-     isPre = a.isPre ;
-     copTyp = a.copTyp ;
-     lock_A = <>} ;
+  mkADeg a b = a ** {
+    compar = \\aagr => b.s ! aagr2aform aagr ; -- meilleur, meilleure, meilleurs, meilleures
+    isDeg = True } ;
+  compADeg a = lin A
+    {s = a.s ;
+     compar = \\_ => nonExist ; --
+     isPre = False ;       -- default values
+     copTyp = <> ;
+     isDeg = False
+     } ;
 
   mkV = overload {
     mkV : Str -> V = regV ;
-    mkV : (jeter,jette : Str) -> V = 
+    mkV : (jeter,jette : Str) -> V =
       \x,y -> let v = vvf (mkVerb2Reg x y) in {s = v ; vtyp = VTyp VHabere (getVerbT v) ; lock_V = <> ; p = []} ;
     mkV : (jeter,jette,jettera : Str) -> V = reg3V ;
     mkV : V2 -> V = v2V ;
     mkV : (tenir,tiens,tenons,tiennent,tint,tiendra,tenu : Str) -> V
-    = \tenir,tiens,tenons,tiennent,tint,tiendra,tenu -> 
+    = \tenir,tiens,tenons,tiennent,tint,tiendra,tenu ->
       let v = vvf (mkVerb7 tenir tiens tenons tiennent tint tiendra tenu) in
       {s = v ; vtyp = VTyp VHabere (getVerbT v) ; lock_V = <> ; p = []} ;
     mkV : (tenir,tiens,tient,tenons,tenez,tiennent,tienne,tenions,tiensI,tint,tiendra,tenu : Str) -> V
-    = \tenir,tiens,tient,tenons,tenez,tiennent,tienne,tenions,tiensI,tint,tiendra,tenu -> 
+    = \tenir,tiens,tient,tenons,tenez,tiennent,tienne,tenions,tiensI,tint,tiendra,tenu ->
       let v = vvf (mkVerb12 tenir tiens tient tenons tenez tiennent tienne tenions tiensI tint tiendra tenu) in
       {s = v ; vtyp = VTyp VHabere (getVerbT v) ; lock_V = <> ; p = []} ;
    mkV : V -> V
     = \v -> v ;
-    mkV : V -> Str -> V 
+    mkV : V -> Str -> V
     = \v,p -> v ** {p = p} ;  ---- to recognize particles in dict, not yet in lincat V
   } ;
 
@@ -532,5 +601,6 @@ oper
     _ => VFalse  -- prend-il
     } ;
 
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False; hasArt=False} ;
 
 } ;

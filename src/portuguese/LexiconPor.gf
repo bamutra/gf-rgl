@@ -13,7 +13,7 @@ lin
    probable_AS = mkAS (prefixA (mkA "provável")) ;
    fun_AV = mkAV (mkA "divertido") genitive ;
    -- A
-   bad_A       = prefixA (mkA (mkA "mau") (mkA "pior")) ;
+   bad_A       = prefixA (mkA (mkA "mau" "má" "maus" "más") (mkA "pior")) ;
    beautiful_A = prefixA (mkA "belo") ;    -- bela
    big_A       = prefixA (mkA "grande") ;
    black_A     = mkA "preto" ;	-- preta
@@ -29,7 +29,7 @@ lin
    dull_A      = mkA "desafilado" ;
    empty_A     = mkA "vazio" ;
    full_A      = mkA "cheio" ;
-   good_A      = prefixA (mkA (mkA "bom") (mkA "melhor")) ; ---- adv?
+   good_A      = prefixA (mkA (mkA "bom" "boa" "bons" "boas" "bem") (mkA "melhor")) ;
    green_A     = mkA "verde" ;
    heavy_A     = mkA "pesado" ;
    hot_A       = mkA "quente" ;
@@ -55,7 +55,7 @@ lin
    uncertain_A = mkA (mkA "incerto") D.estarCopula ;
    warm_A      = mkA "quente" ;
    wet_A       = mkA "molhado" ;
-   white_A     = compADeg (mkA "branco") ;
+   white_A     = mkA "branco" ;
    wide_A      = mkA "largo" ; -- extenso
    yellow_A    = mkA "amarelo" ;
    young_A     = prefixA (mkA "jovem") ;

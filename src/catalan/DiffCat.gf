@@ -1,5 +1,5 @@
 --# -path=.:../romance:../abstract:../common:prelude
-instance DiffCat of DiffRomance - [partAgr,stare_V,vpAgrSubj,vpAgrClits] = open CommonRomance, PhonoCat, BeschCat, Prelude in {
+instance DiffCat of DiffRomance - [partAgr,stare_V,vpAgrSubj,vpAgrClits,AFormSimple] = open CommonRomance, PhonoCat, BeschCat, Prelude in {
 
   flags optimize=noexpand ;
   coding=utf8 ;
@@ -52,21 +52,36 @@ oper
 
     artIndef = \isNP,g,n,c -> case isNP of {
      True => case <n,c> of {
-      <Sg,CPrep P_de>   => genForms ("d' ++ Predef.BIND ++ un") ("d' ++ Predef.BIND ++ una") ! g ;
+      <Sg,CPrep P_de>   => genForms ("d'un") ("d'una") ! g ;
       <Sg,_> => prepCase c ++ genForms "un" "una" ! g ;
-      <Pl,CPrep P_de>   => genForms ("d' ++ Predef.BIND ++ uns") ("d' ++ Predef.BIND ++ unes") ! g ; -- AR 3/12/2014
+      <Pl,CPrep P_de>   => genForms ("d'uns") ("d'unes") ! g ; -- AR 3/12/2014
       <Pl,_> => prepCase c ++ genForms "uns" "unes" ! g
       } ;
      _ => case <n,c> of {
-      <Sg,CPrep P_de>   => genForms ("d' ++ Predef.BIND ++ un") ("d' ++ Predef.BIND ++ una") ! g ;
+      <Sg,CPrep P_de>   => genForms ("d'un") ("d'una") ! g ;
       <Sg,_> => prepCase c ++ genForms "un" "una" ! g ;
       <Pl,_> => prepCase c --- ++ genForms "uns" "unes" ! g --- take this as a determiner
       }
      } ;
 
+-- AForm and comparatives
+  param
+    AFormComplex = AF Gender Number | AAttrMasc | AA ;
+  oper
+    AForm = AFormComplex ;
+    aform2aagr : AForm -> AAgr = \a -> case a of {
+      DiffCat.AF g n => aagr g n ;
+      _              => aagr Masc Sg -- "le plus lentement"
+      } ;
+    genNum2Aform : Gender -> Number -> AForm = DiffCat.AF ;
+    genNumPos2Aform : Gender -> Number -> Bool -> AForm = \g,n,isPre ->
+      case <g,n,isPre> of {
+        <Masc,Sg,True> => AAttrMasc ;
+        _              => genNum2Aform g n
+      } ;
+    piuComp = "més" ;
 
-
-    possCase = \_,_,c -> prepCase c ;
+    possCase = \g,n,c -> artDef False g n c ;
 
     partitive = \g,c -> case c of {
       CPrep P_de => "de" ;
@@ -112,7 +127,7 @@ oper
      \\pol,g,n => case pol of {
        RPos   => neg.p1 ++ imper ++ bindIf refl.isRefl ++ refl.pron
                    ++ bindIf hasClit ++ clit ++ compl ;
-       RNeg _ => neg.p1 ++ refl.pron ++ clit ++ compl ++ subj 
+       RNeg _ => neg.p1 ++ refl.pron ++ clit ++ compl ++ subj
      } where {
        pe   = case isPol of {True => P3 ; _ => p} ;
        refl = case vp.s.vtyp of {
@@ -127,7 +142,7 @@ oper
        agr     = {g = g ; n = n ; p = pe} ;
        compl   = neg.p2 ++ vp.comp ! agr ++ vp.ext ! pol
      } ;
-   
+
     CopulaType = Bool ;
     selectCopula = \isEstar -> case isEstar of {True => estar_V ; False => copula} ;
     serCopula = False ;
@@ -199,7 +214,8 @@ oper
       _ => False
       } ;
 
-    haver_V, auxPassive : Verb = verbBeschH (estar_54 "estar") ;
+    haver_V : Verb = verbBeschH (haver_59 "haver" (True|False)) ;
+    auxPassive : Verb = verbBeschH (ser_52 "ser" True) ;
 
     essere_V, copula = verbBeschH (ser_52 "ser" True) ;
     stare_V, estar_V = verbBeschH (estar_54 "estar") ;
@@ -209,5 +225,11 @@ oper
     subjPron = \_ -> [] ;
 
     polNegDirSubj = RPos ;
+
+param
+  HasArt = NoArt | UseArt ;
+
+oper
+  superlCanBePost = False ;
 
 }

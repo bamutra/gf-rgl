@@ -1,33 +1,54 @@
 concrete SentenceTur of Sentence = CatTur ** open Prelude, ResTur in {
 
   lin
+    PredVP np vp = {s = \\t,a,p => np.s ! Nom ++ vp.compl ++ vp.s ! Perf ! VFin t a p np.a} ;
 
-    PredVP np vp = mkClause (np.s ! Nom) np.a vp ;
+    PredSCVP sc vp = {
+      s = \\t,a,p => sc.s ++ vp.compl ++ vp.s ! Perf ! VFin t a p (agrP3 Sg)
+    } ;
 
-    PredSCVP sc vp = variants {} ;
+    EmbedVP vp = {s = vp.compl ++ vp.s ! Perf ! VInf Pos} ;
 
-    -- TODO: Check how correct this is.
-    EmbedVP vp = {s = (vp.s ! Gerund Sg Acc)} ;
+    UseCl temp pol cl = {s = temp.s ++ pol.s ++ cl.s ! temp.t ! temp.a ! pol.p} ;
 
-    -- TODO: rudimentary implementation; revise this.
-    UseCl temp pol cl = {s = temp.s ++ cl.s ! temp.t; subord=cl.subord} ;
+    UseQCl temp pol cl = {s = temp.s ++ pol.s ++ cl.s ! temp.t ! temp.a ! pol.p} ;
 
-    UseQCl _ _ = variants {} ;
+    UseRCl temp pol cl = {s = \\agr => temp.s ++ pol.s ++ cl.s ! temp.t ! temp.a ! pol.p ! agr} ;
 
-    UseRCl _ _ _ = variants {} ;
+    SlashVP np vp = {
+      s = \\t,a,p => np.s ! Nom ++ vp.compl ++ mkVerbForms vp ! Perf ! VFin t a p np.a ;
+      c = vp.c
+    } ;
+    AdvSlash cl adv = cl ** {
+      s = \\t,a,p => cl.s ! t ! a ! p ++ adv.s
+    } ;
+    SlashPrep cl prep = cl ** {c = prep} ;
+    SlashVS np v ss = {
+      s = \\t,a,p => np.s ! Nom ++ ss.s ++ mkVerbForms v ! Perf ! VFin t a p np.a ;
+      c = ss.c
+    } ;
 
-    SlashVP _ _ = variants {} ;
-    AdvSlash _ _ = variants {} ;
-    SlashPrep _ _ = variants {} ;
-    SlashVS v = variants {} ;
+    EmbedQS q = {s = q.s} ;
+    EmbedS s = {s = s.s} ;
 
-    EmbedQS _ = variants {} ;
-    EmbedS _ = variants {} ;
-    
-    ImpVP _ = variants {} ;
-    
-    AdvS _ _ = variants {} ;
-    
-    UseSlash _ = variants {} ;
+    ImpVP vp = {s = \\p,n => vp.compl ++ vp.s ! Perf ! VImp p n
+               } ;
+
+    AdvS adv s = {
+       s = adv.s ++ s.s
+    } ;
+
+    ExtAdvS adv s = {s = adv.s ++ "," ++ s.s} ;
+
+    SSubjS s1 subj s2 = {s = s1.s ++ "," ++ subj.s ++ s2.s} ;
+
+    AdvImp adv imp = {
+      s = \\p,n => adv.s ++ imp.s ! p ! n
+    } ;
+
+    UseSlash temp pol cl = {
+      s = temp.s ++ pol.s ++ cl.s ! temp.t ! temp.a ! pol.p ;
+      c = cl.c
+    } ;
 
 }

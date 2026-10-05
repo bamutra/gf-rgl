@@ -10,11 +10,11 @@ concrete IdiomChi of Idiom = CatChi ** open Prelude, ResChi in {
     -- GenericCl vp = mkClause "有人" vp ; (meaning: there is a person)
 
     ---- it is John who did it
-    CleftNP np rs = mkClause rs.s copula np.s ; -- did it + de + is I
+    CleftNP np rs = mkClause rs.s copula (linNP np) ; -- did it + de + is I
 
-    CleftAdv ad s = mkClause (s.s ++ possessive_s) copula ad.s ;  -- she sleeps + de + is here
+    CleftAdv ad s = mkClause (linS s ++ possessive_s) copula ad.s ;  -- she sleeps + de + is here
 
-    ExistNP np = mkClause [] (regVerb you_s) np.s ; ---- infl of you
+    ExistNP np = mkClause [] (regVerb you_s) (linNP np) ; ---- infl of you
 
     ExistIP ip = {s = \\_ => (mkClause [] (regVerb you_s) ip.s).s} ; ---- infl of you
 
@@ -25,13 +25,15 @@ concrete IdiomChi of Idiom = CatChi ** open Prelude, ResChi in {
       isAdj = False ;
       } ;
 
+    ExistNPAdv np adv = mkClause adv.s (regVerb you_s) (linNP np) ;
+    ExistIPAdv ip adv = {s = \\_ => (mkClause adv.s (regVerb you_s) ip.s).s} ;
 
     ImpPl1 vp = ss (zan_s ++ men_s ++ infVP vp ++ ba0_s) ;
 
+    ImpP3 np vp = ss ("让" ++ linNP np ++ infVP vp ++ ba0_s) ;
+
     SelfAdvVP vp = insertAdv (ss reflPron) vp ;
     SelfAdVVP vp = insertAdv (ss reflPron) vp ;
-    SelfNP np = {s = np.s ++ reflPron} ;
+    SelfNP np = np ** {s = linNP np ++ reflPron} ;
 
 }
-
-

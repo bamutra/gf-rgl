@@ -41,8 +41,27 @@ oper
     mkN : Str -> Bizi -> N = \s,bizi -> lin N (mkNoun s ** { anim = bizi }) ;
   } ;
 
+  -- Keep the noun's lexical final -a inside compounds with a following
+  -- adjective or adverb, but let case and number suffixes attach at the
+  -- compound's right edge: bonba atomiko+a, bonba atomiko+ek, ...
+  compoundN = overload {
+    compoundN : N -> A -> N = \noun,adj ->
+      lin N {
+        s = noun.s ++ artIndef ! Abs ! noun.ph ++ adj.s ! AF Posit ;
+        ph = adj.ph ;
+        anim = noun.anim
+      } ;
+
+    compoundN : N -> Str -> N = \noun,adv ->
+      let compound = mkNoun (noun.s ++ artIndef ! Abs ! noun.ph ++ adv)
+      in lin N (compound ** {anim = noun.anim}) ;
+  } ;
+
   mkPN : Str -> PN = \s -> lin PN (mkPNoun s) ;
-  
+  mkLN : Str -> LN = \s -> lin LN (mkPNoun s) ;
+  mkGN : Str -> GN = \s -> lin GN (mkPNoun s) ;
+  mkSN : Str -> SN = \s -> lin SN (mkPNoun s) ;
+
   mkN2 = overload {
     mkN2 : Str -> N2 = \s -> lin N2 (mkNoun2 s genitive) ; 
     mkN2 : Str -> Case -> N2 = \s,cas -> lin N2 (mkNoun2 s cas) ;
@@ -64,7 +83,7 @@ oper
 
   mkA = overload {
     mkA : Str -> A = \s -> lin A (regAdj s) ;
-    mkA : Str -> A -> A = \s,a -> irregAdvAdj s a 
+    mkA : Str -> A -> A = \s,a -> lin A (irregAdvAdj s a) 
   } ;
 
   mkA2 : Str -> Prep -> A2 = \s,pp -> lin A2 (regAdj s ** { compl = pp }) ;
@@ -85,43 +104,58 @@ oper
   -- For verbs with non-inflecting participle, see izanV, egonV and ukanV.
 
   mkV2 = overload {
-    mkV2 : Str -> V2 = \s -> lin V2 (mkVerbDu s) ;
+    mkV2 : Str -> V2 = \s -> lin V2 (mkVerbDu s ** {c2 = noPost}) ;
 
-    mkV2 : Str -> AuxType -> V2 = \s,val -> lin V2 (mkVerbDa s ** { val = val }) ;
+    mkV2 : Str -> AuxType -> V2 = \s,val -> lin V2 (mkVerbDa s ** {val = val ; c2 = noPost}) ;
 
     mkV2 : Str -> V -> V2 = \lo,egin -> 
       lin V2 (egin ** { prc = \\t => lo ++ egin.prc ! t ;
-                        val = Du Ukan }) ;
+                        val = Du Ukan ;
+                        c2 = noPost}) ;
 
-    mkV2 : V -> V2 = \x -> lin V2 x ;
+    -- A V2 always selects the transitive auxiliary.  Keeping the auxiliary
+    -- inherited from mkV made the very common `mkV2 (mkV "...")` idiom
+    -- produce absolutive subjects and forms of izan (e.g. *hura ... da).
+    mkV2 : V -> V2 = \x -> lin V2 (x ** {val = Du Ukan ; c2 = noPost}) ;
+
+    mkV2 : V -> Prep -> V2 = \v,p ->
+      lin V2 (v ** {val = Du Ukan ; c2 = p}) ;
   } ;
 
   mkVA : Str -> VA = \s -> lin VA (mkVerbDa s) ; -- Nor
 
-  mkV2A : Str -> V2A = \s -> lin V2A (mkVerbDu s) ;  -- Nor-nork   
+  mkV2A : Str -> V2A = \s -> lin V2A (mkVerbDu s ** {c2 = noPost}) ;  -- Nor-nork
   mkVQ : Str -> VQ = \s -> lin VQ (mkVerbDu s) ;  -- Nor-nork 
   mkVS : Str -> VS = \s -> lin VS (mkVerbDu s) ;  -- Nor-nork
+  mkVV : V -> VV = \v -> lin VV v ;
 
+  mkV2V : Str -> V2V = \s -> lin V2V (mkVerbDio s ** {c2 = noPost}) ; -- ??? TODO check valency
+  mkV2S : Str -> V2S = \s -> lin V2S (mkVerbDio s ** {c2 = noPost}) ; -- Nor-nori-nork: (mutilari) (neska datorrela) erantzun diot
+  mkV2Q : Str -> V2Q = \s -> lin V2Q (mkVerbDio s ** {c2 = noPost}) ; -- Nor-nori-nork: (mutilari) (neska datorren) galdetu diot
 
-  mkV2V : Str -> V2V = \s -> lin V2V (mkVerbDio s) ; -- ??? TODO check valency
-  mkV2S : Str -> V2S = \s -> lin V2S (mkVerbDio s) ; -- Nor-nori-nork: (mutilari) (neska datorrela) erantzun diot
-  mkV2Q : Str -> V2Q = \s -> lin V2Q (mkVerbDio s) ; -- Nor-nori-nork: (mutilari) (neska datorren) galdetu diot
-  mkV3 : Str -> V3 = \s -> lin V3 (mkVerbDio s) ; -- Nor-nori-nork: (mutilari) (garagardoa) edan diot
+  mkV3 = overload {
+    mkV3 : Str -> V3 = \s ->
+      lin V3 (mkVerbDio s ** {c2 = noPost ; c3 = mkPost [] Dat False}) ;
+    mkV3 : V -> Prep -> V3 = \v,p3 ->
+      lin V3 (v ** {val = Dio ; c2 = noPost ; c3 = p3}) ;
+    mkV3 : V -> Prep -> Prep -> V3 = \v,p2,p3 ->
+      lin V3 (v ** {val = Dio ; c2 = p2 ; c3 = p3}) ;
+  } ; -- Nor-nori-nork: (mutilari) (garagardoa) edan diot
 
 
   -----
   -- Verbs with non-inflecting participle
   -- These are just Verb, use izanV or egonV for intransitive and ukanV for transitive.
 
-  izanV : Str -> Verb = \bizi -> 
-    mkVerbDa bizi ** { prc = \\_ => bizi } ; -- Non-inflecting participle, auxtype is Da (nor): e.g. "bizi naiz", "beldur naiz"
+  izanV : Str -> V = \bizi ->
+    lin V (mkVerbDa bizi ** { prc = \\_ => bizi }) ; -- Non-inflecting participle, auxtype is Da (nor): e.g. "bizi naiz", "beldur naiz"
 
-  egonV : Str -> Verb = \zain -> 
-    mkVerbDaEgon zain ** { prc = \\_ => zain } ; -- Non-inflecting participle, auxtype is Da (nor), but with egon: e.g. "zain nago"
+  egonV : Str -> V = \zain ->
+    lin V (mkVerbDaEgon zain ** { prc = \\_ => zain }) ; -- Non-inflecting participle, auxtype is Da (nor), but with egon: e.g. "zain nago"
 
 
-  ukanV : Str -> Verb = \maite -> 
-    mkVerbDu maite ** { prc = \\_ => maite } ; -- Non-inflecting participle, auxtype is Du (nor-nork): e.g, "maite zaitut"
+  ukanV : Str -> V = \maite ->
+    lin V (mkVerbDu maite ** { prc = \\_ => maite }) ; -- Non-inflecting participle, auxtype is Du (nor-nork): e.g, "maite zaitut"
 
 
 --2 Structural categories
@@ -154,6 +188,10 @@ oper
 
   mkAdA : Str -> AdA = \s -> lin AdA {s = s} ;
 
+  oper mkAdN : Str -> AdN = \s -> lin AdN {s=s} ;
+
+  oper mkInterj : Str -> Interj = \s -> lin Interj {s=s} ;
+  oper mkVoc : Str -> Voc = \s -> lin Voc {s=s} ;
 
 --.
 -------------------------------------------------------------------------------
@@ -187,4 +225,3 @@ oper
 --------------------------------------------------------------------------------
 
 }
-

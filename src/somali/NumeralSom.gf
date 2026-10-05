@@ -1,4 +1,4 @@
-concrete NumeralSom of Numeral = CatSom [Numeral,Digits] **
+concrete NumeralSom of Numeral = CatSom [Numeral,Digits,Decimal] **
   open Prelude, ResSom, ParamSom in {
 
 oper
@@ -37,7 +37,7 @@ lincat
   where laba 'two' is a feminine noun in absolutive case and
   boqol 'hundred' is a masculine noun in genitive case.
   Since laba is head, the whole nominal is feminine." -}
-  Sub10, Sub100, Sub1000, Sub1000000 = {
+  Sub10, Sub100, Sub1000, Sub1000000, Sub1000000000, Sub1000000000000 = {
     s : DForm => Str ;
     thousand : Str ; -- TODO figure out if this really works so
     hasThousand : Bool ;
@@ -128,6 +128,76 @@ lin pot3plus n m = n ** {
   ord = n.ord ++ "kun iyo" ++ m.ord ;
   n = Pl} ;
 
+lin pot3as4 n = n ;
+
+lin pot41 = {
+    s = \\_ => [] ;
+    thousand = "milyan" ;
+    hasThousand = True ;
+    ord = "milyanaad" ;
+    da = M KA ;
+    n = Pl
+    } ;
+
+lin pot4 n = n ** {
+    thousand = n.thousand ++ "milyan" ;
+    hasThousand = True ;
+    ord = n.s ! Hal ++ n.thousand ++ "milyanaad" ;
+    n = Pl
+    } ;
+
+lin pot4plus n m = n ** {
+    s = \\b => n.s ! b ++ n.thousand ++ "milyan iyo" ++ m.s ! b ++ m.thousand ;
+    thousand = [] ;
+    hasThousand = True ;
+    ord = n.s ! Hal ++ n.thousand ++ "milyan iyo" ++ m.ord ;
+    n = Pl
+    } ;
+
+lin pot4as5 n = n ;
+
+lin pot4decimal dec = {
+    s = \\_ => dec.s ! NCard ;
+    thousand = "milyan" ;
+    hasThousand = True ;
+    ord = dec.s ! NCard ++ "milyanaad" ;
+    da = M KA ;
+    n = Pl
+    } ;
+
+lin pot51 = {
+    s = \\_ => [] ;
+    thousand = "bilyan" ;
+    hasThousand = True ;
+    ord = "bilyanaad" ;
+    da = M KA ;
+    n = Pl
+    } ;
+
+lin pot5 n = n ** {
+    thousand = n.thousand ++ "bilyan" ;
+    hasThousand = True ;
+    ord = n.s ! Hal ++ n.thousand ++ "bilyanaad" ;
+    n = Pl
+    } ;
+
+lin pot5plus n m = n ** {
+    s = \\b => n.s ! b ++ n.thousand ++ "bilyan iyo" ++ m.s ! b ++ m.thousand ;
+    thousand = [] ;
+    hasThousand = True ;
+    ord = n.s ! Hal ++ n.thousand ++ "bilyan iyo" ++ m.ord ;
+    n = Pl
+    } ;
+
+lin pot5decimal dec = {
+    s = \\_ => dec.s ! NCard ;
+    thousand = "bilyan" ;
+    hasThousand = True ;
+    ord = dec.s ! NCard ++ "bilyanaad" ;
+    da = M KA ;
+    n = Pl
+    } ;
+
 
 ----------------------------------------------------------------------------
 
@@ -158,5 +228,18 @@ lin D_9 = mkDig "9" ;
 lin IDig dig = dig ;
     -- : Dig -> Digits -> Digits ;
 lin IIDig dig digs = digs ** {s = \\co => glue (dig.s ! co) (digs.s ! co) } ;
+lin PosDecimal d = d ** {hasDot=False} ;
+lin NegDecimal d = {
+      s = \\co => glue "-" (d.s ! co) ;
+      n = Pl ;
+      hasDot=False
+    } ;
+    IFrac d i = {
+      s = \\co => d.s ! co ++
+                  if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+                  i.s ! co;
+      n = Pl ;
+      hasDot=True
+    } ;
 
 }

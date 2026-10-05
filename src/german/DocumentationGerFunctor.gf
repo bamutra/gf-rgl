@@ -25,18 +25,78 @@ oper
 lin
   InflectionN, InflectionN2, InflectionN3 = \noun -> {
     t  = "s" ;
-    s1 = heading1 (heading noun_Category ++ 
+    s1 = heading1 (heading noun_Category ++
                    case noun.g of {
-                     Masc   => "("+heading masculine_Parameter+")" ; 
+                     Masc   => "("+heading masculine_Parameter+")" ;
                      Fem    => "("+heading feminine_Parameter+")" ;
                      Neutr  => "("+heading neuter_Parameter+")"
                    }) ;
-    s2 = frameTable ( 
+    s2 = frameTable (
            tr (th "" ++ th (heading singular_Parameter)            ++ th (heading plural_Parameter)   ) ++
            tr (th (heading nominative_Parameter) ++ td (noun.s ! Sg ! Nom) ++ td (noun.s ! Pl ! Nom)) ++
-           tr (th (heading genitive_Parameter)   ++ td (noun.s ! Sg ! Gen) ++ td (noun.s ! Pl ! Gen)) ++
-           tr (th (heading dative_Parameter)     ++ td (noun.s ! Sg ! Dat) ++ td (noun.s ! Pl ! Dat)) ++
-           tr (th (heading accusative_Parameter) ++ td (noun.s ! Sg ! Acc) ++ td (noun.s ! Pl ! Acc))
+           tr (th (heading genitive_Parameter)   ++ td (noun.s ! Sg ! (Obj Gen)) ++ td (noun.s ! Pl ! (Obj Gen))) ++
+           tr (th (heading dative_Parameter)     ++ td (noun.s ! Sg ! (Obj Dat)) ++ td (noun.s ! Pl ! (Obj Dat))) ++
+           tr (th (heading accusative_Parameter) ++ td (noun.s ! Sg ! (Obj Acc)) ++ td (noun.s ! Pl ! (Obj Acc)))
+           )
+    } ;
+
+  InflectionPN = \pn -> {
+    t  = "pn" ;
+    s1 = heading1 ("Eigenname" ++
+                   "("+case <pn.g,pn.n> of {
+                         <Masc,Sg>   => heading masculine_Parameter ;
+                         <Fem,Sg>    => heading feminine_Parameter ;
+                         <Neutr,Sg>  => heading neuter_Parameter ;
+                         <_,Pl>      => heading plural_Parameter
+                       } ++")") ;
+    s2 = frameTable (
+           tr (th (heading nominative_Parameter) ++ td (pn.s ! Nom)) ++
+           tr (th (heading genitive_Parameter)   ++ td (pn.s ! (Obj Gen))) ++
+           tr (th (heading dative_Parameter)     ++ td (pn.s ! (Obj Dat))) ++
+           tr (th (heading accusative_Parameter) ++ td (pn.s ! (Obj Acc)))
+           )
+    } ;
+
+  InflectionGN = \gn -> {
+    t  = "vn" ;
+    s1 = heading1 ("Vorname" ++
+                   case gn.g of {
+                     Male   => "(männlich)" ;
+                     Female => "(weiblich)"
+                   }) ;
+    s2 = frameTable (
+           tr (th (heading nominative_Parameter) ++ td (gn.s ! Nom)) ++
+           tr (th (heading genitive_Parameter)   ++ td (gn.s ! (Obj Gen))) ++
+           tr (th (heading dative_Parameter)     ++ td (gn.s ! (Obj Dat))) ++
+           tr (th (heading accusative_Parameter) ++ td (gn.s ! (Obj Acc)))
+           ) ;
+    } ;
+
+  InflectionSN = \sn -> {
+    t  = "fn" ;
+    s1 = heading1 ("Familienname") ;
+    s2 = frameTable (
+           tr (th (heading nominative_Parameter) ++ td (sn.s ! Male ! Nom)) ++
+           tr (th (heading genitive_Parameter)   ++ td (sn.s ! Male ! (Obj Gen))) ++
+           tr (th (heading dative_Parameter)     ++ td (sn.s ! Male ! (Obj Dat))) ++
+           tr (th (heading accusative_Parameter) ++ td (sn.s ! Male ! (Obj Acc)))
+           ) ;
+    } ;
+
+  InflectionLN = \ln -> {
+    t  = "pn" ;
+    s1 = heading1 ("Standortnamen" ++
+                   "("+case <ln.g,ln.n> of {
+                         <Masc,Sg>   => heading masculine_Parameter ;
+                         <Fem,Sg>    => heading feminine_Parameter ;
+                         <Neutr,Sg>  => heading neuter_Parameter ;
+                         <_,Pl>      => heading plural_Parameter
+                       } ++")") ;
+    s2 = frameTable (
+           tr (th (heading nominative_Parameter) ++ td (ln.s ! Strong ! Nom)) ++
+           tr (th (heading genitive_Parameter)   ++ td (ln.s ! Strong ! (Obj Gen))) ++
+           tr (th (heading dative_Parameter)     ++ td (ln.s ! Strong ! (Obj Dat))) ++
+           tr (th (heading accusative_Parameter) ++ td (ln.s ! Strong ! (Obj Acc)))
            )
     } ;
 
@@ -48,13 +108,13 @@ lin
         td (adj.s ! d ! (AMod (GSg Neutr) c)) ++
         td (adj.s ! d ! (AMod GPl         c)) ;
       dtable : Parameter -> Degree -> Str = \s,d ->
-        paragraph (heading2 (heading s) ++ frameTable ( 
-          tr (th []  ++ th (heading masculine_Parameter) ++ th (heading feminine_Parameter) ++ th (heading neuter_Parameter) ++ 
+        paragraph (heading2 (heading s) ++ frameTable (
+          tr (th []  ++ th (heading masculine_Parameter) ++ th (heading feminine_Parameter) ++ th (heading neuter_Parameter) ++
                         th (heading plural_Parameter)) ++
           tr (th (heading nominative_Parameter) ++ gforms d Nom) ++
-          tr (th (heading genitive_Parameter)   ++ gforms d Gen) ++
-          tr (th (heading dative_Parameter)     ++ gforms d Dat) ++
-          tr (th (heading accusative_Parameter) ++ gforms d Acc) ++
+          tr (th (heading genitive_Parameter)   ++ gforms d (Obj Gen)) ++
+          tr (th (heading dative_Parameter)     ++ gforms d (Obj Dat)) ++
+          tr (th (heading accusative_Parameter) ++ gforms d (Obj Acc)) ++
           tr (th (heading predicative_Parameter) ++ intagAttr "td" "colspan=4" (adj.s ! d ! APred))
           ))
     in { t  = "a" ;
@@ -62,7 +122,7 @@ lin
          s2 = dtable positive_Parameter Posit ++ dtable comparative_Parameter Compar ++ dtable superlative_Parameter Superl
        } ;
 
-  InflectionAdv adv = {
+  InflectionAdv, InflectionAdV, InflectionAdA, InflectionAdN = \adv -> {
     t  = "adverb" ;
     s1 = heading1 (heading adverb_Category) ;
     s2 = paragraph adv.s
@@ -73,6 +133,35 @@ lin
     s1 = heading1 (heading preposition_Category) ;
     s2 = paragraph (S.mkAdv (lin Prep p) (S.mkNP S.a_Det L.computer_N)).s
     } ;
+
+{-
+-}  --# notpresent
+
+  InflectionCl = \cl -> {
+    t  = "satz" ;
+    s1 = heading1 "Satz" ;
+    s2 = frameTable (
+           tr (intagAttr "th" "colspan=3" "Einfache Tempora" ++
+               intagAttr "th" "colspan=3" "Perfekte Tempora") ++
+           tr (th "Tempus" ++ th "Aussage" ++ th "Frage" ++
+               th "Tempus" ++ th "Aussage" ++ th "Frage") ++
+           inflClauseTense (heading present_Parameter)
+                           (heading present_Parameter ++ " " ++ heading perfect_Parameter)
+                           Pres cl ++
+           inflClauseTense (heading past_Parameter)
+                           (heading past_Parameter ++ " " ++ heading perfect_Parameter)
+                           Past cl ++
+           inflClauseTense (heading future_Parameter)
+                           (heading future_Parameter ++ " " ++ heading perfect_Parameter)
+                           Fut cl ++
+           inflClauseTense (heading conditional_Parameter)
+                           (heading conditional_Parameter ++ " " ++ heading perfect_Parameter)
+                           Cond cl
+         )
+    } ;
+
+{-  --# notpresent
+-}
 
   InflectionV v = {
     t  = "v" ;
@@ -147,13 +236,31 @@ lin
 
 lin
   NoDefinition   t     = {s=t.s};
-  MkDefinition   t d   = {s="<p><b>Definierung:</b>"++t.s++d.s++"</p>"};
-  MkDefinitionEx t d e = {s="<p><b>Definierung:</b>"++t.s++d.s++"</p><p><b>Beispiel:</b>"++e.s++"</p>"};
+  MkDefinition   t d   = {s="<p><b>Definition:</b>"++t.s++d.s++"</p>"};
+  MkDefinitionEx t d e = {s="<p><b>Definition:</b>"++t.s++d.s++"</p><p><b>Beispiel:</b>"++e.s++"</p>"};
 
   MkDocument d i e = ss (i.s1 ++ d.s ++ i.s2 ++ paragraph e.s) ;  -- explanation appended in a new paragraph
   MkTag i = ss i.t ;
 
-oper 
+oper
+{-
+-}  --# notpresent
+
+  inflClauseTense : Str -> Str -> ResGer.Tense -> Cl -> Str = \simple,perfect,tense,cl ->
+    tr (intagAttr "th" "rowspan=2" simple ++
+        td (cl.s ! MIndic ! tense ! Simul ! Pos ! Main) ++
+        td (cl.s ! MIndic ! tense ! Simul ! Pos ! Inv) ++
+        intagAttr "th" "rowspan=2" perfect ++
+        td (cl.s ! MIndic ! tense ! Anter ! Pos ! Main) ++
+        td (cl.s ! MIndic ! tense ! Anter ! Pos ! Inv)) ++
+    tr (td (cl.s ! MIndic ! tense ! Simul ! Neg ! Main) ++
+        td (cl.s ! MIndic ! tense ! Simul ! Neg ! Inv) ++
+        td (cl.s ! MIndic ! tense ! Anter ! Neg ! Main) ++
+        td (cl.s ! MIndic ! tense ! Anter ! Neg ! Inv)) ;
+
+{-  --# notpresent
+-}
+
   verbExample : CatGer.Cl -> Str = \cl ->
      (S.mkUtt cl).s 
      ++ ";" ++ (S.mkUtt (S.mkS S.anteriorAnt cl)).s  --# notpresent
@@ -163,7 +270,7 @@ oper
      let 
        vfin : VForm -> Str = \f ->
          verb.s ! f ++ verb.prefix ; 
-       gforms : Number -> Person -> Str = \n,p -> 
+       gforms : ParadigmsGer.Number -> Person -> Str = \n,p -> 
          td (vfin (VFin False (VPresInd  n p))) ++
          td (vfin (VFin False (VPresSubj n p)))
          ++ td (vfin (VFin False (VImpfInd  n p))) --# notpresent

@@ -16,6 +16,9 @@ flags  coding=utf8 ;
     AdjOrd o = {s=o.s; adv="["++o.s!AF MascPersSg Nom ++ [": the adverb form does not exist (fun AdjOrd)]"] ; isPost = False};
     
     AdAP ada ap = { s = \\af => ada.s ++ ap.s ! af; adv = ada.s ++ ap.adv ; isPost = ap.isPost};
+
+--     AdvAP : AP -> Adv -> AP ; -- warm by nature
+    AdvAP ap adv = { s = \\af => ap.s ! af ++ adv.s; adv = ap.adv ++ adv.s ; isPost = True};
     
 --     CAdvAP  : CAdv -> AP -> NP -> AP ; -- as cool as John
     CAdvAP c a n = {
@@ -41,7 +44,10 @@ flags  coding=utf8 ;
     UseA2 a = { s = mkAtable a.pos; adv=a.advpos ; isPost = False};
 
 --     SentAP  : AP -> SC -> AP ;  -- good that she is here -- I have bad feelling about this function
-    SentAP a s = {s=\\_=>a.adv ++ s.s; adv=a.adv ++ s.s ; isPost = True};
+    SentAP a sc = {
+      s = \\af => a.s ! af ++ sc.s;
+      adv = a.adv ++ sc.s;
+      isPost = False
+      };
 
 };
-

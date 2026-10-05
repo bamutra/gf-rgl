@@ -1,0 +1,396 @@
+resource ResKaz = open (P = ParamX) in {
+
+param Case = Nom | Acc | Dat | Loc | Gen | Instr | Ablat ;
+oper Compl = {s : Str; c : Case} ;
+param Number = Sg | Pl ;
+param Person = P1 | P2 Formality | P3 ;
+param Formality = Informal | Formal ;
+oper Agr = {p : Person; n : Number} ;
+-- MorphoKaz's generated possessive tables use the two P2 labels in the
+-- opposite order from verbal agreement.  Normalize them at noun lookup.
+oper nounPerson : Person -> Person = \p -> case p of {
+  P2 Informal => P2 Formal;
+  P2 Formal => P2 Informal;
+  _ => p
+  } ;
+-- The source morphology has no separate second/third-person forms for a
+-- plural possessor.  Kazakh uses the same possessive ending in these cells;
+-- plurality is already expressed by the possessor NP/pronoun.
+oper possForm : Noun -> Number -> Person -> Number -> Str = \noun,owner,p,n ->
+  noun.poss ! case <owner,p> of {
+    <Pl,P2 _> => Sg ;
+    <Pl,P3> => Sg ;
+    _ => owner
+  } ! p ! n ;
+param Possessor = NoPoss | Poss Person Number ;
+oper Clause = {
+  pres : P.Polarity => Str;
+  past : P.Polarity => Str;
+  fut  : P.Polarity => Str;
+  cond : P.Polarity => Str;
+  anter : P.Polarity => Str
+  } ;
+oper Noun = {s: Case => Number => Str; poss: Number => Person => Number => Str} ; -- 1651
+oper mkNoun : (_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_ : Str) -> Noun =
+       \f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30 ->
+          { s = table {
+                  Nom => table {
+                           Sg => f1 ;
+                           Pl => f2
+                         } ;
+                  Acc => table {
+                           Sg => f3 ;
+                           Pl => f4
+                         } ;
+                  Dat => table {
+                           Sg => f5 ;
+                           Pl => f6
+                         } ;
+                  Gen => table {
+                           Sg => f7 ;
+                           Pl => f8
+                         } ;
+                  Ablat => table {
+                             Sg => f9 ;
+                             Pl => f10
+                           } ;
+                  Instr => table {
+                             Sg => f11 ;
+                             Pl => f12
+                           } ;
+                  Loc => table {
+                           Sg => f13 ;
+                           Pl => f14
+                         }
+                } ;
+            poss = table {
+                     Sg => table {
+                             P1 => table {
+                                     Sg => f15 ;
+                                     Pl => f16
+                                   } ;
+                             P2 Informal => table {
+                                              Sg => f17 ;
+                                              Pl => f18
+                                            } ;
+                             P2 Formal => table {
+                                            Sg => f19 ;
+                                            Pl => f20
+                                          } ;
+                             P3 => table {
+                                     Sg => f21 ;
+                                     Pl => f22
+                                   }
+                           } ;
+                     Pl => table {
+                             P1 => table {
+                                     Sg => f23 ;
+                                     Pl => f24
+                                   } ;
+                             P2 Informal => table {
+                                              Sg => f25 ;
+                                              Pl => f26
+                                            } ;
+                             P2 Formal => table {
+                                            Sg => f27 ;
+                                            Pl => f28
+                                          } ;
+                             P3 => table {
+                                     Sg => f29 ;
+                                     Pl => f30
+                                   }
+                           }
+                   }
+          } ;
+
+
+param Polarity = Pos | Neg ;
+oper Verb = {infinitive: Str; indicative: {fut: Str; pres: {progressive: Polarity => Person => Number => Str; noAspect: Polarity => Person => Number => Str}; past: {perfect: Polarity => Person => Number => Str; progressive: Polarity => Person => Number => Str; noAspect: Polarity => Person => Number => Str}}; imperative: Polarity => Formality => Number => Str; subjunctive: Person => Number => Str} ; -- 113
+oper mkVerb : (_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_ : Str) -> Verb =
+       \f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65,f66,f67,f68,f69,f70,f71,f72,f73,f74,f75,f76,f77,f78,f79,f80,f81,f82,f83,f84,f85,f86,f87,f88,f89,f90,f91,f92,f93,f94,f95,f96,f97,f98 ->
+          { infinitive = f1 ;
+            indicative = { fut = f2 ;
+                           pres = { progressive = table {
+                                                    Pos => table {
+                                                             P1 => table {
+                                                                     Sg => f3 ;
+                                                                     Pl => f4
+                                                                   } ;
+                                                             P2 Informal => table {
+                                                                              Sg => f5 ;
+                                                                              Pl => f6
+                                                                            } ;
+                                                             P2 Formal => table {
+                                                                            Sg => f7 ;
+                                                                            Pl => f8
+                                                                          } ;
+                                                             P3 => table {
+                                                                     Sg => f9 ;
+                                                                     Pl => f10
+                                                                   }
+                                                           } ;
+                                                    Neg => table {
+                                                             P1 => table {
+                                                                     Sg => f11 ;
+                                                                     Pl => f12
+                                                                   } ;
+                                                             P2 Informal => table {
+                                                                              Sg => f13 ;
+                                                                              Pl => f14
+                                                                            } ;
+                                                             P2 Formal => table {
+                                                                            Sg => f15 ;
+                                                                            Pl => f16
+                                                                          } ;
+                                                             P3 => table {
+                                                                     Sg => f17 ;
+                                                                     Pl => f18
+                                                                   }
+                                                           }
+                                                  } ;
+                                    noAspect = table {
+                                                 Pos => table {
+                                                          P1 => table {
+                                                                  Sg => f19 ;
+                                                                  Pl => f20
+                                                                } ;
+                                                          P2 Informal => table {
+                                                                           Sg => f21 ;
+                                                                           Pl => f22
+                                                                         } ;
+                                                          P2 Formal => table {
+                                                                         Sg => f23 ;
+                                                                         Pl => f24
+                                                                       } ;
+                                                          P3 => table {
+                                                                  Sg => f25 ;
+                                                                  Pl => f26
+                                                                }
+                                                        } ;
+                                                 Neg => table {
+                                                          P1 => table {
+                                                                  Sg => f27 ;
+                                                                  Pl => f28
+                                                                } ;
+                                                          P2 Informal => table {
+                                                                           Sg => f29 ;
+                                                                           Pl => f30
+                                                                         } ;
+                                                          P2 Formal => table {
+                                                                         Sg => f31 ;
+                                                                         Pl => f32
+                                                                       } ;
+                                                          P3 => table {
+                                                                  Sg => f33 ;
+                                                                  Pl => f34
+                                                                }
+                                                        }
+                                               }
+                                  } ;
+                           past = { perfect = table {
+                                                Pos => table {
+                                                         P1 => table {
+                                                                 Sg => f35 ;
+                                                                 Pl => f36
+                                                               } ;
+                                                         P2 Informal => table {
+                                                                          Sg => f37 ;
+                                                                          Pl => f38
+                                                                        } ;
+                                                         P2 Formal => table {
+                                                                        Sg => f39 ;
+                                                                        Pl => f40
+                                                                      } ;
+                                                         P3 => table {
+                                                                 Sg => f41 ;
+                                                                 Pl => f42
+                                                               }
+                                                       } ;
+                                                Neg => table {
+                                                         P1 => table {
+                                                                 Sg => f43 ;
+                                                                 Pl => f44
+                                                               } ;
+                                                         P2 Informal => table {
+                                                                          Sg => f45 ;
+                                                                          Pl => f46
+                                                                        } ;
+                                                         P2 Formal => table {
+                                                                        Sg => f47 ;
+                                                                        Pl => f48
+                                                                      } ;
+                                                         P3 => table {
+                                                                 Sg => f49 ;
+                                                                 Pl => f50
+                                                               }
+                                                       }
+                                              } ;
+                                    progressive = table {
+                                                    Pos => table {
+                                                             P1 => table {
+                                                                     Sg => f51 ;
+                                                                     Pl => f52
+                                                                   } ;
+                                                             P2 Informal => table {
+                                                                              Sg => f53 ;
+                                                                              Pl => f54
+                                                                            } ;
+                                                             P2 Formal => table {
+                                                                            Sg => f55 ;
+                                                                            Pl => f56
+                                                                          } ;
+                                                             P3 => table {
+                                                                     Sg => f57 ;
+                                                                     Pl => f58
+                                                                   }
+                                                           } ;
+                                                    Neg => table {
+                                                             P1 => table {
+                                                                     Sg => f59 ;
+                                                                     Pl => f60
+                                                                   } ;
+                                                             P2 Informal => table {
+                                                                              Sg => f61 ;
+                                                                              Pl => f62
+                                                                            } ;
+                                                             P2 Formal => table {
+                                                                            Sg => f63 ;
+                                                                            Pl => f64
+                                                                          } ;
+                                                             P3 => table {
+                                                                     Sg => f65 ;
+                                                                     Pl => f66
+                                                                   }
+                                                           }
+                                                  } ;
+                                    noAspect = table {
+                                                 Pos => table {
+                                                          P1 => table {
+                                                                  Sg => f67 ;
+                                                                  Pl => f68
+                                                                } ;
+                                                          P2 Informal => table {
+                                                                           Sg => f69 ;
+                                                                           Pl => f70
+                                                                         } ;
+                                                          P2 Formal => table {
+                                                                         Sg => f71 ;
+                                                                         Pl => f72
+                                                                       } ;
+                                                          P3 => table {
+                                                                  Sg => f73 ;
+                                                                  Pl => f74
+                                                                }
+                                                        } ;
+                                                 Neg => table {
+                                                          P1 => table {
+                                                                  Sg => f75 ;
+                                                                  Pl => f76
+                                                                } ;
+                                                          P2 Informal => table {
+                                                                           Sg => f77 ;
+                                                                           Pl => f78
+                                                                         } ;
+                                                          P2 Formal => table {
+                                                                         Sg => f79 ;
+                                                                         Pl => f80
+                                                                       } ;
+                                                          P3 => table {
+                                                                  Sg => f81 ;
+                                                                  Pl => f82
+                                                                }
+                                                        }
+                                               }
+                                  }
+                         } ;
+            imperative = table {
+                                   Pos => table {
+                                            Informal => table {
+                                                          Sg => f83 ;
+                                                          Pl => f84
+                                                        } ;
+                                            Formal => table {
+                                                        Sg => f85 ;
+                                                        Pl => f86
+                                                      }
+                                          } ;
+                                   Neg => table {
+                                            Informal => table {
+                                                          Sg => f87 ;
+                                                          Pl => f88
+                                                        } ;
+                                            Formal => table {
+                                                        Sg => f89 ;
+                                                        Pl => f90
+                                                      }
+                                          }
+                                 } ;
+            subjunctive = table {
+                            P1 => table {
+                                    Sg => f91 ;
+                                    Pl => f92
+                                  } ;
+                            P2 Informal => table {
+                                             Sg => f93 ;
+                                             Pl => f94
+                                           } ;
+                            P2 Formal => table {
+                                           Sg => f95 ;
+                                           Pl => f96
+                                         } ;
+                            P3 => table {
+                                    Sg => f97 ;
+                                    Pl => f98
+                                  }
+                          }
+          } ;
+
+oper mapVerb : (Str -> Str) -> Verb -> Verb = \f,v -> {
+  infinitive = f v.infinitive ;
+  indicative = {
+    fut = f v.indicative.fut ;
+    pres = {
+      progressive = \\pol,p,n => f (v.indicative.pres.progressive ! pol ! p ! n) ;
+      noAspect = \\pol,p,n => f (v.indicative.pres.noAspect ! pol ! p ! n)
+      } ;
+    past = {
+      perfect = \\pol,p,n => f (v.indicative.past.perfect ! pol ! p ! n) ;
+      progressive = \\pol,p,n => f (v.indicative.past.progressive ! pol ! p ! n) ;
+      noAspect = \\pol,p,n => f (v.indicative.past.noAspect ! pol ! p ! n)
+      }
+    } ;
+  imperative = \\pol,form,n => f (v.imperative ! pol ! form ! n) ;
+  subjunctive = \\p,n => f (v.subjunctive ! p ! n)
+  } ;
+
+oper prefixVerb : Str -> Verb -> Verb = \x,v -> mapVerb (\s -> x ++ s) v ;
+
+oper NPForm = {s : Case => Str; a : Agr} ;
+oper defaultAgr : Agr = {p=P3; n=Sg} ;
+oper complNP : Compl -> NPForm -> Str = \c,np -> np.s ! c.c ++ c.s ;
+
+oper rglPolarity : P.Polarity -> Polarity = \pol -> case pol of {
+  P.Pos => Pos;
+  P.Neg => Neg
+  } ;
+
+oper selectVerb : Verb -> P.Tense -> P.Anteriority -> P.Polarity -> Agr -> Str =
+  \v,t,a,pol,agr -> case <t,a> of {
+    <P.Pres,P.Simul> => v.indicative.pres.noAspect ! rglPolarity pol ! agr.p ! agr.n ;
+    <P.Pres,P.Anter> => v.indicative.past.perfect ! rglPolarity pol ! agr.p ! agr.n ;
+    <P.Past,P.Simul> => v.indicative.past.noAspect ! rglPolarity pol ! agr.p ! agr.n ;
+    <P.Past,P.Anter> => v.indicative.past.perfect ! rglPolarity pol ! agr.p ! agr.n ;
+    -- The habitual/non-past form is also the ordinary future form.
+    <P.Fut,_> => v.indicative.pres.noAspect ! rglPolarity pol ! agr.p ! agr.n ;
+    <P.Cond,_> => v.subjunctive ! agr.p ! agr.n
+    } ;
+
+oper mkClause : NPForm -> Verb -> Clause = \np,vp -> {
+  pres = \\pol => np.s ! Nom ++ selectVerb vp P.Pres P.Simul pol np.a ;
+  past = \\pol => np.s ! Nom ++ selectVerb vp P.Past P.Simul pol np.a ;
+  fut = \\pol => np.s ! Nom ++ selectVerb vp P.Fut P.Simul pol np.a ;
+  cond = \\pol => np.s ! Nom ++ selectVerb vp P.Cond P.Simul pol np.a ;
+  anter = \\pol => np.s ! Nom ++ selectVerb vp P.Past P.Anter pol np.a
+  } ;
+
+}

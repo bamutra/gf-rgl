@@ -117,7 +117,14 @@ oper
 
     exceptNomSNoun : SNoun -> Str -> SNoun = \noun,nom -> {
       s = table {
-        0 => nom ;
+        5 => nom ;
+        f => noun.s ! f
+	} ;
+      h = noun.h
+      } ;
+    exceptPlGenSNoun : SNoun -> Str -> SNoun = \noun,plgen -> {
+      s = table {
+        5 => init plgen ;
         f => noun.s ! f
 	} ;
       h = noun.h
@@ -141,7 +148,7 @@ oper
     let 
       tuoree = tuore.s ! 1 ;
       tuoreesti  = tuoree + "sti" ; 
-      tuoreemmin =  init tuoree ;
+      tuoreemmin = init tuoree + "in" ;
     in {s = table {
          SAN f => tuore.s ! f ;
          SAAdv => if_then_Str isPos tuoreesti tuoreemmin

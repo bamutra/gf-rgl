@@ -42,7 +42,7 @@ concrete NounBul of Noun = CatBul ** open ResBul, Prelude in {
                        RObj c => linCase c Pos ++ pn.s; 
                        _      => pn.s
                      } ;
-                 gn = GSg pn.g ;
+                 gn = pn.gn ;
                  p = NounP3 Pos
                } ;
     UsePron p = p ;
@@ -116,10 +116,12 @@ concrete NounBul of Noun = CatBul ** open ResBul, Prelude in {
     NumCard n = {s=n.s; nn=n.nn; nonEmpty = True} ;
 
     NumDigits n = {s = \\gspec => n.s ! NCard gspec; nn = case n.n of {Sg => NNum Sg; Pl => NCountable}} ;
+    NumDecimal n = {s = \\gspec => n.s ! NCard gspec; nn = case n.n of {Sg => NNum Sg; Pl => NCountable}} ;
     OrdDigits n = {s = \\aform => n.s ! NOrd aform} ;
 
     NumNumeral numeral = {s = \\gspec => numeral.s ! NCard gspec; nn = case numeral.n of {Sg => NNum Sg; Pl => NCountable}} ;
     OrdNumeral numeral = {s = \\aform => numeral.s ! NOrd aform} ;
+    OrdNumeralSuperl numeral a = {s = \\aform => numeral.s ! NOrd aform ++ "най" ++ hyphen ++ a.s ! indefAForm aform} ;
     
     AdNum adn num = {s = \\gspec => adn.s ++ num.s ! gspec; nn = num.nn} ;
 
@@ -208,7 +210,7 @@ concrete NounBul of Noun = CatBul ** open ResBul, Prelude in {
                               GSg Fem  => AFem ;
                               GPl      => ANeut
                             }
-                    in det.s ! False ! g ! role ++ np.s ! (RObj Acc) ;
+                    in det.s ! False ! g ! role ++ "от" ++ np.s ! (RObj CPrep) ;
       gn = gennum ANeut (numnnum det.nn);
       p = NounP3 Pos
       } ;
@@ -238,4 +240,11 @@ concrete NounBul of Noun = CatBul ** open ResBul, Prelude in {
                      p = dap.p
                     } ;
     DetDAP det = det ;
+
+    QuantityNP n m = {
+      s = \\role => preOrPost m.isPre m.s (n.s ! NCard (CFMasc Indef NonHuman)) ;
+      gn = gennum (AMasc NonHuman) n.n ;
+      p  = NounP3 Pos
+      } ;
+
 }

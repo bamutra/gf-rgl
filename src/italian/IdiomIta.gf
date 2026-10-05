@@ -23,6 +23,14 @@ concrete IdiomIta of Idiom = CatIta **
         (insertClit3 (elision "ci" "c'" "ci") 
           (insertComplement (\\_ => (np.s ! Nom).ton) 
             (predV copula))) ;
+	    
+    ExistNPAdv np adv =
+      let npa = complAgr np.a in
+      mkClause [] True False (agrP3 npa.g npa.n)
+      (insertAdv adv.s 
+        (insertClit3 (elision "ci" "c'" "ci") 
+          (insertComplement (\\_ => (np.s ! Nom).ton) 
+            (predV copula)))) ;
 
     ExistIP ip = {
       s = \\t,a,p,_ =>
@@ -45,6 +53,11 @@ concrete IdiomIta of Idiom = CatIta **
 
     ImpPl1 vp = {s =
       mkImperative False P1 vp ! RPos ! Masc ! Pl --- fem
+      } ;
+
+    ImpP3 np vp = {
+      s = (mkClause (np.s ! Nom).comp np.hasClit False np.a vp).s 
+             ! DInv ! RPres ! Simul ! RPos ! Conjunct
       } ;
 
 }

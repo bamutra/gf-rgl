@@ -1,4 +1,4 @@
-concrete NumeralDan of Numeral = CatDan [Numeral,Digits] ** open MorphoDan,Prelude in {
+concrete NumeralDan of Numeral = CatDan [Numeral,Digits,Decimal] ** open MorphoDan,Prelude in {
   flags coding=utf8 ;
 
 
@@ -7,7 +7,7 @@ concrete NumeralDan of Numeral = CatDan [Numeral,Digits] ** open MorphoDan,Prelu
 lincat 
   Digit = {s : DForm => CardOrd => Str} ;
   Sub10 = {s : DForm => CardOrd => Str ; n : Number} ;
-  Sub100, Sub1000, Sub1000000 = 
+  Sub100, Sub1000, Sub1000000, Sub1000000000, Sub1000000000000 =
           {s :          CardOrd => Str ; n : Number} ;
 
 lin num x = x ;
@@ -38,12 +38,35 @@ lin n9 = mkTal "ni"   "nitten"  "halvfems"   "niende" "halvfemsindstyvende" ;
   pot1plus d e = {
     s = \\g => e.s ! ental ! invNum ++ "og" ++ d.s ! tiotal ! g ; n = Pl} ;
   pot1as2 n = n ;
+  pot21 = numPl (cardOrd "hundrede" "hundredende") ;
   pot2 d = numPl (\\_ => d.s ! ental ! invNum ++ "hundrede") ;
   pot2plus d e = 
     {s = \\g => d.s ! ental ! invNum ++ "hundrede" ++ "og" ++ e.s ! g ; n = Pl} ;
   pot2as3 n = n ;
+  pot31 = numPl (cardOrd "tusind" "tusinde") ;
   pot3 n = numPl (\\g => n.s ! invNum ++ cardOrd "tusind" "tusinde" ! g) ;
   pot3plus n m = {s = \\g => n.s ! invNum ++ "tusind" ++ "og" ++ m.s ! g ; n =Pl} ;
+
+  pot3as4 n = n ;
+
+  pot41 = numPl (cardOrd "en million" "millionte") ;
+  pot4 n = numPl (\\g => n.s ! NCard Utr ++
+    cardOrd (case n.n of {Sg => "million" ; Pl => "millioner"}) "millionte" ! g) ;
+  pot4plus n m = {
+    s = \\g => n.s ! NCard Utr ++ case n.n of {Sg => "million" ; Pl => "millioner"} ++ m.s ! g ;
+    n = Pl
+    } ;
+  pot4decimal d = numPl (\\g => d.s ! NCard Utr ++ cardOrd "millioner" "millionte" ! g) ;
+  pot4as5 n = n ;
+
+  pot51 = numPl (cardOrd "en milliard" "milliardte") ;
+  pot5 n = numPl (\\g => n.s ! NCard Utr ++
+    cardOrd (case n.n of {Sg => "milliard" ; Pl => "milliarder"}) "milliardte" ! g) ;
+  pot5plus n m = {
+    s = \\g => n.s ! NCard Utr ++ case n.n of {Sg => "milliard" ; Pl => "milliarder"} ++ m.s ! g ;
+    n = Pl
+    } ;
+  pot5decimal d = numPl (\\g => d.s ! NCard Utr ++ cardOrd "milliarder" "milliardte" ! g) ;
 
   lincat 
     Dig = TDigit ;
@@ -66,6 +89,20 @@ lin n9 = mkTal "ni"   "nitten"  "halvfems"   "niende" "halvfemsindstyvende" ;
     D_7 = mkDig "7" ;
     D_8 = mkDig "8" ;
     D_9 = mkDig "9" ;
+
+    PosDecimal d = d ** {hasDot=False} ;
+    NegDecimal d = {
+      s = \\o => "-" ++ BIND ++ d.s ! o ;
+      n = Pl ;
+      hasDot=False
+    } ;
+    IFrac d i = {
+      s=\\o=>d.s ! NCard neutrum ++
+             if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+             i.s ! o;
+      hasDot=True;
+      n = Pl
+    } ;
 
   oper
     mk2Dig : Str -> Str -> TDigit = \c,o -> mk3Dig c o Pl ;

@@ -185,15 +185,14 @@ lin
   ComplSlash vpslash np =
     let agr : Agreement = np.agr in {
       v        = vpslash.v ;
-      {-
-      compl    = \\agr => case vpslash.voice of {
-        Act  => vpslash.rightVal.s ++ np.s ! (vpslash.rightVal.c ! (fromAgr agr).num) ;
-        Pass => case vpslash.rightVal.c ! (fromAgr agr).num of {
-          Nom => np.s ! (vpslash.rightVal.c ! Sg) ;
-          _   => vpslash.rightVal.s ++ np.s ! (vpslash.rightVal.c ! (fromAgr agr).num)
-        }
-      } ++ vpslash.compl ! agr ;
-      -}
+      -- compl    = \\agr => case vpslash.voice of {
+      --  Act  => vpslash.rightVal.s ++ np.s ! (vpslash.rightVal.c ! (fromAgr agr).num) ;
+      --  Pass => case vpslash.rightVal.c ! (fromAgr agr).num of {
+      --    Nom => np.s ! (vpslash.rightVal.c ! Sg) ;
+      --    _   => vpslash.rightVal.s ++ np.s ! (vpslash.rightVal.c ! (fromAgr agr).num)
+      --  }
+      -- } ++ vpslash.compl ! agr ;
+      
       compl    = \\agr => vpslash.rightVal.s ++ 
                           np.s ! (vpslash.rightVal.c ! (fromAgr agr).num) ++ 
                           vpslash.compl ! agr ;
@@ -273,15 +272,16 @@ lin
   -- e.g. 'sleep here'
   AdvVP vp adv = insertObjReg (\\_ => adv.s) adv.isPron vp ;
 
+  ExtAdvVP vp adv = insertObjReg (\\_ => "," ++ adv.s) False vp ;
+
   -- AdV -> VP -> VP
   -- e.g. 'always sleep'
   AdVVP adv vp = insertObjPre (\\_ => adv.s) vp ;
 
-  -- TODO: AdvVPSlash : VPSlash -> Adv -> VPSlash
-  -- e.g. 'use (it) here'
+  AdvVPSlash vp adv = insertObjSlash (\\_ => adv.s) vp ;
 
-  -- TODO: AdVVPSlash : AdV -> VPSlash -> VPSlash
-  -- e.g. 'always use (it)'
+  AdVVPSlash adv vp =
+    (insertObjPre (\\_ => adv.s) vp) ** {rightVal = vp.rightVal} ;
 
   -- VP -> Prep -> VPSlash
   -- e.g. 'live in (it)'
@@ -330,7 +330,7 @@ oper
       Ind Anter tense => (mkV "būt").s ! finalPol ! (VInd agr.pers agr.num tense) ++ part ;  --# notpresent
 
       -- FIXME(?): Rel _ Past => ...
-      Rel _     Past  => NON_EXISTENT ;  --# notpresent
+      Rel _     Past  => nonExist ;  --# notpresent
       Rel Simul tense => v.s ! finalPol ! (VRel tense) ;  --# notpresent
       Rel Anter tense => (mkV "būt").s ! finalPol ! (VRel tense) ++ part ;  --# notpresent
 

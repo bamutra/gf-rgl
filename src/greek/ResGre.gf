@@ -39,7 +39,7 @@ resource ResGre = ParamX  **  open Prelude in {
 
   oper
 
-  AAgr : Type = {g : Gender ; n : Number} ;
+  AAgr : PType = {g : Gender ; n : Number} ;
 
   VP = { v : Verb ;  clit,clit2 : Str ; comp : Agr => Str ; isNeg : Bool ; voice : Voice ; aspect :Aspect} ;
 
@@ -375,7 +375,8 @@ resource ResGre = ParamX  **  open Prelude in {
         Fros + "ω" => mkName  Giannis (Fros + "ως") (Fros + "ω") (Fros + "ω") ("") ("")Fem ;
         Mirt + "ώ" => mkName  Giannis (Mirt + "ώς") (Mirt + "ώ") (Mirt + "ώ") ("")("")Fem ;
         Londin + "ο" => mkName  Giannis (Londin + "ου") (Londin + "ο") (Londin + "ο") (Londin + "α") (Londin + "ων")   Neut ;
-        Paris + "ι" => mkName  Giannis (mkStemNouns Paris + "ιού") (Paris + "ι") (Paris + "ι")(Paris + "ια") (mkStemNouns Paris + "ιών")   Neut
+        Paris + "ι" => mkName  Giannis (mkStemNouns Paris + "ιού") (Paris + "ι") (Paris + "ι")(Paris + "ια") (mkStemNouns Paris + "ιών")   Neut ;
+	x => mkName x x x x x x Neut ---- AR 2025-02-13 guess
       };
 
 
@@ -668,31 +669,6 @@ resource ResGre = ParamX  **  open Prelude in {
           } ;
         g = g
         } ;
-
-        
-        mkNoun_anthropos : (s1,_ : Str) -> Gender -> Noun = 
-        \anthropos, anthropon,  g ->
-        let
-          anthrop = Predef.tk 2 anthropos ;
-          anthrOp = Predef.tk 2 anthropon ;
-        in {
-        s = table {
-          Sg => table {
-            Nom => anthropos ;
-            Gen|CPrep P_Dat => anthrOp + "ου" ;
-            Acc |CPrep P_se |CPrep PNul  => anthrop + "ο";
-            Vocative => anthrop + "ε" 
-            } ;
-          Pl => table {
-            Nom | Vocative=> anthrop + "οι" ;
-            Gen |CPrep P_Dat=> anthropon ;
-            Acc |CPrep P_se |CPrep PNul => anthrOp + "ους" 
-            }
-          } ;
-        g = g
-        } ;
-
-
 
        ----------------Neuter nouns in -ς , with  stress movement,syllabic augmentation,  irregular (φως, γεγονός, ημίφως) --------------
       mkNoun_fws: (s1,_ : Str) -> Gender -> Noun = 
@@ -1379,7 +1355,7 @@ resource ResGre = ParamX  **  open Prelude in {
 
 
   -----Pattern for the final -ν in the Feminine Accusative of the definite article----------
-   FemAccFinalN : pattern Str = #("ά" | "ό" | "ί"| "έ" | "ή" | "ύ"| "ώ" | "α" | "ο" | "ι"| "ε" |"η" | "υ" | "ω" |"κ"|"π" |"τ"| "ξ" |"ψ"| "γκ" |"μπ" |"ντ" );
+   FemAccFinalN : pattern Str = #("Α" | "Τ" | "ά" | "ό" | "ί"| "έ" | "ή" | "ύ"| "ώ" | "α" | "ο" | "ι"| "ε" |"η" | "υ" | "ω" |"κ"|"π" |"τ"| "ξ" |"ψ"| "γκ" |"μπ" |"ντ" );
 
 
 
@@ -1405,8 +1381,10 @@ resource ResGre = ParamX  **  open Prelude in {
         <Masc | Change,Sg,CPrep P_se > =>   "στον" ; 
         <Fem, Sg, Nom>    => "η" ;
         <Fem, Sg, Gen|CPrep P_Dat>   =>  "της" ;
-        <Fem, Sg, Acc |CPrep PNul>   =>   pre { "ά" | "ό" | "ί"| "έ" | "ή" | "ύ"| "ώ" | "α" | "ο" | "ι"| "ε" |"η" | "υ" | "ω" |"κ"|"π" |"τ"| "ξ" |"ψ"| "γκ" |"μπ" |"ντ"  => "την" ; _=> "τη"} ;
-        <Fem, Sg, CPrep P_se  >   =>   pre { "ά" | "ό" | "ί"| "έ" | "ή" | "ύ"| "ώ" | "α" | "ο" | "ι"| "ε" |"η" | "υ" | "ω" |"κ"|"π" |"τ"| "ξ" |"ψ"| "γκ" |"μπ" |"ντ" => "στην" ; _=> "στη"} ;
+        <Fem, Sg, Acc |CPrep PNul>   =>
+	pre {#FemAccFinalN => "την" ; _=> "τη"} ;
+        <Fem, Sg, CPrep P_se  >   =>
+	pre {#FemAccFinalN => "στην" ; _=> "στη"} ;
         <Neut, Sg, Nom | Acc |CPrep PNul>    => prepCase c++  "το" ;
         <Neut, Sg, Gen|CPrep P_Dat>   =>  "του" ;
         <Neut, Sg, CPrep P_se >    =>   "στο" ;

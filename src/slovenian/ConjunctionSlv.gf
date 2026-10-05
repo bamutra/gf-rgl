@@ -10,6 +10,10 @@ concrete ConjunctionSlv of Conjunction =
     ConjAP conj xs = {
       s = \\sp,g,c,n => xs.s1 ! sp ! g ! c ! n ++ conj.s ++ xs.s2 ! sp ! g ! c ! n
     } ;
+    ConjCN conj xs = {
+      s = \\s,c,n => xs.s1 ! s ! c ! n ++ conj.s ++ xs.s2 ! s ! c ! n ;
+      g = xs.g ;
+    } ;
 
 -- These fun's are generated from the list cat's.
 
@@ -28,9 +32,27 @@ concrete ConjunctionSlv of Conjunction =
       s1 = \\sp,g,c,n => x.s ! sp ! g ! c ! n ++ xs.s1 ! sp ! g ! c ! n ;
       s2 = xs.s2
     } ;
+    BaseCN x y = {
+      s1 = x.s ;
+      s2 = y.s ;
+      g  = y.g
+    } ;
+    ConsCN x xs = {
+      s1 = \\s,c,n => x.s ! s ! c ! n ++ "," ++ xs.s1 ! s ! c ! n ;
+      s2 = xs.s2 ;
+      g  = xs.g
+    } ;
+    ConjS conj xs = {s=xs.s1++conj.s++xs.s2} ;
+    BaseS a b = {s1=a.s;s2=b.s} ;
+    ConsS a xs = {s1=a.s++","++xs.s1;s2=xs.s2} ;
+    ConjAdv conj xs = {s=xs.s1++conj.s++xs.s2} ;
+    BaseAdv a b = {s1=a.s;s2=b.s} ;
+    ConsAdv a xs = {s1=a.s++","++xs.s1;s2=xs.s2} ;
 
   lincat
     [NP] = {s1,s2 : Case => Str; a : Agr} ;
     [AP] = {s1,s2 : Species => AGender => Case => Number => Str} ;
+    [CN] = {s1,s2 : Species => Case => Number => Str; g : AGender} ;
+    [S], [Adv] = {s1,s2 : Str} ;
 
 }

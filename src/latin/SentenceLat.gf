@@ -6,6 +6,21 @@ concrete SentenceLat of Sentence = CatLat ** open Prelude, ResLat in {
 
     PredVP np vp = -- NP -> VP -> Cl
       mkClause np vp ;
+
+    PredSCVP sc vp = mkClause (dummyNP sc.s) vp ;
+
+    ImpVP vp = {
+      s = \\pol,form => case pol of {
+        Neg => case form of {VImp1 Pl => "nolite"; VImp2 Pl _ => "nolite"; _ => "noli"};
+        Pos => ""
+        } ++
+        vp.adv ++ vp.obj ++ vp.compl ! Ag Masc Sg Acc ++
+        case pol of {Neg => vp.inf ! VInfActPres ; Pos => vp.imp ! form}
+      } ;
+
+    AdvImp adv imp = imp ** {
+      s = \\p,f => adv.s ! Posit ++ imp.s ! p ! f
+      } ;
 --
 --    PredSCVP sc vp = mkClause sc.s (agrP3 Sg) vp ;
 --
@@ -25,7 +40,7 @@ concrete SentenceLat of Sentence = CatLat ** open Prelude, ResLat in {
    
 --  SlashVP  : NP -> VPSlash -> ClSlash ;      -- (whom) he sees
     SlashVP np vp = 
-      mkClause np ( vp ** {c2 = vp.c2} ) ;
+      mkClause np vp ** {c2 = vp.c} ;
 --
 --    AdvSlash slash adv = {
 --      s  = \\t,a,b,o => slash.s ! t ! a ! b ! o ++ adv.s ;
@@ -33,7 +48,23 @@ concrete SentenceLat of Sentence = CatLat ** open Prelude, ResLat in {
 --    } ;
 
 --  SlashPrep : Cl -> Prep -> ClSlash ;         -- (with whom) he walks 
-    SlashPrep cl prep = cl ** {c2 = prep.s} ;
+    SlashPrep cl prep = cl ** {c2 = prep} ;
+
+    AdvSlash cl adv = cl ** {adv = adv.s ! Posit ++ cl.adv} ;
+
+    EmbedS s = {s = "quod" ++ defaultSentence s ! SOV} ;
+    EmbedQS qs = {s = qs.s ! QIndir} ;
+    EmbedVP vp = {s = vp.adv ++ vp.obj ++ vp.compl ! Ag Masc Sg Nom ++ vp.inf ! VInfActPres} ;
+
+    ExtAdvS adv s = s ** {sadv = adv.s ! Posit ++ s.sadv} ;
+
+    SSubjS s1 subj s2 = s1 ** {
+      sadv = subj.s ++ defaultSentence s2 ! SOV ++ s1.sadv
+      } ;
+
+    RelS s rs = s ** {sadv = s.sadv ++ rs.s ! Neutr ! Sg} ;
+
+    UseSlash t p cl = combineClause (t.s ++ p.s) cl t.t t.a p.p VQFalse ** {c2 = cl.c2} ;
 --
 --    SlashVS np vs slash = 
 --      mkClause (combineNounPhrase np ! PronNonDrop ! Nom) np.a 
@@ -45,12 +76,12 @@ concrete SentenceLat of Sentence = CatLat ** open Prelude, ResLat in {
 --    EmbedVP vp = {s = infVP False vp (agrP3 Sg)} ; --- agr
 --
     UseCl  t p cl = -- Temp -> Pol-> Cl -> S
-      (combineClause cl (lin Tense t) t.a (lin Pol p) VQFalse) ;
+      (combineClause (t.s++p.s) cl t.t t.a p.p VQFalse) ;
 
-    -- 	UseQCl : Temp -> Pol -> QCl -> QS -- maybe use mkQuestion
+    -- 	UseQCl : Temp -> Pol -> QCl -> QS
     UseQCl t p cl =
       {
-	s = let qs = combineClause cl t t.a p VQTrue in
+	s = let qs = combineClause (t.s++p.s) cl t.t t.a p.p VQTrue in
 	  \\q => case q of {
 	  QDir => cl.q ++ defaultSentence qs ! SVO ; -- t.s ++ p.s ++ cl.q ++ cl.s ! PreV ++ cl.v ! t.t ! t.a ! VQTrue ! PreV ! CPostV ++ cl.o ! PreV ;
 	  QIndir => cl.q ++ defaultSentence qs ! SOV -- t.s ++ p.s ++ cl.q ++ cl.s ! PreV ++ cl.o ! PreV ++ cl.v ! t.t ! t.a ! VQTrue ! PreV ! CPostV
@@ -58,7 +89,7 @@ concrete SentenceLat of Sentence = CatLat ** open Prelude, ResLat in {
       } ;
     -- UseRCl : Temp -> Pol -> RCl -> RS ;
     UseRCl t p cl = {
-      s = \\g,n => defaultSentence (combineClause (cl.s ! g ! n) (lin Tense t) t.a (lin Pol p) VQFalse) ! SOV ;
+      s = \\g,n => defaultSentence (combineClause (t.s++p.s) (cl.s ! g ! n) t.t t.a p.p VQFalse) ! SOV ;
 --      s = \\r => t.s ++ p.s ++ cl.s ! t.t ! t.a ! ctr p.p ! r ;
 --      c = cl.c
     } ;
@@ -82,4 +113,3 @@ concrete SentenceLat of Sentence = CatLat ** open Prelude, ResLat in {
 --    ctr = contrNeg True ;  -- contracted negations
 --
 }
-

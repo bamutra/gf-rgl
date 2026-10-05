@@ -73,6 +73,25 @@ oper
     mkPN : Str -> PN ; -- proper name
     } ;
 
+  mkGN = overload {  -- given name
+    mkGN : Str -> GN = \s -> lin GN {s = \\_ => s; g = Male} ;
+    mkGN : Str -> Sex -> GN = \s,g -> lin GN {s = \\_ => s; g = g} ;
+    } ;
+
+  mkSN = overload {  -- given name
+    mkSN : Str -> SN = \s -> lin SN {s = \\_,_ => s; pl = \\_=>s} ;
+    mkSN : Str -> Str -> Str -> SN = \male,female,pl -> lin SN {s = table {Male=>\\_=>male; Female=>\\_=>female}; pl=\\_=>pl} ;
+    } ;
+
+  mkLN = overload {
+    mkLN : Str -> LN  -- location name
+     = \s -> lin LN {s = \\_,_ => s; hasArt = False; n = Sg} ;
+    mkLN : Str -> Number -> LN  -- location name
+     = \s,n -> lin LN {s = \\_,_ => s; hasArt = False; n = n} ;
+    } ;
+
+  defLN : LN -> LN = \n -> n ** {hasArt = True} ;
+
 
 --2 Adjectives
 
@@ -205,6 +224,8 @@ oper
   feminine  = Neutr ;
   het,neuter = Neutr ;
   de,utrum = Neutr ;
+  male = Male ;
+  female = Female ;
 
   mkA = overload {
     mkA : (vers : Str) -> A = \a -> lin A (regAdjective a) ;
@@ -254,6 +275,18 @@ oper
 
 
 
+oper
+  mkAdV : Str -> AdV = \s -> lin AdV {s=s} ;
+  mkAdA : Str -> AdA = \s -> lin AdA {s=s} ;
+  mkAdN : Str -> AdN = \s -> lin AdN {s=s} ;
+  mkACard : Str -> ACard = \s -> lin ACard {s=s} ;
+  mkCard : Str -> Number -> Card = \s,n -> lin Card {s=\\_,_=>s; n=n} ;
+  mkConj : Str -> Number -> Conj = \s,n -> lin Conj {s1=[]; s2=s; n=n} ;
+  mkSubj : Str -> Subj = \s -> lin Subj {s=s} ;
+  mkIDet : Str -> Number -> IDet = \s,n -> lin IDet {s=\\_=>s; n=n} ;
+  mkIQuant : Str -> IQuant = \s -> lin IQuant {s=\\_,_=>s} ;
+  mkCAdv : Str -> CAdv = \s -> lin CAdv {s=s; p=[]} ;
+  mkIAdv : Str -> IAdv = \s -> lin IAdv {s=s} ;
 
 
 ----2 Definitions of paradigms
@@ -493,5 +526,7 @@ oper
 --    } ;
 --
 --}
+
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False} ;
 
 }

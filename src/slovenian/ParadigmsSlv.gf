@@ -1,4 +1,4 @@
-resource ParadigmsSlv = open CatSlv, ResSlv, Prelude, Predef in {
+resource ParadigmsSlv = open CatSlv, ResSlv, (P=ParamX), Prelude, Predef in {
 
 oper
   nominative : Case = Nom ;
@@ -16,9 +16,12 @@ oper
   feminine  = AFem;
   neuter    = ANeut;
 
-  singular : Number = Sg ;
-  dual : Number = Dl ;
-  plural : Number = Pl ;
+  male = P.Male ;
+  female = P.Female ;
+
+  singular : ResSlv.Number = ResSlv.Sg ;
+  dual : ResSlv.Number = Dl ;
+  plural : ResSlv.Number = ResSlv.Pl ;
 
   definite : Species = Def ;
   indefinite : Species = Indef ; 
@@ -31,14 +34,21 @@ oper
     mkN : (_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_ : Str) -> AGender -> N = worstN ;
     } ;
 
-  mkN2 : N -> Prep -> N2 = \n,c -> n ** {c=c} ;
+  compoundN = overload {
+    compoundN : A -> N -> N = \adj,noun -> noun ** {
+      s = \\c,n => adj.s ! APosit (agender2gender noun.g) n c ++ noun.s ! c ! n
+    } ;
+    compoundN : N -> Str -> N = \noun,adv -> noun ** {s = \\c,n => noun.s ! c ! n ++ adv} ;
+  } ;
+
+  mkN2 : N -> Prep -> N2 = \n,c -> lin N2 (n ** {c=c}) ;
 
 --All masculine forms (except those with long pluralstem) are formed here. 
 --Takes the baseform + the genitive singular form + animacy. 
 --In case the genitive singular has an extra vowel in the end, it is dropped before coming here.  
 
   mascAll : (_,_ : Str) -> Animacy -> N = \oce,ocet,anim ->
-    let accsg = case anim of {Animate => ocet + "a"; _ => oce}; --Special case: Masc Sg Acc Animate
+    let accsg = case anim of {Animate => ocet + "a"; _ => oce}; --Special case: Masc ResSlv.Sg Acc Animate
         oceto : Str
               = case ocet of {
                   _ + ("c"|"j"|"ž"|"š"|"č") => ocet+"e" ;
@@ -200,6 +210,82 @@ oper
       };
     } ;
 
+  mkGN = overload {
+    mkGN : Str -> P.Sex -> GN =
+      \s,g -> lin GN {
+         s = \\_ => s ;
+         g = g
+      };
+    mkGN : (_,_,_,_,_,_ : Str) -> P.Sex -> GN =
+      \nom,gen,dat,acc,loc,instr,g -> lin GN {
+         s = table {
+               Nom   => nom;
+               Gen   => gen;
+               Dat   => dat;
+               Acc   => acc;
+               Loc   => loc;
+               Instr => instr
+             };
+         g = g
+      };
+    } ;
+
+  mkSN = overload {
+    mkSN : Str -> SN =
+      \s -> lin SN {
+         s = \\_,_ => s
+      };
+    mkPN : (_,_,_,_,_,_ : Str) -> SN =
+      \nom,gen,dat,acc,loc,instr -> lin SN {
+         s = \\_ => table {
+               Nom   => nom;
+               Gen   => gen;
+               Dat   => dat;
+               Acc   => acc;
+               Loc   => loc;
+               Instr => instr
+             }
+      };
+    } ;
+
+  mkLN = overload {
+    mkLN : N -> LN = \noun -> lin LN {
+      s = \\c => noun.s ! c ! Sg ;
+      g = noun.g ;
+      n = Sg
+    };
+    mkLN : N -> Number -> LN = \noun,nr -> lin LN {
+      s = \\c => noun.s ! c ! nr ;
+      g = noun.g ;
+      n = nr
+    }; 
+    mkLN : Str -> LN =
+      \s -> lin LN {
+         s = \\_ => s ;
+         g = AMasc Inanimate ;
+         n = Sg
+      };
+    mkLN : Str -> AGender -> Number -> LN =
+      \s,g,n -> lin LN {
+         s = \\_ => s ;
+         g = g ;
+         n = n
+      };
+    mkLN : (_,_,_,_,_,_ : Str) -> AGender -> Number -> LN =
+      \nom,gen,dat,acc,loc,instr,g,n -> lin LN {
+         s = table {
+               Nom   => nom;
+               Gen   => gen;
+               Dat   => dat;
+               Acc   => acc;
+               Loc   => loc;
+               Instr => instr
+             };
+         g = g ;
+         n = n
+      };
+    } ;
+
   mkV = overload {
     mkV : (inf : Str) -> V = \v -> regV v (dp 2 v) ; 
     mkV : (inf,stem : Str) -> V = regV ; 
@@ -212,6 +298,13 @@ oper
   mkReflV : V -> Case -> V = \v,c -> v ** {refl = reflexive ! c} ;
 
   particleV : V -> Str -> V = \v,p -> v ** {p = p} ;
+
+  compoundV = overload {
+    compoundV : V -> Str -> V = \v,compl -> v ** {p = compl} ;
+    compoundV : Str -> V -> V = \compl,v -> v ** {
+      s = \\vf => compl ++ v.s ! vf
+    } ;
+  } ;
 
 -- Regular verbs are formed from two forms. Infinitive and 3rd person singular presens. 
 
@@ -315,11 +408,11 @@ oper
   } ;
 
   mkV3 = overload {
-    mkV3 : V -> V3 = \v -> lin V2 (v ** {c2 = lin Prep {s=""; c=Acc}; c3 = lin Prep {s=""; c=Acc}}) ;
-    mkV3 : V -> Case -> Case -> V3 = \v,c2,c3 -> lin V2 (v ** {c2 = lin Prep {s=""; c=c2}; c3 = lin Prep {s=""; c=c3}}) ;
-    mkV3 : V -> Case -> Prep -> V3 = \v,c2,p3 -> lin V2 (v ** {c2 = lin Prep {s=""; c=c2}; c3 = p3}) ;
-    mkV3 : V -> Prep -> Case -> V3 = \v,p2,c3 -> lin V2 (v ** {c2 = p2 ; c3 = lin Prep {s=""; c=c3}}) ;
-    mkV3 : V -> Prep -> Prep -> V3 = \v,p2,p3 -> lin V2 (v ** {c2 = p2 ; c3 = p3}) ;
+    mkV3 : V -> V3 = \v -> lin V3 (v ** {c2 = lin Prep {s=""; c=Acc}; c3 = lin Prep {s=""; c=Acc}}) ;
+    mkV3 : V -> Case -> Case -> V3 = \v,c2,c3 -> lin V3 (v ** {c2 = lin Prep {s=""; c=c2}; c3 = lin Prep {s=""; c=c3}}) ;
+    mkV3 : V -> Case -> Prep -> V3 = \v,c2,p3 -> lin V3 (v ** {c2 = lin Prep {s=""; c=c2}; c3 = p3}) ;
+    mkV3 : V -> Prep -> Case -> V3 = \v,p2,c3 -> lin V3 (v ** {c2 = p2 ; c3 = lin Prep {s=""; c=c3}}) ;
+    mkV3 : V -> Prep -> Prep -> V3 = \v,p2,p3 -> lin V3 (v ** {c2 = p2 ; c3 = p3}) ;
   } ; 
 
   mkVA : V -> VA ;
@@ -359,7 +452,7 @@ oper
     mkA : (x1,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,x166 : Str) -> A = worstA ;
     } ;
     
-  mkA2 : A -> Prep -> A2 = \a,c -> a ** {c=c} ;
+  mkA2 : A -> Prep -> A2 = \a,c -> lin A2 (a ** {c=c}) ;
 
   irregA : (_,_,_,_,_,_ :Str) -> A = \masc,fem,neut,mascC,femC,neutC -> lin A {
     s = table {
@@ -809,4 +902,7 @@ oper
     
   vowel : pattern Str = #("a"|"e"|"i"|"o"|"u") ;
   consonant : pattern Str = #("b"|"c"|"d"|"f"|"g"|"h"|"j"|"k"|"l"|"m"|"n"|"p"|"r"|"s"|"t"|"v"|"x"|"z") ;
+
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False} ;
+
 }

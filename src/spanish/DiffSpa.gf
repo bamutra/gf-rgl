@@ -71,6 +71,23 @@ instance DiffSpa of DiffRomance - [iAdvQuestionInv,otherInv,partAgr,stare_V,vpAg
       } ;
 -}
 
+-- AForm and comparatives
+  param
+    AFormComplex = AF Gender Number | AAttr Gender | AA ;
+  oper
+    AForm = AFormComplex ;
+    aform2aagr : AForm -> AAgr = \a -> case a of {
+      DiffSpa.AF g n => aagr g n ;
+      _              => aagr Masc Sg -- "le plus lentement"
+      } ;
+    genNum2Aform = \g,n -> DiffSpa.AF g n ;
+    genNumPos2Aform : Gender -> Number -> Bool -> AForm = \g,n,isPre ->
+      case <n,isPre> of {
+        <Sg,True> => AAttr g ;
+        _         => genNum2Aform g n
+      } ;
+    piuComp = "más" ;
+
     conjunctCase : Case -> Case = \c -> case c of {
       Nom => Nom ;
       _ => Acc
@@ -219,5 +236,11 @@ instance DiffSpa of DiffRomance - [iAdvQuestionInv,otherInv,partAgr,stare_V,vpAg
     subjPron = \_ -> [] ;
 
     polNegDirSubj = RPos ;
+
+param
+  HasArt = NoArt | UseArt ;
+
+oper
+  superlCanBePost = True ;
 
 }

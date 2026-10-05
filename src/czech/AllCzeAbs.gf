@@ -1,6 +1,8 @@
 --# -path=.:../abstract:../common:prelude
 
 abstract AllCzeAbs =
-  Lang
+  Lang,
+  Extend,
+  ExtraCzeAbs
   ;
 

@@ -4,7 +4,7 @@
 -- Inari Listenmaa, 2020
 
    resource ParadigmsPol = open
-     CatPol, MorphoPol, ResPol, (NM=NounMorphoPol)
+     CatPol, MorphoPol, ResPol, (NM=NounMorphoPol), Prelude
   in
      {
   flags  coding=utf8;
@@ -26,9 +26,36 @@
 
     mkA2 : A -> Str -> ComplCase -> A2 ;
 
+    mkVS : V -> VS ;
+    mkVA : V -> VA ;
+    mkVV : V -> VV ;
+    mkVQ : V -> VQ ;
+    mkV2V : V -> Complement -> V2V ;
+    mkV2S : V -> Complement -> V2S ;
+    mkV2A : V -> Complement -> V2A ;
+
+    mkAdA : Str -> AdA ;
+    mkAdN : Str -> AdN ;
+    mkAdV : Str -> AdV ;
+    mkIAdv : Str -> IAdv ;
+    mkPConj : Str -> PConj ;
+    mkSubj : Str -> Subj ;
+    mkCard : Str -> Card ;
+    mkACard : Str -> ACard ;
+    mkDet : Str -> Det ;
+    mkIDet : Str -> IDet ;
+    mkQuant : Str -> Quant ;
+    mkIQuant : Str -> IQuant ;
+    mkPredet : Str -> Predet ;
+    mkCAdv : Str -> CAdv ;
+
+    mkAdv : Str -> Adv ; -- an adverb from a string
+
 
 --.
 -- Definitions hidden from the public API
+
+  mkAdv s = lin Adv {s = s} ;
 
   ComplCase = ResPol.ComplCase ;
   genPrep = GenPrep ;
@@ -41,6 +68,7 @@
     { nom = (tab form)!SF Sg Nom;
       voc = (tab form)!SF Sg VocP;
       dep = let forms = (tab form) in table {
+                  NomPrep          =>forms!SF Sg Nom;
                   GenPrep|GenNoPrep=>forms!SF Sg Gen;
                   AccPrep|AccNoPrep=>forms!SF Sg Acc;
                   DatPrep|DatNoPrep=>forms!SF Sg Dat;
@@ -51,6 +79,29 @@
     } ;
 
     mkA2 adj s c = lin A2 (adj ** { c={s=s; c=c} });
+
+    mkVS v = lin VS v ;
+    mkVA v = lin VA (v ** {c={s=""; adv=False; c=Nom}}) ;
+    mkVV v = lin VV v ;
+    mkVQ v = lin VQ v ;
+    mkV2V v p = lin V2V (v ** {c=p}) ;
+    mkV2S v p = lin V2S (v ** {c=p}) ;
+    mkV2A v p = lin V2A (v ** {c={s=""; adv=False; c=Nom}; c2=p}) ;
+
+    mkAdA s = lin AdA {s=s} ;
+    mkAdN s = lin AdN {s=s} ;
+    mkAdV s = lin AdV {s=s} ;
+    mkIAdv s = lin IAdv {s=s} ;
+    mkPConj s = lin PConj {s=s} ;
+    mkSubj s = lin Subj {s=s} ;
+    mkCard s = lin Card {s=\\_,_ => s; a=NoA; n=Pl} ;
+    mkACard s = lin ACard {s=s} ;
+    mkDet s = lin Det {s,sp=\\_,_ => s; n=Sg; a=NoA} ;
+    mkIDet s = lin IDet {s=\\_,_ => s; n=Pl; a=NoA} ;
+    mkQuant s = lin Quant {s,sp=\\_ => s} ;
+    mkIQuant s = lin IQuant {s=\\_ => s} ;
+    mkPredet s = lin Predet {s=\\_ => s; np=wszystko; adj=True} ;
+    mkCAdv s = lin CAdv {s,sn=s; p,pn="niż"} ;
 
     mkN = overload {
       mkN : Str -> N = mkNGuessGender ;
@@ -98,12 +149,19 @@
     mkNGender = overload { 
       -- 1 string
       mkNGender : Str -> Gender -> N = \sgnom,gender ->
-        let ntable : SubstForm => Str = guess_paradigm_basic sgnom in
-        lin N (NM.mkN ntable gender) ;
+        let ntable : SubstForm => Str = guess_paradigm_basic sgnom
+        in NM.mkN ntable gender ;
       -- 2 string
+      -- NB: sggen is deliberately NOT passed to guess_paradigm. The 2-string
+      -- guess_paradigm table is unsound: its first branch <_ + "a", _ + "">
+      -- matches every noun in -a (the suffix "" matches anything), and its
+      -- branches disagree about whether mkNTable* takes the nominative
+      -- (mkNTable0021 does Predef.tk 1) or the bare stem (mkNTable0308 does
+      -- not). Routing sggen there turns "liczba"/"liczby" into "liczbaa".
+      -- Until that table is repaired, the 1-string guesser is the sound path.
       mkNGender : Str -> Str -> Gender -> N = \sgnom,sggen,gender ->
-       let ntable : SubstForm => Str = guess_paradigm sgnom in
-       lin N (NM.mkN ntable gender) ;
+       let ntable : SubstForm => Str = guess_paradigm sgnom
+       in NM.mkN ntable gender ;
      };
 
     guess_paradigm = overload {
@@ -373,6 +431,9 @@
         _ + "ń" => NM.mkNTable0142 sgnom ; -- Alternatives: mkNTable0268,mkNTable0290,mkNTable0297,mkNTable0468,mkNTable0592,mkNTable0612,mkNTable0674,mkNTable0676,mkNTable0775,mkNTable0815,mkNTable0935,mkNTable1004
         _ + "ł" => NM.mkNTable0151 sgnom ; -- Alternatives: mkNTable0192,mkNTable0280,mkNTable0533,mkNTable0601
         _ + "ę" => NM.mkNTable0379 sgnom ; -- Alternatives: mkNTable0604
+        -- -ość is the productive feminine abstract-noun suffix (sprzeczność,
+        -- własność, równość); it always takes the kość declension.
+        _ + "ość" => NM.mkNTable0475 sgnom ;
         _ + "ć" => NM.mkNTable0069 sgnom ; -- Alternatives: mkNTable0475,mkNTable0567,mkNTable0573,mkNTable0649,mkNTable0734,mkNTable0792,mkNTable0793,mkNTable0794,mkNTable0814,mkNTable0838,mkNTable0922,mkNTable0923,mkNTable1014
         _ + "ź" => NM.mkNTable0316 sgnom ; -- Alternatives: mkNTable0633,mkNTable0661,mkNTable0722,mkNTable0732,mkNTable0771
         _ + "y" => NM.mkNTable0012 sgnom ; -- Alternatives: mkNTable0050,mkNTable0058,mkNTable0123,mkNTable0203,mkNTable0635,mkNTable0665,mkNTable0777,mkNTable0886,mkNTable1020
@@ -382,5 +443,7 @@
         -- NB: Covered in 2-string, including all alternatives: mkNTable0308,mkNTable0364,mkNTable0644,mkNTable0701,mkNTable1022,mkNTable0013,mkNTable0014,mkNTable0020,mkNTable0021,mkNTable0055,mkNTable0060,mkNTable0073,mkNTable0088,mkNTable0099,mkNTable0100,mkNTable0110,mkNTable0159,mkNTable0161,mkNTable0175,mkNTable0189,mkNTable0253,mkNTable0254,mkNTable0274,mkNTable0283,mkNTable0287,mkNTable0300,mkNTable0302,mkNTable0352,mkNTable0382,mkNTable0411,mkNTable0501,mkNTable0504,mkNTable0530,mkNTable0546,mkNTable0565,mkNTable0576,mkNTable0580,mkNTable0614,mkNTable0630,mkNTable0702,mkNTable0721,mkNTable0727,mkNTable0755,mkNTable0760,mkNTable0921,mkNTable0950,mkNTable0990,mkNTable1045
         _ => NM.mkNTable0171 sgnom  -- Alternatives: mkNTable0000,mkNTable0001,mkNTable0002,mkNTable0003,mkNTable0010,mkNTable0015,mkNTable0028,mkNTable0037,mkNTable0043,mkNTable0044,mkNTable0053,mkNTable0064,mkNTable0067,mkNTable0075,mkNTable0091,mkNTable0096,mkNTable0111,mkNTable0117,mkNTable0118,mkNTable0129,mkNTable0131,mkNTable0168,mkNTable0171,mkNTable0173,mkNTable0176,mkNTable0181,mkNTable0191,mkNTable0197,mkNTable0213,mkNTable0243,mkNTable0244,mkNTable0247,mkNTable0248,mkNTable0271,mkNTable0281,mkNTable0282,mkNTable0286,mkNTable0304,mkNTable0309,mkNTable0312,mkNTable0315,mkNTable0324,mkNTable0333,mkNTable0338,mkNTable0348,mkNTable0350,mkNTable0365,mkNTable0373,mkNTable0375,mkNTable0428,mkNTable0444,mkNTable0467,mkNTable0495,mkNTable0497,mkNTable0500,mkNTable0503,mkNTable0514,mkNTable0516,mkNTable0518,mkNTable0519,mkNTable0523,mkNTable0539,mkNTable0542,mkNTable0550,mkNTable0552,mkNTable0570,mkNTable0578,mkNTable0583,mkNTable0589,mkNTable0648,mkNTable0662,mkNTable0691,mkNTable0696,mkNTable0717,mkNTable0773,mkNTable0803,mkNTable0826,mkNTable0828,mkNTable0859,mkNTable0868,mkNTable0869,mkNTable0944,mkNTable0964,mkNTable0965,mkNTable0966,mkNTable0970,mkNTable0981,mkNTable0991,mkNTable0995
      } ;
+
+  mkMU : Str -> MU = \s -> lin MU {s=s; isPre=False} ;
 
 }

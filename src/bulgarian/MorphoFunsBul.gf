@@ -33,13 +33,13 @@ oper
   mkA2 a p = a ** {c2 = p ; lock_A2 = <>} ;
   
   mkAS  : A -> AS ;
-  mkAS  v = v ** {lock_A = <>} ;
+  mkAS  v = v ;
   
   mkA2S : A -> Prep -> A2S ;
-  mkA2S v p = mkA2 v p ** {lock_A = <>} ;
+  mkA2S v p = mkA2 v p ;
   
   mkAV  : A -> AV ;
-  mkAV  v = v ** {lock_A = <>} ;
+  mkAV  v = v ;
   
   mkA2V : A -> Prep -> A2V ;
   mkA2V v p = mkA2 v p ** {lock_A2 = <>} ;
@@ -57,12 +57,6 @@ oper
   dualV : VTable -> VTable -> V ;
   dualV imperf perf = { 
     s = table {Imperf=>imperf; Perf=>perf};
-    n = let v0 = init (imperf ! (VImperfect Sg P1)) + "н"
-        in (mkNoun (v0+"е")
-                   (v0+"ия")
-                   (v0+"ия")
-                   (v0+"е")
-                   ANeut).s;
     vtype = VNormal;
     lock_V=<>
     } ;
@@ -72,12 +66,6 @@ oper
   singleV : VTable -> V ;
   singleV vtable = { 
     s = \\_=>vtable;
-    n = let v0 = init (vtable ! (VImperfect Sg P1)) + "н"
-        in (mkNoun (v0+"е")
-                   (v0+"ия")
-                   (v0+"ия")
-                   (v0+"е")
-                   ANeut).s;
     vtype = VNormal;
     lock_V=<>
     } ;
@@ -87,7 +75,6 @@ oper
   compoundV : V -> Str -> V ;
   compoundV v adv = {
     s = \\asp,vform => v.s ! asp ! vform ++ adv ;
-    n = \\nform => v.n ! nform ++ adv ;
     vtype = VNormal;
     lock_V=<>
     } ;
@@ -117,7 +104,7 @@ oper
 -- the first one or both can be absent.
 
   mkV3     : V -> Prep -> Prep -> V3 ;   -- speak, with, about
-  mkV3 v p q = {s = v.s; s1 = v.s1; c2 = p; c3 = q; vtype = v.vtype; lock_V3 = <>} ;
+  mkV3 v p q = {s = v.s; c2 = p; c3 = q; vtype = v.vtype; lock_V3 = <>} ;
   
   dirV3    : V -> Prep -> V3 ;           -- give,_,to
   dirV3 v p = mkV3 v noPrep p ;
@@ -181,7 +168,7 @@ oper
 --
 
   prepN2 : N -> Prep -> N2 ;
-  prepN2 n p = n ** {c2 = p} ;
+  prepN2 n p = lin N2 (n ** {c2 = p}) ;
   
   dirN2 : N -> N2 ;
   dirN2 n = prepN2 n noPrep ;
@@ -191,7 +178,7 @@ oper
 --
 
   prepN3 : N -> Prep -> Prep -> N3 ;
-  prepN3 n p q = n ** {c2 = p; c3 = q} ;
+  prepN3 n p q = lin N3 (n ** {c2 = p; c3 = q}) ;
   
   dirN3 : N -> Prep -> N3 ;
   dirN3 n p = prepN3 n noPrep p ;
@@ -201,9 +188,9 @@ oper
 
   compoundN = overload {
     compoundN : Str -> N -> N 
-      = \s,n -> {s = \\nform => s ++ n.s ! nform ; rel = \\aform => s ++ n.rel ! aform; relType = AdvMod; g=n.g ; anim=n.anim ; lock_N = <>} ;
+      = \s,n -> {s = \\nform => s ++ n.s ! nform ; rel = \\aform => s ++ n.rel ! aform; relType = AdvMod; g=n.g ; lock_N = <>} ;
     compoundN : N -> Str -> N 
-      = \n,s -> {s = \\nform => n.s ! nform ++ s; rel = \\aform => n.rel ! aform ++ s; relType = AdvMod; g=n.g ; anim=n.anim ; lock_N = <>} ;
+      = \n,s -> {s = \\nform => n.s ! nform ++ s; rel = \\aform => n.rel ! aform ++ s; relType = AdvMod; g=n.g ; lock_N = <>} ;
     compoundN : N -> N -> N 
       = \n1,n2 -> lin N
                 {s = table {
@@ -278,9 +265,44 @@ oper
 
 --2 Proper Names
 --
-  mkPN : Str -> Gender -> PN ;
-  mkPN s g = {s = s; g = g ; lock_PN = <>} ;
 
+  masculine : Gender = Masc ;
+  feminine : Gender = Fem ;
+  neutr : Gender = Neut ;
+
+  male : Sex = Male ;
+  female : Sex = Female ;
+
+  mkGN : Str -> Sex -> GN =
+     \s,g -> lin GN {s = s; g = g} ;
+  mkSN = overload {
+    mkSN : Str -> SN =
+      \s -> lin SN {s = \\_ => s; pl = s} ;
+    mkSN : Str -> Str -> Str -> SN =
+      \m,f,pl -> lin SN {s = table Sex [m; f]; pl = pl} ;
+  } ;
+
+  mkPN = overload {
+    mkPN : Str -> PN = \s -> {s = s; gn = GSg Masc ; lock_PN = <>} ;
+    mkPN : Str -> Gender -> PN = 
+      \s,g -> {s = s; gn = GSg g ; lock_PN = <>} ;
+    mkPN : Str -> GenNum -> PN = 
+      \s,gn -> {s = s; gn = gn ; lock_PN = <>} ;
+  } ;
+
+  mkLN = overload {
+    mkLN : Str -> LN = \s -> lin LN {s = \\_ => s; defNom=s; onPrep = False; hasArt = False; gn = GSg Masc} ;
+    mkLN : Str -> Gender -> LN =
+      \s,g -> lin LN {s = \\_ => s; defNom=s; onPrep = False; hasArt = False; gn = GSg g} ;
+    mkLN : Str -> GenNum -> LN =
+      \s,gn -> lin LN {s = \\_ => s; defNom=s; onPrep = False; hasArt = False; gn = gn} ;
+    mkLN : Str -> Str -> GenNum -> LN =
+      \s1,s2,gn -> lin LN {s = table Species [s2; s1]; defNom=s2; onPrep = False; hasArt = True; gn = gn} ;
+    mkLN : Str -> Str -> Str -> LN =
+      \s1,s2,s3 -> lin LN {s = table Species [s3; s2]; defNom=s1; onPrep = False; hasArt = True; gn = GSg Masc} ;
+  } ;
+
+  onLN : LN -> LN = \n -> n ** {onPrep = True} ;
 
 --2 IAdv
 --

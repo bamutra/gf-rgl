@@ -143,6 +143,11 @@ concrete NounFin of Noun = CatFin ** open ResFin, MorphoFin, StemFin, Prelude in
       } ;
     OrdDigits numeral = {s = \\f => numeral.s ! NOrd f} ;
 
+    NumDecimal numeral = {
+      s = \\n,c => numeral.s ! NCard (NCase n c) ;
+      n = numeral.n
+      } ;
+
     NumNumeral numeral = {
       s = \\n,c => numeral.s ! NCard (NCase n c) ;
       n = numeral.n
@@ -289,7 +294,19 @@ concrete NounFin of Noun = CatFin ** open ResFin, MorphoFin, StemFin, Prelude in
         isPron = False ; isNeg = det.isNeg
       } ;
 
+    AdjDAP dap ap = dap ** {
+      s1 = \\c => dap.s1 ! c ++ ap.s ! True ! NCase dap.n c ;
+      sp = \\c => dap.sp ! c ++ ap.s ! False ! NCase dap.n c
+      } ;
+
     DetDAP d = d ;
+
+    QuantityNP n m = {
+      s = \\c => preOrPost m.isPre m.s (n.s ! NCard (NCase Sg Nom)) ;
+      a = agrP3 n.n ;
+      isPron = False ;
+      isNeg = False
+      } ;
 
   oper
     numN : NForm -> Number = \nf -> case nf of {

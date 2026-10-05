@@ -2,7 +2,7 @@
 
 -- Adam Slaski, 2009, 2010 <adam.slaski@gmail.com>
 
-concrete NumeralPol of Numeral = CatPol [Numeral,Digits] ** open ResPol,Prelude, AdjectiveMorphoPol in {
+concrete NumeralPol of Numeral = CatPol [Numeral,Digits,Decimal] ** open ResPol,Prelude, AdjectiveMorphoPol in {
 
   flags  coding=utf8 ;
 
@@ -13,7 +13,7 @@ concrete NumeralPol of Numeral = CatPol [Numeral,Digits] ** open ResPol,Prelude,
     Sub10 =  { unit,hundred:   Case * Gender => Str; 
                ounit,ohundred: AForm => Str;
                a:Accom; n:Number };       -- 1..9
-    Sub100, Sub1000, Sub1000000 = 
+    Sub100, Sub1000, Sub1000000, Sub1000000000, Sub1000000000000 = 
              { s:Case * Gender => Str; 
                o:AForm => Str;
                a:Accom; n:Number }; 
@@ -468,6 +468,13 @@ n9 = { unit = table {
     };
 
 --   pot2 : Sub10 -> Sub1000 ;                     -- m * 100
+    pot21 = {
+      s = \\_ => "sto";
+      o = mkAtable (guess_model "setny");
+      a = StoA;
+      n = Pl
+    };
+
     pot2 s = {
         s = s.hundred;
         o = s.ohundred;
@@ -493,6 +500,13 @@ n9 = { unit = table {
     };
 
 --   pot3 : Sub1000 -> Sub1000000 ;                -- m * 1000
+    pot31 = {
+      s = \\x => tysiac ! <x.p1,Sg>;
+      o = mkAtable (guess_model "tysięczny");
+      a = TysiacA;
+      n = Pl
+    };
+
     pot3 s = {
         s = \\x => case s.n of { Sg => ""; Pl => s.s!<x.p1,Masc Inanimate> } 
             ++ tysiac!<(accom_case! <s.a,x.p1, Masc Inanimate>),s.n>;
@@ -513,7 +527,61 @@ n9 = { unit = table {
         a = case s2.n of { Sg => TysiacA; _=> s2.a } ;
         n = Pl
     };
-    
+
+    pot3as4 n = n ;
+
+    pot41 = {
+      s = \\x => milion ! <x.p1,Sg>;
+      o = mkAtable (guess_model "milionowy");
+      a = TysiacA;
+      n = Pl
+    };
+
+    pot4 n = {
+      s = \\x => n.s ! <x.p1,Masc Inanimate> ++
+        milion ! <(accom_case ! <n.a,x.p1,Masc Inanimate>),n.n>;
+      o = \\af => n.s ! <Nom,Masc Inanimate> ++
+        (mkAtable (guess_model "milionowy")) ! af;
+      a = TysiacA;
+      n = Pl
+    };
+
+    pot4plus n rest = {
+      s = \\x => n.s ! <x.p1,Masc Inanimate> ++
+        milion ! <(accom_case ! <n.a,x.p1,Masc Inanimate>),n.n> ++
+        rest.s ! x;
+      o = \\af => n.s ! <Nom,Masc Inanimate> ++ "milion" ++ rest.o ! af;
+      a = rest.a;
+      n = Pl
+    };
+
+    pot4as5 n = n ;
+
+    pot51 = {
+      s = \\x => miliard ! <x.p1,Sg>;
+      o = mkAtable (guess_model "miliardowy");
+      a = TysiacA;
+      n = Pl
+    };
+
+    pot5 n = {
+      s = \\x => n.s ! <x.p1,Masc Inanimate> ++
+        miliard ! <(accom_case ! <n.a,x.p1,Masc Inanimate>),n.n>;
+      o = \\af => n.s ! <Nom,Masc Inanimate> ++
+        (mkAtable (guess_model "miliardowy")) ! af;
+      a = TysiacA;
+      n = Pl
+    };
+
+    pot5plus n rest = {
+      s = \\x => n.s ! <x.p1,Masc Inanimate> ++
+        miliard ! <(accom_case ! <n.a,x.p1,Masc Inanimate>),n.n> ++
+        rest.s ! x;
+      o = \\af => n.s ! <Nom,Masc Inanimate> ++ "miliard" ++ rest.o ! af;
+      a = rest.a;
+      n = Pl
+    };
+
 oper tysiac = table {
     <(Nom|Acc), Sg> => "tysiąc";
     <Gen,       Sg> => "tysiąca";
@@ -525,6 +593,32 @@ oper tysiac = table {
     <Dat,       Pl> => "tysiącom";
     <Instr,     Pl> => "tysiącami";
     <Loc,       Pl> => "tysiącach"
+  };
+
+  milion = table {
+    <(Nom|Acc), Sg> => "milion";
+    <Gen,       Sg> => "miliona";
+    <Dat,       Sg> => "milionowi";
+    <Instr,     Sg> => "milionem";
+    <(Loc|VocP),Sg> => "milionie";
+    <(Nom|Acc|VocP), Pl> => "miliony";
+    <Gen,       Pl> => "milionów";
+    <Dat,       Pl> => "milionom";
+    <Instr,     Pl> => "milionami";
+    <Loc,       Pl> => "milionach"
+  };
+
+  miliard = table {
+    <(Nom|Acc), Sg> => "miliard";
+    <Gen,       Sg> => "miliarda";
+    <Dat,       Sg> => "miliardowi";
+    <Instr,     Sg> => "miliardem";
+    <(Loc|VocP),Sg> => "miliardzie";
+    <(Nom|Acc|VocP), Pl> => "miliardy";
+    <Gen,       Pl> => "miliardów";
+    <Dat,       Pl> => "miliardom";
+    <Instr,     Pl> => "miliardami";
+    <Loc,       Pl> => "miliardach"
   };
 
 
@@ -549,5 +643,25 @@ oper tysiac = table {
     D_7 = { s = "7"; o="7."; n=Pl; a=PiecA };
     D_8 = { s = "8"; o="8."; n=Pl; a=PiecA };
     D_9 = { s = "9"; o="9."; n=Pl; a=PiecA };
+
+    PosDecimal d = d ** {hasDot=False} ;
+    NegDecimal d = {
+      s = "-" ++ BIND ++ d.s;
+      o = "-" ++ BIND ++ d.o;
+      n=Pl;
+      a=d.a;
+      hasDot=False
+      } ;
+    IFrac d i = {
+      s = d.s ++
+          if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+          i.s;
+      o = d.o ++
+          if_then_Str d.hasDot BIND (BIND++"."++BIND) ++
+          i.o;
+      n=Pl;
+      a=d.a;
+      hasDot=True
+      } ;
 
 }

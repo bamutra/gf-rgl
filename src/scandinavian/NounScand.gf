@@ -13,9 +13,9 @@ incomplete concrete NounScand of Noun =
       let 
         g = cn.g ;
         m = cn.isMod ;
-        dd = case <det.det,detDef,m> of {
-          <DDef Def, Indef, True> => DDef Indef ;
-          <d,_,_> => d
+        dd = case <detDef,det.det,m> of {
+          <Indef, DDef Def, True> => DDef Indef ;
+          <_,d,_> => d
           }
       in {
       s = \\c => det.s ! m ! g ++
@@ -109,6 +109,8 @@ incomplete concrete NounScand of Noun =
 
     NumDigits nu = {s = \\g => nu.s ! NCard g ; n = nu.n} ;
     OrdDigits nu = {s = nu.s ! NOrd SupWeak} ;
+
+    NumDecimal dec = {s = \\g => dec.s ! NCard g ; n = dec.n} ;
 
     NumNumeral nu = {s = \\g => nu.s ! NCard g ; n = nu.n} ;
     OrdNumeral nu = {s = nu.s ! NOrd SupWeak} ;
@@ -260,5 +262,11 @@ incomplete concrete NounScand of Noun =
       } ;
 
     DetDAP d = d ;
+
+    QuantityNP n m = {
+      s = \\c => preOrPost m.isPre m.s (n.s ! NCard neutrum);
+      a = agrP3 Utr n.n ;
+      isPron = False
+      } ;
 
 }

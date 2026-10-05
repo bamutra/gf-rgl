@@ -13,6 +13,10 @@ fun
   InflectionN   : N -> Inflection ;
   InflectionN2  : N2 -> Inflection ;
   InflectionN3  : N3 -> Inflection ;
+  InflectionPN  : PN -> Inflection ;
+  InflectionLN  : LN -> Inflection ;
+  InflectionGN  : GN -> Inflection ;
+  InflectionSN  : SN -> Inflection ;
   InflectionA   : A -> Inflection ;
   InflectionA2  : A2 -> Inflection ;
   InflectionV   : V -> Inflection ;
@@ -27,7 +31,11 @@ fun
   InflectionV2Q : V2Q -> Inflection ;
   InflectionV2A : V2A -> Inflection ;
   InflectionAdv : Adv -> Inflection ;
+  InflectionAdV : AdV -> Inflection ;
+  InflectionAdA : AdA -> Inflection ;
+  InflectionAdN : AdN -> Inflection ;
   InflectionPrep : Prep -> Inflection ;
+  InflectionCl : Cl -> Inflection ;
 
 fun
   NoDefinition   : String -> Definition ;

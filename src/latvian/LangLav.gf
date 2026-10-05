@@ -3,6 +3,8 @@
 concrete LangLav of Lang =
   GrammarLav,
   LexiconLav
+  ,ConstructionLav
+  ,DocumentationLav --# notpresent
   ** {
 
 flags
