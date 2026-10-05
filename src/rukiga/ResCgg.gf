@@ -1383,7 +1383,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
       						comp:Str ; 
       						comp2:Str;
       						ap : Str;
-      						isCompApStem : Bool; 
+      						isCompApStem : Bool; --tells us if the Complement is an adjectival stem hence requiring a clitic
       						agr : AgrExist; 
       						adv:Str; 
       						containsAdv: Bool;

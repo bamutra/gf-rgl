@@ -25,8 +25,8 @@ lin
                 in 
   case <temp.t,temp.a, pol.p> of {
       <Pres,Simul, Pos> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ clitic ++ root  ++ Predef.BIND ++ "a" ++ compl};
-                                  False => {s = subj ++ clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  True  => {s = subj ++ "ni" ++ clitic ++ root  ++ Predef.BIND ++ "a" ++ compl};
+                                  False => {s = subj ++ "ni" ++clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                           };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Pres,Simul, Neg> => case cl.isPresBlank of { 
@@ -283,7 +283,7 @@ lin
 
     PredVP np vp = case <vp.isCompApStem,vp.containsAdv, vp.containsAdV,vp.containsComp, vp.containsComp2> of {
               <False,False,True,False,False>    => {
-                        s = np.s ! Nom;   --: NP -> VP -> Cl ;            -- John walks / John does not walk
+                        s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
                         pres = vp.pres;
                         perf = vp.perf;
@@ -302,7 +302,7 @@ lin
                         compl = vp.adV
                         };
               <False,True,False,False,False>    => {
-                        s = np.s ! Nom;   --: NP -> VP -> Cl ;            -- John walks / John does not walk
+                        s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
                         pres = vp.pres;
                         perf = vp.perf;
@@ -322,7 +322,7 @@ lin
                         };
 
               <_, _,_,True,False>    =>  {
-                        s = np.s ! Nom;   --: NP -> VP -> Cl ;            -- John walks / John does not walk
+                        s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
                         pres = vp.pres;
                         perf = vp.perf;
@@ -341,7 +341,7 @@ lin
                         compl = mkSubjClitic np.agr   ++ vp.comp --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
                       };
               <_, _,_,True, True>    =>  {
-                        s = np.s ! Nom;   --: NP -> VP -> Cl ;            -- John walks / John does not walk
+                        s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
                         pres = vp.pres;
                         perf = vp.perf;
@@ -360,7 +360,7 @@ lin
                         compl = mkSubjClitic np.agr ++ vp.comp ++ vp.comp2 --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
                       };
               <_, _,_,_, _>    =>  {
-                        s = np.s ! Nom;   --: NP -> VP -> Cl ;            -- John walks / John does not walk
+                        s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
                         pres = vp.pres;
                         perf = vp.perf;
@@ -378,7 +378,7 @@ lin
                       --root = vp.root ;
                         compl = [] --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
                       }
-        };--: NP -> VP -> Cl ; -- John walks / John does not walk
+        };-- : NP -> VP -> Cl ; -- John walks / John does not walk
   
     {-
     Note: It seems mkSubjClitic comes with a Predef.BIND already
@@ -448,9 +448,9 @@ lin
     --EmbedS    : S  -> SC ;               -- that she goes
     --EmbedQS   : QS -> SC ;               -- who goes
     --EmbedVP   : VP -> SC ;               -- to go
-    EmbedVP vp = case  vp.isPresBlank of {
-                        TRUE => {s= "oku" ++ Predef.BIND ++ vp.s ++ BIND ++ "a"};
-                        _    => {s= "oku" ++ Predef.BIND ++ vp.s ++ BIND ++ vp.pres}
+    EmbedVP vp = case  <vp.isPresBlank> of {
+                        <True> => {s= "oku" ++ Predef.BIND ++ vp.s ++ BIND ++ "a"};
+                        <False>    => {s= "oku" ++ Predef.BIND ++ vp.s ++ BIND ++ vp.pres}
     };
 
 -- An adverb can be added to the beginning of a sentence, either with comma ("externally")

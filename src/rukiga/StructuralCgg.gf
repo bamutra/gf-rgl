@@ -268,8 +268,8 @@ lin
                         isPerfBlank = False; isRegular = False; p = []; isRefl = False; morphs=mkVerbMorphs; isRegular=False; inf=[]; whenUsed = VVPerf}; --VV 
   everybody_NP = {s = \\_=>"buri muntu" ; agr=AgP3 Sg MU_BA};
   everything_NP = {s = \\_=>"buri kintu" ; agr=AgP3 Sg KI_BI};
-  somebody_NP = {s = \\_=>"somebody:omuntu omwe" ; agr=AgP3 Sg MU_BA}; --: NP ;
-  something_NP = {s = \\_=>"Something:ekintu kimwe" ; agr=AgP3 Sg KI_BI} ; -- NP ;
+  somebody_NP = {s = \\_=>"omuntu omwe" ; agr=AgP3 Sg MU_BA}; --: NP ;
+  something_NP = {s = \\_=>"ekintu kimwe" ; agr=AgP3 Sg KI_BI} ; -- NP ;
   nobody_NP = {s = \\_=>"tihiine muntu" ; agr=AgP3 Sg MU_BA};
   nothing_NP = {s = \\_=>"tihiine kintu" ; agr=AgP3 Sg KI_BI};
 
