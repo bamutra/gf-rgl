@@ -338,7 +338,7 @@ lin
                         pastPart  = mkVerbPastPart vp.root;                              -- subject
                       -}
                       --root = vp.root ;
-                        compl = mkSubjClitic np.agr   ++ vp.comp --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
+                        compl = (case vp.isCompApStem of {True => mkSubjClitic np.agr ; False => []}) ++ vp.comp --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
                       };
               <_, _,_,True, True>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
@@ -357,7 +357,7 @@ lin
                         pastPart  = mkVerbPastPart vp.root;                              -- subject
                       -}
                       --root = vp.root ;
-                        compl = mkSubjClitic np.agr ++ vp.comp ++ vp.comp2 --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
+                        compl = (case vp.isCompApStem of {True => mkSubjClitic np.agr ; False => []}) ++ vp.comp ++ vp.comp2 --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
                       };
               <_, _,_,_, _>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
