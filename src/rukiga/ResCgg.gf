@@ -375,7 +375,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 
     -- present tense marker ni- fused with the subject prefix:
     -- ni+a -> naa, ni+o -> noo, ni+e -> nee, otherwise ni+SP (nibaa, nikiri, nin-)
-    mkNiSubjClitic : Agreement -> Str = \a -> case a of {
+    mkNiSubjClitic : Agreement -> Str = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgMUBAP2 Sg   => mkClitic "noo" ;
         AgP3 Sg MU_BA => mkClitic "naa" ;
         AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => mkClitic "nee" ;
@@ -384,7 +384,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
       } ;
 
     -- negative ti- fused with the subject prefix: ti+a -> ta, ti+o -> to, ti+e -> te
-    mkTiSubjClitic : Agreement -> Str = \a -> case a of {
+    mkTiSubjClitic : Agreement -> Str = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgMUBAP2 Sg   => mkClitic "to" ;
         AgP3 Sg MU_BA => mkClitic "ta" ;
         AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => mkClitic "te" ;
@@ -429,16 +429,16 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
     -- Memorial present: auxiliary yaaba/naba; tense marker -aa- with
     -- a+aa -> aa (aagwejegyera); negative without ti-fusion: tiyaagwejegyera,
     -- tinaagwejegyera. Classes other than 1 and 1sg keep SC+aa(ba) for now.
-    mkMemAux : Agreement -> Str = \a -> case a of {
+    mkMemAux : Agreement -> Str = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgP3 Sg MU_BA => "yaaba" ;
         AgMUBAP1 Sg   => "naba" ;
         _             => mkSubjClitic a ++ "aaba"
       } ;
-    mkMemSubj : Agreement -> Str = \a -> case a of {
+    mkMemSubj : Agreement -> Str = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgP3 Sg MU_BA => mkClitic "aa" ;
         _             => mkSubjClitic a ++ "aa" ++ Predef.BIND
       } ;
-    mkMemNegSubj : Agreement -> Str = \a -> case a of {
+    mkMemNegSubj : Agreement -> Str = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgP3 Sg MU_BA => mkClitic "tiyaa" ;
         _             => "ti" ++ Predef.BIND ++ mkSubjClitic a ++ "aa" ++ Predef.BIND
       } ;
@@ -474,7 +474,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         SLongE => cv "e" ("y" + r)
       } ;
     -- base and shape of the plain subject prefix
-    scBase : Agreement -> Str * PrefShape = \a -> case a of {
+    scBase : Agreement -> Str * PrefShape = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgMUBAP1 Sg => <"n", SPlain> ;   AgMUBAP1 Pl => <"t", SCu> ;
         AgMUBAP2 Sg => <"o", SPlain> ;   AgMUBAP2 Pl => <"m", SCu> ;
         AgP3 Sg MU_BA => <"a", SPlain> ; AgP3 Pl MU_BA => <"b", SCa> ;
@@ -491,15 +491,16 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         AgP3 _ KU_ZERO => <"k", SCu> ;
         AgP3 _ ZERO_TU => <"t", SCu> ;
         AgP3 Sg (ZERO_MI | ZERO_ZERO) | AgP3 Pl KA_ZERO => <"", SPlain> ;
+        AgP3 _ HA => <"h", SCa> ;
         _ => <"SubjNotKnown", SPlain>
       } ;
-    niBase : Agreement -> Str * PrefShape = \a -> case a of {
+    niBase : Agreement -> Str * PrefShape = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgMUBAP2 Sg => <"no", SLongO> ;
         AgP3 Sg MU_BA => <"na", SLongA> ;
         AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => <"ne", SLongE> ;
         _ => <"ni" + (scBase a).p1, (scBase a).p2>
       } ;
-    tiBase : Agreement -> Str * PrefShape = \a -> case a of {
+    tiBase : Agreement -> Str * PrefShape = \a0 -> let a : Agreement = normSubj a0 in case a of {
         AgMUBAP2 Sg => <"to", SPlain> ;
         AgP3 Sg MU_BA => <"ta", SPlain> ;
         AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => <"te", SPlain> ;
@@ -538,7 +539,29 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         _           => {s = [] ; exists = False}
       } ;
 
-    mkSubjClitic : Agreement -> Str = \a ->
+    -- Subject-prefix class of each gender/number (reviewed): genders without
+    -- their own row in the prefix tables behave like the class given here.
+    --   1a/2a ZERO_BAA -> 1/2 (tata naagwejegyera, baatata nibagwejegyera)
+    --   loanwords ZERO_ZERO, N_ZERO, ZERO_N -> 9/10 (kamera neegwejegyera)
+    --   I_MA sg -> 5 (eihanga), KU_MA sg -> 15 (okutu), BU_MA sg -> 14,
+    --   GU_GA -> 20/22 (gu/ga), KA_TU pl -> 13, KI_ZERO -> 7/8, I_ZERO pl -> 6,
+    --   locatives: HA -> ha (16, own rows), KU -> ku (17), MU -> mu (18)
+    normSubj : Agreement -> Agreement = \a -> case a of {
+        AgP3 n ZERO_BAA                      => AgP3 n MU_BA ;
+        AgP3 n (ZERO_ZERO | N_ZERO | ZERO_N) => AgP3 n N_N ;
+        AgP3 Sg I_MA                         => AgP3 Sg RI_MA ;
+        AgP3 Sg KU_MA                        => AgP3 Sg KU_ZERO ;
+        AgP3 Sg BU_MA                        => AgP3 Sg ZERO_BU ;
+        AgP3 Sg GU_GA                        => AgP3 Sg MU_MI ;
+        AgP3 Pl GU_GA                        => AgP3 Pl RI_MA ;
+        AgP3 Pl KA_TU                        => AgP3 Pl ZERO_TU ;
+        AgP3 n KI_ZERO                       => AgP3 n KI_BI ;
+        AgP3 Pl I_ZERO                       => AgP3 Pl RI_MA ;
+        AgP3 _ KU                            => AgP3 Sg KU_ZERO ;
+        AgP3 _ MU                            => AgMUBAP2 Pl ;
+        _                                    => a
+      } ;
+    mkSubjClitic : Agreement -> Str = \a0 -> let a : Agreement = normSubj a0 in
       case a of {
           AgMUBAP1 n => mkClitics "n" "tu" n;
           --AgMUBAP1 Pl => "tu" ;
@@ -572,6 +595,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
           AgP3 Sg (ZERO_MI | ZERO_ZERO)  => mkClitic "" ;
           AgP3 Pl ZERO_MI  => mkClitic "e" ;
           AgP3 Pl KA_ZERO  => mkClitic "" ;
+          AgP3 _ HA => mkClitic "ha" ;
           _        => mkClitic "SubjNotKnown" --for checking if there is some class unaccounted for
       };
 
