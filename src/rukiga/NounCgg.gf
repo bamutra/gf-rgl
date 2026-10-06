@@ -33,7 +33,8 @@ lin
                   };
           <Post, False> => case ap.isPrep of {
                      False  =>  { 
-                            s = \\ num, ns => cn.s  ! num ! ns ++ mkAdjClitic ! (AgP3 num cn.gender) 
+                            s = \\ num, ns => cn.s  ! num ! ns ++ mkAdjPronIVClitic (AgP3 num cn.gender) -- FIX: adjectival prefix (omuti omu-hango), not demonstrative (ogu)
+                                 
                                  ++ ap.s ! AgP3 Sg KI_BI; 
                               gender = cn.gender; nounCat = cn.nounCat 
                           };
