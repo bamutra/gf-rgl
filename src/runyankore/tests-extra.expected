@@ -1,0 +1,170 @@
+-- Expected AllNyn output for tests-extra.gfs, one line per command, in order.
+-- Source: tense-aspect specification reviewed by D. S. Bamutura (Oct 2026).
+omwana akagwejegyera
+nyowe nkagwejegyera
+omwana taragwejegyeire
+nyowe tindagwejegyeire
+omwana akaba agwejegyeire
+nyowe nkaba ngwejegyeire
+omwana akaba atagwejegyeire
+nyowe nkaba ntagwejegyeire
+omwana akaba agwejegyeire
+nyowe nkaba ngwejegyeire
+omwana akaba atagwejegyeire
+nyowe nkaba ntagwejegyeire
+omwana akaba agwejegyeire
+nyowe nkaba ngwejegyeire
+omwana akaba atakagwejegyeire
+nyowe nkaba ntakagwejegyeire
+omwana akaba agwejegyera
+nyowe nkaba ngwejegyera
+omwana akaba atagwejegyera
+nyowe nkaba ntagwejegyera
+omwana akaba ni agwejegyera
+nyowe nkaba ni ngwejegyera
+omwana akaba ata rikugwejegyera
+nyowe nkaba nta rikugwejegyera
+omwana akaba akyaagwejegyera
+nyowe nkaba nkyaagwejegyera
+omwana akaba atakigwejegyera
+nyowe nkaba ntakigwejegyera
+omwana agwejegyeire
+nyowe ngwejegyeire
+omwana tagwejegyeire
+nyowe tingwejegyeire
+omwana abaire agwejegyeire
+nyowe mbaire ngwejegyeire
+omwana abaire atagwejegyeire
+nyowe mbaire ntagwejegyeire
+omwana abaire agwejegyeire
+nyowe mbaire ngwejegyeire
+omwana abaire atagwejegyeire
+nyowe mbaire ntagwejegyeire
+omwana abaire agwejegyeire
+nyowe mbaire naagwejegyeire
+omwana abaire atakagwejegyeire
+nyowe mbaire ntakagwejegyeire
+omwana agwejegyera
+nyowe ngwejegyera
+omwana tagwejegyera
+nyowe tingwejegyera
+omwana abaire naagwejegyera
+nyowe mbaire ningwejegyera
+omwana abaire atarikugwejegyera
+nyowe mbaire ntarikugwejegyera
+omwana abaire akyaagwejegyera
+nyowe mbaire nkyaagwejegyera
+omwana abaire atakigwejegyera
+nyowe mbaire ntakigwejegyera
+omwana aagwejegyera
+nyowe naagwejegyera
+omwana tiyaagwejegyera
+nyowe tinaagwejegyera
+omwana yaaba agwejegyeire
+nyowe naba ngwejegyeire
+omwana yaaba atagwejegyeire
+nyowe naba ntagwejegyeire
+omwana yaaba agwejegyeire
+nyowe naba ngwejegyeire
+omwana yaaba atagwejegyeire
+nyowe naba ntagwejegyeire
+omwana yaaba agwejegyeire
+nyowe naba ngwejegyeire
+omwana yaaba atakagwejegyeire
+nyowe naba ntakagwejegyeire
+omwana agwejegyera
+nyowe ngwejegyera
+omwana tagwejegyera
+nyowe tingwejegyera
+omwana yaaba naagwejegyera
+nyowe naba ningwejegyera
+omwana yaaba atarikugwejegyera
+nyowe naba ntarikugwejegyera
+omwana yaaba akaagwejegyera
+nyowe naba nkaagwejegyera
+omwana yaaba atakigwejegyera
+nyowe naba ntakigwejegyera
+omwana agwejegyera
+nyowe ngwejegyera
+omwana takugwejegyera
+nyowe tinkugwejegyera
+omwana agwejegyeire
+nyowe ngwejegyeire
+omwana tagwejegyeire
+nyowe tingwejegyeire
+omwana agwejegyeire
+nyowe ngwejegyeire
+omwana tagwejegyeire
+nyowe tingwejegyeire
+omwana agwejegyeire
+nyowe naagwejegyeire
+omwana takagwejegyeire
+nyowe tinkagwejegyeire
+omwana agwejegyera
+nyowe ngwejegyera
+omwana tagwejegyera
+nyowe tingwejegyera
+omwana naagwejegyera
+nyowe ningwejegyera
+omwana tari kugwejegyera
+nyowe tindi kugwejegyera
+omwana akaagwejegyera
+nyowe nkaagwejegyera
+omwana tari kugwejegyera
+nyowe tindi kugwejegyera
+omwana naaza kugwejegyera
+nyowe ninza kugwejegyera
+omwana taraagwejegyere
+nyowe tindaagwejegyere
+omwana araba agwejegyeire
+nyowe ndaba ngwejegyeire
+omwana araba atagwejegyeire
+nyowe ndaba ntagwejegyeire
+omwana araba agwejegyeire
+nyowe ndaba ngwejegyeire
+omwana araba atagwejegyeire
+nyowe ndaba ntagwejegyeire
+omwana naaza kubagwejegyeire
+nyowe ninza kubanagwejegyeire
+omwana naaza kubatakagwejegyeire
+nyowe ninza kubantakagwejegyeire
+omwana agwejegyera
+nyowe ngwejegyera
+omwana tagwejegyera
+nyowe tingwejegyera
+omwana naaza kuba naagwejegyera
+nyowe ninza kuba ningwejegyera
+omwana naaza kuba atarikugwejegyera
+nyowe ninza kuba ntarikugwejegyera
+omwana naaza kuba akyaagwejegyera
+nyowe ninza kuba nkyaagwejegyera
+omwana naaza kuba atakigwejegyera
+nyowe ninza kuba ntakigwejegyera
+omwana aryagwejegyera
+nyowe ndyagwejegyera
+omwana taryagwejegyera
+nyowe tindyagwejegyera
+omwana aryaba agwejegyeire
+nyowe ndyaba ngwejegyeire
+omwana aryaba atagwejegyeire
+nyowe ndyaba ntagwejegyeire
+omwana aryaba agwejegyeire
+nyowe ndyaba ngwejegyeire
+omwana aryaba atagwejegyeire
+nyowe ndyaba ntagwejegyeire
+omwana aryaba aagwejegyeire
+nyowe ndyaba naagwejegyeire
+omwana aryaba atakagwejegyeire
+nyowe ndyaba ntakagwejegyeire
+omwana araagwejegyera
+nyowe ndaagwejegyera
+omwana taraagwejegyera
+nyowe tindaagwejegyera
+omwana ariba naagwejegyera
+nyowe ndiba ningwejegyera
+omwana ariba atarikugwejegyera
+nyowe ndiba ntarikugwejegyera
+omwana ariba akyaagwejegyera
+nyowe ndiba nkyaagwejegyera
+omwana ariba atakigwejegyera
+nyowe ndiba ntakigwejegyera

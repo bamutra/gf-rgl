@@ -375,6 +375,43 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         _           => mkSubjClitic a ++ "ra" ++ Predef.BIND
       } ;
 
+    -- Subject prefix joined to an auxiliary or tense-marker stem, with
+    -- nasal assimilation in the 1sg: n+b/p -> m (mbaire), n+r -> nd
+    -- (ndaba, ndyaba, ndiba, ndaa-), otherwise n+ (nkaba). Other persons: SC+stem.
+    mkSubjWord : Agreement -> Str -> Str = \a,stem -> case a of {
+        AgMUBAP1 Sg => case stem of {
+                         "r" + x            => "nd" + x ;
+                         ("b" | "p") + _    => "m" + stem ;
+                         _                  => "n" + stem } ;
+        _           => mkSubjClitic a ++ stem
+      } ;
+
+    -- Negative ti-SC- joined to a syllable starting in r, with n+r -> nd
+    -- in the 1sg: tindi, tindya, tindaa (taryagwejegyera, tari kugwejegyera)
+    mkTiSubjWord : Agreement -> Str -> Str = \a,syl -> case a of {
+        AgMUBAP1 Sg => case syl of {
+                         "r" + x => "tind" + x ;
+                         _       => "tin" + syl } ;
+        _           => mkTiSubjClitic a ++ syl
+      } ;
+
+    -- Memorial present: auxiliary yaaba/naba; tense marker -aa- with
+    -- a+aa -> aa (aagwejegyera); negative without ti-fusion: tiyaagwejegyera,
+    -- tinaagwejegyera. Classes other than 1 and 1sg keep SC+aa(ba) for now.
+    mkMemAux : Agreement -> Str = \a -> case a of {
+        AgP3 Sg MU_BA => "yaaba" ;
+        AgMUBAP1 Sg   => "naba" ;
+        _             => mkSubjClitic a ++ "aaba"
+      } ;
+    mkMemSubj : Agreement -> Str = \a -> case a of {
+        AgP3 Sg MU_BA => mkClitic "aa" ;
+        _             => mkSubjClitic a ++ "aa" ++ Predef.BIND
+      } ;
+    mkMemNegSubj : Agreement -> Str = \a -> case a of {
+        AgP3 Sg MU_BA => mkClitic "tiyaa" ;
+        _             => "ti" ++ Predef.BIND ++ mkSubjClitic a ++ "aa" ++ Predef.BIND
+      } ;
+
     -- Copulas with adjectival complements. Runyankore-Rukiga has two,
     -- used in different tenses:
     --   ni  : present             ekitabo ni-kihango
