@@ -15,7 +15,6 @@ lin
         comp2 = [];
         ap =[];
         isCompApStem = False; 
-        agr = AgrNo; 
         isRegular = v.isRegular;
         adv =[];
         containsAdv =False;
@@ -36,7 +35,6 @@ lin
         comp2 = [];
         ap =[];
         isCompApStem = False; 
-        agr = AgrNo; 
         isRegular = v.isRegular;
         adv =[];
         containsAdv =False;
@@ -63,7 +61,6 @@ lin
                       comp2 = [];
                       ap = [];
                       isCompApStem = True; 
-                      agr = AgrNo;
                       isRegular = False;
                       adv = [];
                       containsAdv =False;
@@ -83,7 +80,6 @@ lin
                         comp2 = [];
                         ap = [];
                         isCompApStem = False; 
-                        agr = AgrNo;
                         isRegular = False;
                         adv = comp.s;
                         containsAdv =True;  
@@ -103,7 +99,6 @@ lin
                         comp2 = [];
                         ap = [];
                         isCompApStem = False; 
-                        agr = AgrNo;
                         isRegular = False;
                         adv = [];
                         containsAdv =False;
@@ -123,7 +118,6 @@ lin
                         comp2 = [];
                         ap = [];
                         isCompApStem = False; 
-                        agr = AgrNo;
                         isRegular = False;
                         adv = [];
                         containsAdv =False;
@@ -246,7 +240,6 @@ lin
         comp2 =vpslash.comp2; --should be empty
         ap = [];
         isCompApStem = False; 
-        agr = AgrYes np.agr;
         isRegular = vpslash.isRegular;
         adv = [];
         containsAdv =False;
@@ -269,7 +262,6 @@ lin
         comp2 = vp.comp2;
         ap =[];
         isCompApStem = False; 
-        agr = AgrNo;
         isRegular = vp.isRegular;
         adv = adv.s;
         containsAdv =True;
@@ -291,7 +283,6 @@ lin
       comp2 =vp.comp2;
       ap = [];
       isCompApStem = False; 
-      agr = AgrNo;
       isRegular = vp.isRegular;
       adv = [];
       containsAdv =False;
@@ -374,7 +365,7 @@ lin
                                         comp=vp.comp ;
                                         comp2 = vp.comp2;
                                         ap = [];
-                                        isCompApStem = False; agr = AgrNo; 
+                                        isCompApStem = False; 
                                         isRegular = vv.isRegular; 
                                         adv =[]; 
                                         containsAdv =False;
@@ -394,7 +385,6 @@ lin
                                       comp2 = vp.comp2;
                                       ap = []; 
                                       isCompApStem = False; 
-                                      agr = AgrNo; 
                                       isRegular = vv.isRegular; 
                                       adv =[]; 
                                       containsAdv =False;
@@ -414,7 +404,6 @@ lin
                                       comp2 = [];
                                       ap = []; 
                                       isCompApStem = False; 
-                                      agr = AgrNo; 
                                       isRegular = vv.isRegular; 
                                       adv =[]; 
                                       containsAdv =False;
@@ -434,7 +423,6 @@ lin
                                       comp2 = [];
                                       ap = []; 
                                       isCompApStem = False; 
-                                      agr = AgrNo; 
                                       isRegular = vv.isRegular; 
                                       adv =[]; 
                                       containsAdv =False;
@@ -457,7 +445,6 @@ lin
     comp2 = []; 
     ap = [];
     isCompApStem = False; 
-    agr = AgrNo; 
     isRegular = vs.isRegular; 
     adv =[]; 
     containsAdv =False;
@@ -482,7 +469,6 @@ lin
     comp2 = [];
     ap = []; 
     isCompApStem = False; 
-    agr = AgrNo; 
     isRegular = vq.isRegular; 
     adv =[]; 
     containsAdv =False;
@@ -512,7 +498,6 @@ lin
     comp2 = [];
     ap = ap.s! AgP3 Sg KI_BI; 
     isCompApStem = True; 
-    agr = AgrNo; 
     isRegular = va.isRegular; 
     adv =[]; 
     containsAdv =False;
@@ -529,7 +514,6 @@ lin
                             comp2 = [];
                             ap = [];
                             isCompApStem = False; 
-                            agr = AgrNo;
                             adv = []; 
                             containsAdv = False;
                             adV =[];
