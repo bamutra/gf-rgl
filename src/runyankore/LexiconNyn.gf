@@ -8,12 +8,14 @@ concrete LexiconNyn of Lexicon = LexiconCgg - [walk_V, freeze_V, hit_V2, hold_V2
   -- derives the Runyankore perfective (t-retention: -sire -> -tsire,
   -- -ise -> -itse). Generated from LexiconCgg; regenerate when those change.
   lin
+    -- t-final verbs, copied from LexiconCgg (Runyankore perfective via ParadigmsNyn)
     walk_V = mkV "ribá" "ta" "sire" ;
     freeze_V = mkV "kwa" "ta" "ise" ;
     hit_V2 = mkV2 "kangaa" "ta" "sire" ;
     hold_V2 = mkV2 "kwa" "ta" "ise" ;
     squeeze_V2 = mkV2 "ima" "ta" "sire" ;
     stab_V2 = mkV2 "cumi" "ta" "sire" ;
+    -- end of t-final verbs
 
     -- Example override pattern (verify with a native speaker first):
     -- 1. add  bark_N  to the exclusion list above

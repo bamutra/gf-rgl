@@ -429,7 +429,7 @@ fun
 	gaiturura_1_1_V2 : V2; 
 	gaiturura_2_1_V2 : V2; 
 	gaiturura_3_1_V2 : V2; 
-	gaitwa_1_V : V; 
+	gaitwa_1_V : V; -- TODO(passive): passive of gaita 
 	gamba_1_1_V2 : V2; 
 	gamba_2_1_V2 : V2; 
 	gambira_1_V2 : V2; 
@@ -882,7 +882,7 @@ fun
 	gira_enda_1_V : V; 
 	hikirira_1_1_V : V; 
 	naija_1_V : V; 
-	orikwetwa_1_V : V; 
+	yetwa_1_V : V; -- TODO(passive): passive of yeta (was orikwetwa_1_V)
 	guma_1_1_V : V; 
 	guma_2_1_V : V; 
 	gumira_1_V2 : V2; 
