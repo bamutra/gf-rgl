@@ -8,6 +8,9 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 subj = cl.s;
                 vMorphs = mkVerbMorphs;
                 clitic = mkSubjClitic cl.subjAgr;
+                niClitic = mkNiSubjClitic cl.subjAgr;   -- ni- fused with the subject prefix
+                tiClitic = mkTiSubjClitic cl.subjAgr;   -- ti- fused with the subject prefix
+                tiRaClitic = mkTiRaClitic cl.subjAgr; -- ti-SC-ra- (tinda- in 1sg)
                 presSimul =  vMorphs ! VFPres; --this is not delivering the string
                 presAnt = vMorphs ! VFPastPart; --this is not delivering the string
                 root = cl.root;
@@ -23,8 +26,8 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									False => {s = subj ++ clitic ++ "ka" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 	     <RemotePast, Perfomative,Neg> => case cl.isPerfBlank of {
-                	     										True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ra" ++ Predef.BIND++  root ++ Predef.BIND ++ "ire" ++ compl};
-                		 										False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ra" ++ Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl} 
+                	     										True => {s = subj ++ tiRaClitic ++  root ++ Predef.BIND ++ "ire" ++ compl};
+                		 										False => {s = subj ++ tiRaClitic ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl} 
                 	 										};
                 	 	 <RemotePast, (Perfect | Resultative),Pos>  => case cl.isPerfBlank of {
                 		 									True => {s = subj ++ clitic ++ "kaba" ++ clitic ++ root ++ Predef.BIND ++ "ire" ++ compl};
@@ -71,8 +74,8 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									False => {s = subj ++ clitic ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
                 		<NearPast, Performative,Neg> => case cl.isPerfBlank of {
-                											True => {s = subj ++ "ti" ++Predef.BIND ++ clitic ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                		 									False => {s = subj ++ "ti" ++ Predef.BIND ++clitic ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                											True => {s = subj ++ tiClitic ++ root ++ Predef.BIND ++ "ire" ++ compl};
+                		 									False => {s = subj ++ tiClitic ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
                 		<NearPast, (Perfect |Resultative),Pos> => case cl.isPerfBlank of {
                 											True => {s = subj ++ clitic ++ "baire" ++clitic ++ root ++ Predef.BIND ++ "ire" ++ compl};
@@ -96,8 +99,8 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									False => {s = subj ++ clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 	    <(NearPast | MemorialPres|ExpPres|NearFut), Habitual,Neg> => case cl.isPresBlank of {
-                	     										True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++  root ++ Predef.BIND ++ "a" ++ compl};
-                		 										False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl} 
+                	     										True => {s = subj ++ tiClitic ++  root ++ Predef.BIND ++ "a" ++ compl};
+                		 										False => {s = subj ++ tiClitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl} 
                 	 										};
                 	 	<NearPast, Progressive, Pos> => case cl.isPresBlank of{
                 											True => {s = subj ++ clitic ++ "beire ni" ++ clitic ++ root ++ Predef.BIND ++ "a" ++ compl};
@@ -120,8 +123,8 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									False => {s = subj ++ clitic ++ "aa" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<MemorialPres, Performative, Neg> => case cl.isPresBlank of {
-                		 									True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "aa" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "aa" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                		 									True => {s = subj ++ tiClitic ++ "aa" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj ++ tiClitic ++ "aa" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<MemorialPres, (Perfect | Resultative), Pos> => case cl.isPerfBlank of {
                 											True => {s = subj ++ clitic ++ "aba" ++ clitic ++ root ++ Predef.BIND ++ "ire" ++ compl};
@@ -169,33 +172,33 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									False => {s = subj ++ clitic ++ "naa" ++ Predef.BIND++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
                 		<ExpPres, Retrospective, Neg>     => case cl.isPerfBlank of {
-                		 									True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ka" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                		 									False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ka" ++ Predef.BIND++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                		 									True => {s = subj ++ tiClitic ++ "ka" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
+                		 									False => {s = subj ++ tiClitic ++ "ka" ++ Predef.BIND++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
                 		<ExpPres, Progressive, Pos>     => case cl.isPresBlank of {
-                		 									True => {s = subj ++ "ni" ++ Predef.BIND ++clitic ++  root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj ++ "ni" ++ Predef.BIND ++ clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                		 									True => {s = subj ++ niClitic ++  root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<ExpPres, Progressive, Neg>     => case cl.isPerfBlank of {
-                		 									True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ri ku" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ri ku" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                		 									True => {s = subj ++ tiClitic ++ "ri ku" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj ++ tiClitic ++ "ri ku" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<ExpPres, Persistive, Pos>     => case cl.isPerfBlank of {
                 		 									True => {s = subj ++ clitic ++ "kaa" ++ Predef.BIND ++  root ++ Predef.BIND ++ "a" ++ compl};
                 		 									False => {s = subj  ++ clitic ++ "kaa" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<ExpPres, Persistive, Neg>     => case cl.isPerfBlank of {
-                		 									True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ri ku" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "ri ku" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                		 									True => {s = subj ++ tiClitic ++ "ri ku" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj ++ tiClitic ++ "ri ku" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<NearFut, Performative, Pos> => case cl.isPresBlank of {
-                											True => {s = subj ++ "ni"  ++ Predef.BIND ++clitic ++"za ku" ++ Predef.BIND ++  root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj  ++ "ni"  ++ Predef.BIND ++clitic ++"za ku" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                											True => {s = subj ++ niClitic ++"za ku" ++ Predef.BIND ++  root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj  ++ niClitic ++"za ku" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		-- Uses the subjunctive e.g a + e = e
                 		<NearFut, Performative, Neg>     => case cl.isPerfBlank of {
-                		 									True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "raa" ++ Predef.BIND ++ root ++ Predef.BIND ++ "e" ++ compl};
-                		 									False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "raa" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++Predef.BIND ++"e" ++ compl} -- my own way of performing the subjuctive i.e a+e =e
+                		 									True => {s = subj ++ tiRaClitic ++ "a" ++ Predef.BIND ++ root ++ Predef.BIND ++ "e" ++ compl};
+                		 									False => {s = subj ++ tiRaClitic ++ "a" ++ Predef.BIND ++ root  ++ Predef.BIND ++ presRestOfVerb ++Predef.BIND ++"e" ++ compl} -- my own way of performing the subjuctive i.e a+e =e
                 											};
                 		<NearFut, (Perfect | Resultative), Pos> => case cl.isPerfBlank of {
                 		 									True => {s = subj ++ clitic ++ "raaba" ++ clitic ++  root ++ Predef.BIND ++ "ire" ++ compl};
@@ -206,36 +209,36 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									False => {s = subj  ++ clitic ++ "raaba" ++ clitic ++ "ta" ++ Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
                 		<NearFut, Retrospective, Pos> =>case cl.isPerfBlank of { 
-                											True => {s = subj ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "aa" ++Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                		 									False => {s = subj  ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "aa" ++Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                											True => {s = subj ++ niClitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "aa" ++Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
+                		 									False => {s = subj  ++ niClitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "aa" ++Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
                 		<NearFut, Retrospective, Neg> =>case cl.isPerfBlank of { 
-                											True => {s = subj ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "taka" ++Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                		 									False => {s = subj  ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "taka" ++Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                											True => {s = subj ++ niClitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "taka" ++Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
+                		 									False => {s = subj  ++ niClitic ++"za kuba" ++ Predef.BIND ++ clitic ++ "taka" ++Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
                 		<NearFut, Progressive, Pos> => case cl.isPresBlank of {
-                											True => {s = subj ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba ni" ++ Predef.BIND ++ clitic ++  root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj  ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba ni" ++ Predef.BIND ++ clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                											True => {s = subj ++ niClitic ++"za kuba ni" ++ Predef.BIND ++ clitic ++  root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj  ++ niClitic ++"za kuba ni" ++ Predef.BIND ++ clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<NearFut, Progressive, Neg> => case cl.isPresBlank of {
-                											True => {s = subj ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba"  ++ clitic ++ "tariku" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj  ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba"  ++ clitic ++ "tariku" ++ Predef.BIND ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                											True => {s = subj ++ niClitic ++"za kuba"  ++ clitic ++ "tariku" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj  ++ niClitic ++"za kuba"  ++ clitic ++ "tariku" ++ Predef.BIND ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<NearFut, Persistive, Pos> => case cl.isPresBlank of {
-                											True => {s = subj ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba" ++ clitic  ++ "kyaa" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj  ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba" ++ clitic  ++ "kyaa" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                											True => {s = subj ++ niClitic ++"za kuba" ++ clitic  ++ "kyaa" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj  ++ niClitic ++"za kuba" ++ clitic  ++ "kyaa" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<NearFut, Persistive, Neg> => case cl.isPresBlank of {
-                											True => {s = subj ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba"  ++ clitic ++ "taki" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj  ++ "ni"  ++ Predef.BIND ++clitic ++"za kuba" ++ clitic ++ "taki" ++ Predef.BIND ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                											True => {s = subj ++ niClitic ++"za kuba"  ++ clitic ++ "taki" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj  ++ niClitic ++"za kuba" ++ clitic ++ "taki" ++ Predef.BIND ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<RemoteFut, Performative, Pos> => case cl.isPresBlank of {
                 		 									True => {s = subj ++ clitic ++ "rya" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "rya" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<RemoteFut, Performative, Neg> => case cl.isPresBlank of {
-                		 									True => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "rya" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
-                		 									False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "rya" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                		 									True => {s = subj ++ tiClitic ++ "rya" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
+                		 									False => {s = subj ++ tiClitic ++ "rya" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
                 		<RemoteFut, (Perfect | Resultative), Pos> => case cl.isPerfBlank of {
                 		 									True => {s = subj ++ clitic ++ "ryaba" ++ clitic ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};

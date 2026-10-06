@@ -368,6 +368,13 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         _           => mkTiSubjClitic a ++ "ra" ++ Predef.BIND
       } ;
 
+    -- SC-ra- (future anterior SC-raaba), with n+r -> nd in the first person
+    -- singular: nyowe ndaaba ngwejegyeire, omwana araaba agwejegyeire
+    mkSubjRaClitic : Agreement -> Str = \a -> case a of {
+        AgMUBAP1 Sg => mkClitic "nda" ;
+        _           => mkSubjClitic a ++ "ra" ++ Predef.BIND
+      } ;
+
     -- Copulas with adjectival complements. Runyankore-Rukiga has two,
     -- used in different tenses:
     --   ni  : present             ekitabo ni-kihango

@@ -18,6 +18,7 @@ lin
                 niClitic = mkNiSubjClitic cl.subjAgr;
                 tiClitic = mkTiSubjClitic cl.subjAgr;
                 tiRaClitic = mkTiRaClitic cl.subjAgr;
+                subjRaClitic = mkSubjRaClitic cl.subjAgr;
                 presSimul =  vMorphs ! VFPres; --this is not delivering the string
                 presAnt = vMorphs ! VFPastPart; --this is not delivering the string
                 root = cl.root;
@@ -46,7 +47,7 @@ lin
                             };        
       <Pres,Anter, Neg> => case cl.isPerfBlank of { 
                                   True  => {s = subj ++ clitic ++ root  ++ compl};
-                                  False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ 
+                                  False => {s = subj ++ tiClitic ++ 
                                               root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                             };
 
@@ -81,7 +82,7 @@ lin
 
       <Fut,Simul, Pos> => case cl.isPresBlank of { 
                                   True  => {s = subj ++ niClitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
-                                            root ++ "a" ++ compl};
+                                            root ++ Predef.BIND ++ "a" ++ compl};
                                   False => {s = subj ++ niClitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
               root ++ Predef.BIND ++ presRestOfVerb ++ compl}
                               };
@@ -89,22 +90,22 @@ lin
       
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Fut,Simul, Neg> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "raaza ku" ++ Predef.BIND ++ 
+                                  True  => {s = subj ++ tiRaClitic ++ "aza ku" ++ Predef.BIND ++ 
                                             root ++ compl};
-                                  False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "raaza ku" ++ Predef.BIND ++ 
+                                  False => {s = subj ++ tiRaClitic ++ "aza ku" ++ Predef.BIND ++ 
                                             root ++ BIND ++ presRestOfVerb ++ compl}
                               };
       <Fut,Anter, Pos> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ Predef.BIND ++clitic ++ "raaba" ++ clitic ++ --choice of za over ija
+                                  True  => {s = subj ++ subjRaClitic ++ "aba" ++ clitic ++ --choice of za over ija
                                             root ++ Predef.BIND ++ "ire" ++ compl};
-                                  False => {s = subj ++ Predef.BIND ++clitic ++ "raaba"  ++ clitic ++ --choice of za over ija
+                                  False => {s = subj ++ subjRaClitic ++ "aba" ++ clitic ++ --choice of za over ija
                                             root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               };
              
       <Fut,Anter, Neg> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ Predef.BIND ++ clitic ++ "raaba " ++ clitic  ++ "ta"++ Predef.BIND ++ 
-                                              root ++ "ire" ++ compl};
-                                  False => {s = subj ++ Predef.BIND ++ clitic ++ "raaba " ++ clitic ++ "ta" ++ Predef.BIND ++ 
+                                  True  => {s = subj ++ subjRaClitic ++ "aba" ++ clitic  ++ "ta"++ Predef.BIND ++ 
+                                              root ++ Predef.BIND ++ "ire" ++ compl};
+                                  False => {s = subj ++ subjRaClitic ++ "aba" ++ clitic ++ "ta" ++ Predef.BIND ++ 
                                               root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               };
       <Cond,Simul, Pos> => case cl.isPresBlank of { 
@@ -114,21 +115,21 @@ lin
                               };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Cond,Simul, Neg> =>case cl.isPresBlank of { 
-                                  True  => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "kaa" ++ Predef.BIND ++ 
-                                              root ++ "ire" ++ compl};
-                                  False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ "kaa" ++ Predef.BIND ++ 
-                                              root ++ presRestOfVerb ++ compl}
+                                  True  => {s = subj ++ tiClitic ++ "kaa" ++ Predef.BIND ++ 
+                                              root ++ Predef.BIND ++ "ire" ++ compl};
+                                  False => {s = subj ++ tiClitic ++ "kaa" ++ Predef.BIND ++ 
+                                              root ++ Predef.BIND ++ presRestOfVerb ++ compl}
                               }; 
 
       <Cond,Anter, Pos> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ clitic ++ "kaa" ++ root ++  compl};
-                                  False => {s = subj ++ clitic ++ "kaa" ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  True  => {s = subj ++ clitic ++ "kaa" ++ Predef.BIND ++ root ++  compl};
+                                  False => {s = subj ++ clitic ++ "kaa" ++ Predef.BIND ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               };
 
       <Cond,Anter, Neg> =>case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++  "kaa" ++Predef.BIND 
+                                  True  => {s = subj ++ tiClitic ++  "kaa" ++Predef.BIND 
                    ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                                  False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++  "kaa" ++Predef.BIND 
+                                  False => {s = subj ++ tiClitic ++  "kaa" ++Predef.BIND 
                    ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               }
     };  --: Temp -> Pol -> QCl  -> QS ; -- has John walked
