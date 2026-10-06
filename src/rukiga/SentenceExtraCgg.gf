@@ -20,12 +20,12 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 compl = cl.compl
 
                 in
-                	case <temp.t, temp.a, Pos> of {
+                	case <temp.t, temp.a, pol.p> of {
                 		 <RemotePast, Performative,Pos>  => case cl.isPresBlank of {
                 		 									True => {s = subj ++ clitic ++ "ka" ++ Predef.BIND ++ root ++ Predef.BIND ++ "a" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "ka" ++ Predef.BIND++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                 											};
-                	     <RemotePast, Perfomative,Neg> => case cl.isPerfBlank of {
+                	     <RemotePast, Performative,Neg> => case cl.isPerfBlank of {
                 	     										True => {s = subj ++ tiRaClitic ++  root ++ Predef.BIND ++ "ire" ++ compl};
                 		 										False => {s = subj ++ tiRaClitic ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl} 
                 	 										};
@@ -134,11 +134,11 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									True => {s = subj ++ clitic ++ "aba" ++ clitic ++ "ta" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "aba" ++ clitic ++ "ta" ++ Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
-                		<MemorialPres, Restrospective, Pos> => case cl.isPerfBlank of {
+                		<MemorialPres, Retrospective, Pos> => case cl.isPerfBlank of {
                 											True => {s = subj ++ clitic ++ "aaba" ++ clitic ++"aa" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "aaba" ++ clitic ++"aa" ++ Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
-                		<MemorialPres, Restrospective, Neg> => case cl.isPerfBlank of {
+                		<MemorialPres, Retrospective, Neg> => case cl.isPerfBlank of {
                 		 									True => {s = subj ++ clitic ++ "aaba" ++ clitic ++ "ta ka" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "aaba" ++ clitic ++ "ta ka" ++ Predef.BIND ++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
@@ -248,11 +248,11 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 		 									True => {s = subj ++ clitic ++ "ryaba" ++ clitic ++ "ta" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "ryaba" ++ clitic ++ "ta" ++ Predef.BIND++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
-                		<RemoteFut, Restrospective, Pos> => case cl.isPerfBlank of {
+                		<RemoteFut, Retrospective, Pos> => case cl.isPerfBlank of {
                 		 									True => {s = subj ++ clitic ++ "ryaba" ++ clitic ++ "aa" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "ryaba" ++ clitic ++ "aa"++ Predef.BIND++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
-                		<RemoteFut, Restrospective, Neg> => case cl.isPerfBlank of {
+                		<RemoteFut, Retrospective, Neg> => case cl.isPerfBlank of {
                 		 									True => {s = subj ++ clitic ++ "ryaba" ++ clitic ++ "taka" ++ Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
                 		 									False => {s = subj ++ clitic ++ "ryaba" ++ clitic ++ "taka" ++ Predef.BIND++ root  ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                 											};
