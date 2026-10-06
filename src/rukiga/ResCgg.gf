@@ -149,7 +149,7 @@ oper
     	--morphs = mkVerbMorphs;
     	isRegular = False;
       p = [];
-      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; isRefl = False
+      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; rootV = mkRootV rad ; noNi = False ; isRefl = False
 	};
   -- creates a verb of type that has particles (prepositions or 
   --adverbials. this is for phrasal verbs)
@@ -162,7 +162,7 @@ oper
       --morphs = mkVerbMorphs;
       isRegular = False;
       p = p;
-      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; isRefl = bool
+      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; rootV = mkRootV rad ; noNi = False ; isRefl = bool
   };
 	--These are regular verbs with {a-ire} entry in the dictionary
 	smartVerb : Str ->Verb = \rad ->{
@@ -174,7 +174,7 @@ oper
       isPerfBlank = False;
     	isRegular = True;
       p = [];
-      passPres = mkPassPres rad "a" ; passPerf = mkPassPerf "ire" ; isRefl = False
+      passPres = mkPassPres rad "a" ; passPerf = mkPassPerf "ire" ; rootV = mkRootV rad ; noNi = False ; isRefl = False
 	};
   
   {-  Smart paradigm
@@ -442,6 +442,83 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         AgP3 Sg MU_BA => mkClitic "tiyaa" ;
         _             => "ti" ++ Predef.BIND ++ mkSubjClitic a ++ "aa" ++ Predef.BIND
       } ;
+
+    -- Vowel coalescence between subject prefix and a vowel-initial root
+    -- (approved table). Stems are stored without the glide y. The prefix is
+    -- reduced to a base (k-, t-, b-, n-, a-, na- ...) and the root supplies the
+    -- rest according to the prefix shape:
+    --   SPlain (n, o, a, e, ta, tin...):  reeba | y+enda       ninyenda, ayenda, tayenda
+    --   SCu    (t, m, g, r, b, k):        u+reeba | w+enda      nitureeba, nitwenda
+    --   SCi    (k, b, r):                 i+reeba | y+enda | ingura   nikireeba, nikyenda, nikingura
+    --   SCa    (b, g, k; -ka-, -ra-):     a+reeba | enda        nibareeba, nibenda, akoga, taroga
+    --   SCaa   (-kaa-):                   aa+reeba | oo+ga      akaareeba, akooga
+    --   SZi    (z):                       i+reeba | enda        nizireeba, nizenda, nizingura
+    --   SLongA/O/E (na, no, ne):          a/o/e+reeba | y+enda  naareeba, nayenda, noyenda, neyenda
+    mkRootV : Str -> (PrefShape => Str) = \r ->
+      let v : Bool = case r of { ("a"|"e"|"i"|"o"|"u") + _ => True ; _ => False } ;
+          -- Ci + i -> Ci only before a nasal cluster (kingura); otherwise the
+          -- long vowel stays (kiine, kiisa)
+          i : Bool = case r of { "i" + ("ng"|"nd"|"nz"|"nj"|"mb"|"mp"|"nt"|"nk") + _ => True ; _ => False } ;
+          cv : Str -> Str -> Str = \c, w -> case v of { True => w ; False => c + r }
+      in table {
+        SPlain => cv "" ("y" + r) ;
+        SCu    => cv "u" ("w" + r) ;
+        SCi    => case <v, i, r> of { <_, True, _> => r ; <True, _, "i" + _> => "i" + r ; _ => cv "i" ("y" + r) } ;
+        SCa    => cv "a" r ;
+        SCaa   => case r of {                                   -- -kaa- keeps the length:
+                    x@("a"|"e"|"i"|"o"|"u") + rest => x + x + rest ;  -- akooga, akeenda
+                    _ => "aa" + r } ;
+        SZi    => case <i, r> of { <False, "i" + _> => "i" + r ; _ => cv "i" r } ;
+        SLongA => cv "a" ("y" + r) ;
+        SLongO => cv "o" ("y" + r) ;
+        SLongE => cv "e" ("y" + r)
+      } ;
+    -- base and shape of the plain subject prefix
+    scBase : Agreement -> Str * PrefShape = \a -> case a of {
+        AgMUBAP1 Sg => <"n", SPlain> ;   AgMUBAP1 Pl => <"t", SCu> ;
+        AgMUBAP2 Sg => <"o", SPlain> ;   AgMUBAP2 Pl => <"m", SCu> ;
+        AgP3 Sg MU_BA => <"a", SPlain> ; AgP3 Pl MU_BA => <"b", SCa> ;
+        AgP3 Sg KI_BI => <"k", SCi> ;
+        AgP3 Pl (KI_BI | ZERO_BI) | AgP3 Sg ZERO_BI => <"b", SCi> ;
+        AgP3 Sg (RU_N | RU_MA | RU_ZERO | RU_BU) | AgP3 Pl RU_ZERO => <"r", SCu> ;
+        AgP3 Pl (RU_N | N_N) => <"z", SZi> ;
+        AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => <"e", SPlain> ;
+        AgP3 Sg (MU_MI | MU_ZERO) | AgP3 Pl MU_ZERO => <"g", SCu> ;
+        AgP3 Sg (RI_MA | RI_ZERO | I_ZERO) => <"r", SCi> ;
+        AgP3 Pl (RI_MA | BU_MA | KU_MA | ZERO_MA | I_MA | RU_MA | RI_ZERO) | AgP3 Sg ZERO_MA => <"g", SCa> ;
+        AgP3 Sg (KA_BU | KA_ZERO | KA_TU) => <"k", SCa> ;
+        AgP3 Pl (KA_BU | RU_BU) | AgP3 (Sg | Pl) ZERO_BU => <"b", SCu> ;
+        AgP3 _ KU_ZERO => <"k", SCu> ;
+        AgP3 _ ZERO_TU => <"t", SCu> ;
+        AgP3 Sg (ZERO_MI | ZERO_ZERO) | AgP3 Pl KA_ZERO => <"", SPlain> ;
+        _ => <"SubjNotKnown", SPlain>
+      } ;
+    niBase : Agreement -> Str * PrefShape = \a -> case a of {
+        AgMUBAP2 Sg => <"no", SLongO> ;
+        AgP3 Sg MU_BA => <"na", SLongA> ;
+        AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => <"ne", SLongE> ;
+        _ => <"ni" + (scBase a).p1, (scBase a).p2>
+      } ;
+    tiBase : Agreement -> Str * PrefShape = \a -> case a of {
+        AgMUBAP2 Sg => <"to", SPlain> ;
+        AgP3 Sg MU_BA => <"ta", SPlain> ;
+        AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => <"te", SPlain> ;
+        _ => <"ti" + (scBase a).p1, (scBase a).p2>
+      } ;
+    -- ti-SC-r- before a root (remote past negative), with n+r -> nd in the 1sg;
+    -- the root supplies the -a- or absorbs it: taragwejegyeire, taroga, tindoga
+    mkTiRaBase : Agreement -> Str = \a -> case a of {
+        AgMUBAP1 Sg => mkClitic "tind" ;
+        _           => mkTiSubjClitic a ++ mkClitic "r"
+      } ;
+    -- remote past stem (the ending follows): akagwejegyer-, akog-; stative
+    -- verbs use the auxiliary -kaba- with the present form: kikaba kiin-
+    mkPastStem : Agreement -> Bool -> (PrefShape => Str) -> Str = \a, stative, rv ->
+      case stative of {
+        True  => mkSubjClitic a ++ "kaba" ++ joinV (scBase a) rv ;
+        False => mkSubjClitic a ++ "k" ++ Predef.BIND ++ rv ! SCa
+      } ;
+    joinV : (Str * PrefShape) -> (PrefShape => Str) -> Str = \b, rv -> b.p1 ++ Predef.BIND ++ rv ! b.p2 ;
 
     -- Copulas with adjectival complements. Runyankore-Rukiga has two,
     -- used in different tenses:
@@ -1483,7 +1560,9 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
                       p : Str;  -- some verbs have particles such as prepositions and adverbial that give the verb a meaning different from what would be automatically deduced
                       isRefl : Bool ;
                       passPres : Str ;  -- passive present ending: gur-wa, gwejegye-rwa, r-ibwa, nyw-ebwa
-                      passPerf : Str    -- passive perfective ending: shom-irwe, gai-sirwe, kom-izibwe, r-iibwe
+                      passPerf : Str ;  -- passive perfective ending: shom-irwe, gai-sirwe, kom-izibwe, r-iibwe
+                      rootV : PrefShape => Str ; -- root as joined to each kind of subject prefix (vowel coalescence)
+                      noNi : Bool               -- stative verb: present without ni- (ekitabo kiine enju)
                     };
       
       GVerb : Type = {
@@ -1530,7 +1609,9 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
       						adV:Str;
       						containsAdV:Bool;
                   containsComp : Bool;
-                  containsComp2 : Bool
+                  containsComp2 : Bool;
+                  rootV : PrefShape => Str;
+                  noNi : Bool
       					};
       -- in VP formation, all verbs are lifted to GVerb, but morphology doesn't need to know this
      verb2gverb : Verb ->Str -> GVerb = \v, ba -> {
@@ -1555,7 +1636,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 
      
        be_Copula : Verb = {
-          s = "ri" ; 
+          s = "ri" ; rootV = mkRootV "ri" ; noNi = False ;
           pres=[]; 
           perf=[]; 
           --morphs= mkVerbMorphs;
@@ -1566,7 +1647,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
           passPres = [] ; passPerf = [] ; isRefl = False
         };
        mkBecome  :  Verb  ={
-         	s = "b" ; 
+         	s = "b" ; rootV = mkRootV "b" ; noNi = False ;
           pres="a"; 
           perf="ire";
           isPresBlank = False;
@@ -1740,7 +1821,9 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
   					adV:Str;
   					containsAdV:Bool;
             containsComp : Bool;
-            containsComp2 : Bool
+            containsComp2 : Bool;
+            rootV : PrefShape => Str;
+            noNi : Bool
   					}; --comp is empty
   
 
@@ -1753,6 +1836,9 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 	      s : Str ; --subject
 	      subjAgr : Agreement;
 	      isCopAP : Bool; -- copular adjectival clause: present tense is ni-PREFIX-stem
+	      vcl, vni, vti, vku : Str; -- SC+root, ni-SC+root, ti-SC+root, ku+root with vowel coalescence
+	      rootV : PrefShape => Str; -- root joined to tense markers (-ka-, -ra-, -kaa-)
+	      vka : Str; -- remote past stem: SC-ka-root (akoga), stative SC-kaba SC-root (kikaba kiine)
 	      root : Str;
 	      pres: Str;
 	      perf: Str;
@@ -1771,6 +1857,8 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 	      } ;
 param 
   CompSource = NounP | ADverb | AdjP | CommonNoun;
+  -- how a subject prefix meets the verb root (see mkRootV)
+  PrefShape = SPlain | SCu | SCi | SCa | SCaa | SZi | SLongA | SLongO | SLongE ;
 oper
   Comp : Type = {s:Str; source : CompSource};
 

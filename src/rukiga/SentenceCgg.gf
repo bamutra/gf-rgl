@@ -32,30 +32,28 @@ lin
                                   -- copula ni: ekitabo nikihango, omwana nimurungi
                                   <True, _>      => {s = subj ++ (mkCopulaAP Pres Pos cl.subjAgr).s ++ compl};
                                   -- ni- fused with the subject prefix (omwana naaribata, abaana nibareeba)
-                                  <False, True>  => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ "a" ++ compl};
-                                  <False, False> => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  <False, True>  => {s = subj ++ cl.vni  ++ Predef.BIND ++ "a" ++ compl};
+                                  <False, False> => {s = subj ++ cl.vni  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                           };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Pres,Simul, Neg> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ tiClitic ++ root ++ compl};
-                                  False => {s = subj ++ tiClitic ++
-                                              root ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  True  => {s = subj ++ cl.vti ++ compl};
+                                  False => {s = subj ++ cl.vti ++ Predef.BIND ++ presRestOfVerb ++ compl}
                             };
       <Pres,Anter, Pos> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ clitic ++ root ++ compl};
-                                  False => {s = subj ++  clitic ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  True  => {s = subj ++ cl.vcl ++ compl};
+                                  False => {s = subj ++  cl.vcl ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                             };        
       <Pres,Anter, Neg> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ clitic ++ root  ++ compl};
-                                  False => {s = subj ++ tiClitic ++ 
-                                              root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  True  => {s = subj ++ cl.vcl  ++ compl};
+                                  False => {s = subj ++ cl.vti ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                             };
 
 
       <Past,Simul, Pos> => case cl.isCopAP of { 
                                   -- FIX: past copula SC-ka-ba SC-ri ADJ: ekitabo kikaba kiri kihango
                                   True => {s = subj ++ (mkCopulaAP Past Pos cl.subjAgr).s ++ compl}; -- copula -ri
-                                  False  => {s = subj ++ clitic ++ "ka" ++ Predef.BIND ++ root ++ Predef.BIND ++ presRestOfVerb ++ compl}--;
+                                  False  => {s = subj ++ cl.vka ++ Predef.BIND ++ presRestOfVerb ++ compl}--;
                                   --False => {s = subj ++ clitic  ++ "ka" ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                           };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
@@ -63,37 +61,34 @@ lin
                                   -- copula -ri, negative: ekitabo kikaba kitari kihango
                                   <True, _>      => {s = subj ++ (mkCopulaAP Past Neg cl.subjAgr).s ++ compl};
                                   -- far past negative: ti-SC-ra-root-ire (omwana taragwejegyeire, abaana tibara...)
-                                  <False, True>  => {s = subj ++ tiRaClitic ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                                  <False, False> => {s = subj ++ tiRaClitic ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  <False, True>  => {s = subj ++ mkTiRaBase cl.subjAgr ++ cl.rootV ! SCa ++ Predef.BIND ++ "ire" ++ compl};
+                                  <False, False> => {s = subj ++ mkTiRaBase cl.subjAgr ++ cl.rootV ! SCa ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                                 };
 
       <Past,Anter, Pos> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ clitic ++ "kaba" ++Predef.BIND ++ clitic ++
-                                               root ++ Predef.BIND ++ "ire"++  compl};
-                                  False => {s = subj ++ clitic ++ "kaba" ++ clitic ++ 
-                                                root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  True  => {s = subj ++ clitic ++ "kaba" ++Predef.BIND ++ cl.vcl ++ Predef.BIND ++ "ire"++  compl};
+                                  False => {s = subj ++ clitic ++ "kaba" ++ cl.vcl ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               };       
       <Past,Anter, Neg> =>case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ clitic ++ "ka" ++Predef.BIND ++ clitic ++
-                                               root ++ Predef.BIND ++ "ire"++  compl};
+                                  True  => {s = subj ++ clitic ++ "ka" ++Predef.BIND ++ cl.vcl ++ Predef.BIND ++ "ire"++  compl};
                                   False => {s = subj ++ clitic ++ "kaba" ++ clitic ++  "ta" ++ Predef.BIND ++ 
                                                 root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               };
 
       <Fut,Simul, Pos> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ niClitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
-                                            root ++ Predef.BIND ++ "a" ++ compl};
-                                  False => {s = subj ++ niClitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
-              root ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  True  => {s = subj ++ niClitic ++ "za" ++  --choice of za over ija
+                                            cl.vku ++ Predef.BIND ++ "a" ++ compl};
+                                  False => {s = subj ++ niClitic ++ "za" ++  --choice of za over ija
+              cl.vku ++ Predef.BIND ++ presRestOfVerb ++ compl}
                               };
 
       
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Fut,Simul, Neg> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ tiRaClitic ++ "aza ku" ++ Predef.BIND ++ 
-                                            root ++ compl};
-                                  False => {s = subj ++ tiRaClitic ++ "aza ku" ++ Predef.BIND ++ 
-                                            root ++ BIND ++ presRestOfVerb ++ compl}
+                                  True  => {s = subj ++ tiRaClitic ++ "aza" ++ 
+                                            cl.vku ++ compl};
+                                  False => {s = subj ++ tiRaClitic ++ "aza" ++ 
+                                            cl.vku ++ BIND ++ presRestOfVerb ++ compl}
                               };
       <Fut,Anter, Pos> => case cl.isPerfBlank of { 
                                   True  => {s = subj ++ subjRaClitic ++ "aba" ++ clitic ++ --choice of za over ija
@@ -109,28 +104,26 @@ lin
                                               root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               };
       <Cond,Simul, Pos> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ clitic ++ "kaa" ++Predef.BIND ++ root ++ compl};
-                                  False => {s = subj ++ clitic ++ "kaa" ++Predef.BIND ++ 
-                                              root ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  True  => {s = subj ++ clitic ++ "k" ++ Predef.BIND ++ cl.rootV ! SCaa ++ compl};
+                                  False => {s = subj ++ clitic ++ "k" ++ Predef.BIND ++ 
+                                              cl.rootV ! SCaa ++ Predef.BIND ++ presRestOfVerb ++ compl}
                               };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Cond,Simul, Neg> =>case cl.isPresBlank of { 
-                                  True  => {s = subj ++ tiClitic ++ "kaa" ++ Predef.BIND ++ 
-                                              root ++ Predef.BIND ++ "ire" ++ compl};
-                                  False => {s = subj ++ tiClitic ++ "kaa" ++ Predef.BIND ++ 
-                                              root ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  True  => {s = subj ++ tiClitic ++ "k" ++ Predef.BIND ++ 
+                                              cl.rootV ! SCaa ++ Predef.BIND ++ "ire" ++ compl};
+                                  False => {s = subj ++ tiClitic ++ "k" ++ Predef.BIND ++ 
+                                              cl.rootV ! SCaa ++ Predef.BIND ++ presRestOfVerb ++ compl}
                               }; 
 
       <Cond,Anter, Pos> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ clitic ++ "kaa" ++ Predef.BIND ++ root ++  compl};
-                                  False => {s = subj ++ clitic ++ "kaa" ++ Predef.BIND ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  True  => {s = subj ++ clitic ++ "k" ++ Predef.BIND ++ cl.rootV ! SCaa ++  compl};
+                                  False => {s = subj ++ clitic ++ "k" ++ Predef.BIND ++ cl.rootV ! SCaa ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               };
 
       <Cond,Anter, Neg> =>case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ tiClitic ++  "kaa" ++Predef.BIND 
-                   ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                                  False => {s = subj ++ tiClitic ++  "kaa" ++Predef.BIND 
-                   ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  True  => {s = subj ++ tiClitic ++  "k" ++ Predef.BIND ++ cl.rootV ! SCaa ++ Predef.BIND ++ "ire" ++ compl};
+                                  False => {s = subj ++ tiClitic ++  "k" ++ Predef.BIND ++ cl.rootV ! SCaa ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                               }
     };  --: Temp -> Pol -> QCl  -> QS ; -- has John walked
 
@@ -295,7 +288,7 @@ lin
               <False,False,True,False,False>    => {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem;
+                        isCopAP = vp.isCompApStem; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -315,7 +308,7 @@ lin
               <False,True,False,False,False>    => {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem;
+                        isCopAP = vp.isCompApStem; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -336,7 +329,7 @@ lin
               <_, _,_,True,False>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem;
+                        isCopAP = vp.isCompApStem; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -356,7 +349,7 @@ lin
               <_, _,_,True, True>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem;
+                        isCopAP = vp.isCompApStem; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -376,7 +369,7 @@ lin
               <_, _,_,_, _>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem;
+                        isCopAP = vp.isCompApStem; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -442,7 +435,7 @@ lin
                             {
                               s = np.s ! Nom;
                               subjAgr     = np.agr;
-                              isCopAP = False;
+                              isCopAP = False; vcl = joinV (scBase np.agr) vpslash.rootV; vni = case vpslash.noNi of { True => joinV (scBase np.agr) vpslash.rootV ; False => joinV (niBase np.agr) vpslash.rootV }; vti = joinV (tiBase np.agr) vpslash.rootV; vku = joinV <"k", SCu> vpslash.rootV; rootV = vpslash.rootV; vka = mkPastStem np.agr vpslash.noNi vpslash.rootV;
                               root        = vpslash.s;
                               pres        = vpslash.pres;
                               perf        = vpslash.perf;

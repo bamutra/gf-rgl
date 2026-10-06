@@ -196,7 +196,7 @@ lin
     nose_N  = mkN "enyindo" N_N;
     --number_N = mkN "enamba" N_N -- TODO look out for the correct word
     oil_N = mkN "amajuta" N_N;
-    open_V2 = mkV2 "ying" "ura" "wire";
+    open_V2 = mkV2 "ing" "ura" "wire";
     brown_A = mkAdjective "TODO: Get the right word for brown" Post False  True False;
     burn_V = mkV "batu" "ra" "ire";
     butter_N = mkN "amajuta g'ente" "amajuta g'ente" N_N;
@@ -235,7 +235,7 @@ lin
     fog_N = mkN "TODO word for fog" "TODO word for fog" N_N;
     foot_N = mkN "ekigyere" "ebigyere" KI_BI;
     forest_N = mkN "eihamba" "amahamba" I_MA;
-    forget_V2 = mkV2 "yebw" "a" "ire";
+    forget_V2 = mkV2 "ebw" "a" "ire";
     freeze_V = mkV "kwa" "ta" "ise";
     fridge_N = mkN "firigi" "firigi" ZERO_ZERO; 
     fruit_N = mkN "ekijuma" "ebijuma" KI_BI;
@@ -269,7 +269,7 @@ lin
     lake_N = mkN "enyanja" "enyanja" N_N;
     lamp_N = mkN "entara" "entara" N_N;
     leaf_N = mkN "ibabi" "amababi" I_MA;
-    learn_V2 = mkV2 "yeg" "a" "ire";
+    learn_V2 = mkV2 "eg" "a" "ire";
     leather_N = mkN "oruhu" "empu" RU_N; --I think plural should be oruhu again
     leave_V2 = mkV2 "rug" "a" "ire";
     left_Ord = mkOrd "bumosho";
@@ -335,7 +335,7 @@ lin
     shop_N = mkN "eduuka" "eduuka" ZERO_ZERO;
     short_A = mkAdjective "gufu" Post False False False;
     --silver_N
-    sing_V = mkV "yeshogor" "ora" "wire"; --TODO : confirm this word and the conjugation
+    sing_V = mkV "eshogor" "ora" "wire"; --TODO : confirm this word and the conjugation
     sister_N = mkN "munyanyazi" "banyanyanzi" MU_BA;
     sit_V = mkV "shutam" "a" "ire";
     --skin_N = mkN "omubiri" "emibiri" MU_MI; This is wrong
@@ -352,7 +352,7 @@ lin
     split_V2 = mkV2 "gangabura";
     squeeze_V2 =mkV2 "ima" "ta" "sire";
     stab_V2 = mkV2 "cumi" "ta" "sire"; --edit for Runyankore
-    stand_V = mkV "yemere" "ra" "ire";
+    stand_V = mkV "emere" "ra" "ire";
     -- steel_N
     stick_N = mkN "omunyafu" "eminyafu" MU_MI;
     stone_N = mkN "eibare" "amabara" I_MA;
@@ -364,7 +364,7 @@ lin
     suck_V2 = mkV2 "komagu" "za" "ize";
     sun_N = mkN "omushana" "omushana" MU_ZERO;
     swell_V = mkV "bimba";
-    switch8on_V2 = mkV2 "ya" "sya" "kise";
+    switch8on_V2 = mkV2 "a" "sya" "kise";
     table_N = mkN "emeeza" "emeeza" N_N;
     tail_N = mkN "omukira" "emikira" MU_MI;
     teacher_N = mkN "omushomesa" "abashomesa" MU_BA;
@@ -381,7 +381,7 @@ lin
     village_N = mkN "ekyalo" "ebyalo" KI_BI;
     vomit_V = mkV "tanaka"; 
     war_N = mkN "orutaro" "entaro" RU_N;
-    wash_V2 = mkV2 "yo" "zya" "gize";
+    wash_V2 = mkV2 "o" "zya" "gize";
     watch_V2 = mkV2 "reeba";
     wet_A = mkAdjective "jubire" Post False False False;
     wide_A = mkAdjective "hango" Post False False False;

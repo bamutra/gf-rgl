@@ -33,11 +33,11 @@ lin
 
   -- better but can be improved upon
   UttVP vp  = case <vp.isCompApStem,vp.containsAdv, vp.containsAdV,vp.containsComp, vp.containsComp2> of {
-                <False,False,True,False,False> => {s = "ku" ++ BIND ++ vp.s ++ BIND ++ vp.pres ++ vp.adV};
-                <False,True,False,False,False> =>{s = "ku" ++ BIND ++ vp.s ++ BIND ++ vp.pres ++ vp.adv};
-                <_, _,_,True,False>  => {s = "ku" ++ BIND ++ vp.s ++ BIND ++ vp.pres ++ vp.comp};
-                <_, _,_,True, True> => {s = "ku" ++ BIND ++ vp.s ++ BIND ++ vp.pres ++ vp.comp ++ vp.comp2};
-                <_, _,_,_, _>    => {s = "ku" ++ BIND ++ vp.s ++ BIND ++ vp.pres}
+                <False,False,True,False,False> => {s = joinV <"k", SCu> vp.rootV ++ BIND ++ vp.pres ++ vp.adV};
+                <False,True,False,False,False> =>{s = joinV <"k", SCu> vp.rootV ++ BIND ++ vp.pres ++ vp.adv};
+                <_, _,_,True,False>  => {s = joinV <"k", SCu> vp.rootV ++ BIND ++ vp.pres ++ vp.comp};
+                <_, _,_,True, True> => {s = joinV <"k", SCu> vp.rootV ++ BIND ++ vp.pres ++ vp.comp ++ vp.comp2};
+                <_, _,_,_, _>    => {s = joinV <"k", SCu> vp.rootV ++ BIND ++ vp.pres}
               };
 
   UttAP ap  = {s=ap.s!(AgP3 Sg KI_BI)};

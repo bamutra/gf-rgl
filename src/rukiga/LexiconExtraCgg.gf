@@ -883,7 +883,7 @@ lin
 	gira_enda_1_V = mkV "gira_en" "ra"  "zire"; 
 	hikirira_1_1_V = mkV "hik" "irira"  "iriire"; 
 	naija_1_V = mkV "naij" "a"  "ire"; 
-	yeta_1_V2 = mkV2 "ye" "ta"  "sire"; -- was yetwa_1_V; passive yetwa/yesirwe via PassV2
+	yeta_1_V2 = mkV2 "e" "ta"  "sire"; -- was yetwa_1_V; passive yetwa/yesirwe via PassV2
 	guma_1_1_V = mkV "gum" "a"  "ire"; 
 	guma_2_1_V = mkV "gum" "a"  "ire"; 
 	gumira_1_V2 = mkV2 "gumi" "za"  "ize"; 
@@ -968,7 +968,7 @@ lin
 	kwatirana_1_V = mkV "kwatira" "na"  "ine"; 
 	kwatanisa_1_V = mkV "kwatani" "sa"  "ise"; 
 	gambira_1_V2 = mkV2 "gambi" "ra"  "ire"; 
-	yegyesa_1_V2 = mkV2 "yegye" "sa"  "ise"; 
+	yegyesa_1_V2 = mkV2 "egye" "sa"  "ise"; 
 	kira_1_1_V2 = mkV2 "ki" "ra"  "zire"; 
 	kira_1_2_V = mkV "ki" "ra"  "zire"; 
 	kira_2_1_V2 = mkV2 "ki" "ra"  "zire"; 
@@ -998,10 +998,10 @@ lin
 	kwata_6_2_V2 = mkV2 "kwa" "ta"  "ise"; -- Runyankore -itse (nk) via ParadigmsNyn
 	kwata_6_3_V2 = mkV2 "kwa" "ta"  "sire"; 
 	kwata_6_4_V2 = mkV2 "kwa" "ta"  "ise"; -- will be corrected in the next run
-	yenda_1_V2 = mkV2 "yen" "da"  "zire"; 
-	yemerera_1_1_V2 = mkV2 "yemere" "ra"  "ire"; 
-	yemerera_2_1_V2 = mkV2 "yemere" "ra"  "ire"; 
-	yemerera_3_1_V2 = mkV2 "yemere" "ra"  "ire"; 
+	yenda_1_V2 = mkV2 "en" "da"  "zire"; 
+	yemerera_1_1_V2 = mkV2 "emere" "ra"  "ire"; 
+	yemerera_2_1_V2 = mkV2 "emere" "ra"  "ire"; 
+	yemerera_3_1_V2 = mkV2 "emere" "ra"  "ire"; 
 	tiina_1_1_V2 = mkV2 "tiin" "a"  "ire"; 
 	tiina_1_2_V = mkV "tiin" "a"  "ire"; 
 	tiina_2_1_V2 = mkV2 "tiin" "a"  "ire"; 
@@ -1016,8 +1016,8 @@ lin
 	kurasa_1_V2 = mkV2 "kuras" "a"  "ize"; 
 	kurata_1_1_V2 = mkV2 "kura" "ta"  "sire"; 
 	kurata_2_1_V2 = mkV2 "kura" "ta"  "sire"; 
-	yera_1_1_V = mkV "ye" "ra"  "zire"; 
-	yera_3_1_V = mkV "ye" "ra"  "zire"; 
+	yera_1_1_V = mkV "e" "ra"  "zire"; 
+	yera_3_1_V = mkV "e" "ra"  "zire"; 
 	shanga_1_V2 = mkV2 "shang" "a"  "ire"; 
 	tuura_1_1_V2 = mkV2 "tu" "ura"  "ire"; 
 	tuura_2_1_V2 = mkV2 "tu" "ura"  "ire"; 
@@ -1041,18 +1041,18 @@ lin
 	rangirira_1_V2 = mkV2 "rangiri" "ra"  "ire"; 
 	--gumizamu_1_V = mkV "gumi" "zamu"  "izemu"; 
 	hikiiriza_1_V2 = mkV2 "hiki" "iriza"  "riize"; 
-	yita_1_V2 = mkV2 "yi" "ta"  "sire"; 
+	yita_1_V2 = mkV2 "i" "ta"  "sire"; 
 	tiina_1_V2 = mkV2 "tiin" "a"  "ire"; 
 	teerana_1_1_V2 = mkV2 "teera" "na"  "ine"; 
 	teerana_2_1_V2 = mkV2 "teera" "na"  "ne"; 
 	teerana_3_1_V = mkV "teera" "na"  "ine"; 
 	teerana_4_1_V2 = mkV2 "teera" "na"  "ine"; 
-	yetegyereza_1_V = mkV "yetegyer" "eza"  "ize"; 
+	yetegyereza_1_V = mkV "etegyer" "eza"  "ize"; 
 	ija_1_1_V = mkV "i" "ja"  "zire"; 
 	ija_2_1_V = mkV "i" "ja"  "zire"; 
 	kinguura_1_V2 = mkV2 "kigu" "ura"  "ire"; 
 	igura_1_V2 = mkV2 "igu" "ra"  "ire"; 
-	yenda_1_V2 = mkV2 "yen" "da"  "zire"; 
+	yenda_1_V2 = mkV2 "en" "da"  "zire"; 
 	kunda_1_V2 = mkV2 "kun" "da"  "zire"; 
 	ruga_1_V2 = mkV2 "rug" "a"  "ire";
 

@@ -23,7 +23,7 @@ concrete LexiconExtraNyn of LexiconExtra = LexiconExtraCgg - [baata_1_V, boota_1
     gweta_1_V = mkV "gwe" "ta" "sire" ;
     gyeta_1_V2 = mkV2 "gye" "ta" "sire" ;
     haata_1_V2 = mkV2 "haa" "ta" "sire" ;
-    yeta_1_V2 = mkV2 "ye" "ta" "sire" ;
+    yeta_1_V2 = mkV2 "e" "ta" "sire" ;
     imata_1_1_V2 = mkV2 "ima" "ta" "sire" ;
     imata_1_2_V2 = mkV2 "ima" "ta" "si" ;
     imata_2_1_V2 = mkV2 "ima" "ta" "sire" ;
@@ -54,6 +54,6 @@ concrete LexiconExtraNyn of LexiconExtra = LexiconExtraCgg - [baata_1_V, boota_1
     kwata_6_4_V2 = mkV2 "kwa" "ta" "ise" ;
     kurata_1_1_V2 = mkV2 "kura" "ta" "sire" ;
     kurata_2_1_V2 = mkV2 "kura" "ta" "sire" ;
-    yita_1_V2 = mkV2 "yi" "ta" "sire" ;
+    yita_1_V2 = mkV2 "i" "ta" "sire" ;
     -- end of t-final verbs
 }

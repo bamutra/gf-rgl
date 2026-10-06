@@ -87,6 +87,9 @@ lincat
         adv:Str;
         adV:Str;
         complType: Res.ComplType;
+        vcl, vni, vti, vku : Str;
+        rootV : Res.PrefShape => Str;
+        vka : Str;
         } ;
   Numeral = {s : Res.CardOrd=>Res.Agreement=> Str ; g : Res.Gender;  n: Res.Number} ;
   Digits  = {s : Res.CardOrd => Res.Agreement=>Str ; n : Res.Number ; tail : Px.DTail} ;
@@ -102,7 +105,7 @@ lincat
   AdA = {s:Str; position:Res.Position};
 linref
   
-  Cl =\cl -> cl.s ++ Res.mkSubjClitic cl.subjAgr ++  cl.root ++ BIND ++ cl.pres ++ cl.compl;
+  Cl =\cl -> cl.s ++ cl.vcl ++ BIND ++ cl.pres ++ cl.compl;
   QCl =\qcl -> qcl.s ++ qcl.posibleSubAgr ! (Res.mkAgreement Res.MU_BA Res.P3 Res.Sg) ++ qcl.root ++ BIND ++ qcl.pres;
   VP =\vp -> vp.adv ++ vp.s ++ BIND ++ vp.pres ++ vp.comp ++vp.comp2 ++ vp.ap;
   VPSlash =\vpslash -> vpslash.s ++ BIND ++ vpslash.pres;

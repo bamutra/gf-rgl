@@ -21,7 +21,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = False;
-        containsComp2 = False
+        containsComp2 = False ; rootV = v.rootV ; noNi = v.noNi
         };
 
       PassV2 v = { -- passive: ekitabo kikashomwa, ekitabo kishomirwe (omwana)
@@ -41,7 +41,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = False;
-        containsComp2 = False
+        containsComp2 = False ; rootV = v.rootV ; noNi = v.noNi
         };  --: V   -> VP; -- sleep --ignoring object agreement
 
   --  UseComp  : Comp -> VP ; -- be warm means complement of a copula especially adjectival Phrase
@@ -67,7 +67,7 @@ lin
                       adV =[];
                       containsAdV = False;
                       containsComp = True;
-                      containsComp2 = False
+                      containsComp2 = False ; rootV = mkBecome.rootV ; noNi = mkBecome.noNi
                     };
               ADverb    => {
                         s = mkBecome.s ;  --Assuming there is no AP which is prepositional
@@ -86,7 +86,7 @@ lin
                         adV =[];
                         containsAdV = False;
                         containsComp = False;
-                        containsComp2 = False
+                        containsComp2 = False ; rootV = mkBecome.rootV ; noNi = mkBecome.noNi
                       };
               NounP    => {
                         s = mkBecome.s  ;  --Assuming there is no AP which is prepositional
@@ -105,7 +105,7 @@ lin
                         adV =[];
                         containsAdV = False;
                         containsComp = True;
-                        containsComp2 = False
+                        containsComp2 = False ; rootV = mkBecome.rootV ; noNi = mkBecome.noNi
                       };
               _       => {
                         s = mkBecome.s ;  --Assuming there is no AP which is prepositional
@@ -124,7 +124,7 @@ lin
                         adV =[];
                         containsAdV = False;
                         containsComp = True;
-                        containsComp2 = False
+                        containsComp2 = False ; rootV = mkBecome.rootV ; noNi = mkBecome.noNi
                       }
           }; --its not generating any sentence
                        
@@ -160,7 +160,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = False;
-        containsComp2 =False
+        containsComp2 =False ; rootV = v2.rootV ; noNi = v2.noNi
       };
       --Slash2V3 : V3  -> NP -> VPSlash ;  -- give it (to her)
       Slash2V3 v3 np ={
@@ -179,7 +179,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = True;
-        containsComp2 =False
+        containsComp2 =False ; rootV = v3.rootV ; noNi = v3.noNi
       };
 
       --Slash3V3 : V3  -> NP -> VPSlash ;  -- give (it) to her
@@ -199,7 +199,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = True;
-        containsComp2 = True
+        containsComp2 = True ; rootV = v3.rootV ; noNi = v3.noNi
       };
       --SlashVV    : VV  -> VPSlash -> VPSlash ;       -- want to buy
       SlashVV vv vpslash ={
@@ -221,7 +221,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = False;
-        containsComp2 = False
+        containsComp2 = False ; rootV = vv.rootV ; noNi = vv.noNi
       };
       --SlashV2V : V2V -> VP -> VPSlash ;  -- beg (her) to go
 
@@ -246,7 +246,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = True;
-        containsComp2 = vpslash.containsComp2
+        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi
       };
 --   AdvVP    : VP -> Adv -> VP ;        -- sleep here
 --   VerbPhrase: Type = {s:Str; morphs: VMorphs ; comp:Str ; isCompApStem : Bool; agr : AgrExist};
@@ -268,7 +268,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = True;
-        containsComp2 = vp.containsComp2
+        containsComp2 = vp.containsComp2 ; rootV = vp.rootV ; noNi = vp.noNi
       };
 
   -- AdVVP    : AdV -> VP -> VP ;        -- always sleep
@@ -289,7 +289,7 @@ lin
       adV =adV.s;
       containsAdV = True;
       containsComp = vp.containsComp;
-      containsComp2 = vp.containsComp2
+      containsComp2 = vp.containsComp2 ; rootV = vp.rootV ; noNi = vp.noNi
       };
 
     --AdvVPSlash : VPSlash -> Adv -> VPSlash ;  -- use (it) here
@@ -314,7 +314,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = vpslash.containsComp;
-        containsComp2 = vpslash.containsComp2
+        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi
       };
     -- Adverb directly attached to verb
     --AdVVPSlash : AdV -> VPSlash -> VPSlash ;  -- always use (it)
@@ -338,7 +338,7 @@ lin
         adV =adV.s;
         containsAdV = True;
         containsComp = vpslash.containsComp;
-        containsComp2 = vpslash.containsComp2
+        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi
       };
   -- Verb phrases are constructed from verbs by providing their
   -- complements. There is one rule for each verb category.
@@ -353,7 +353,7 @@ lin
                     --                       True => "a";
                     --                       False => vp.pres;
                     --                   };
-                    vpPres = "ku" ++ BIND ++ vp.s ++ BIND ++ vp.pres;
+                    vpPres = joinV <"k", SCu> vp.rootV ++ BIND ++ vp.pres;
                   in case <vv.whenUsed, vp.containsComp,vp.containsComp2> of {
                           <VVPerf,True,True> => {
                                         s= vv.s ++ BIND ++ vv.perf ++ vpPres; 
@@ -372,7 +372,7 @@ lin
                                         adV =[];
                                         containsAdV = False;
                                         containsComp = True;
-                                        containsComp2 = True
+                                        containsComp2 = True ; rootV = \\sh => vv.rootV ! sh ++ BIND ++ vv.perf ++ vpPres ; noNi = vv.noNi
                                     };
                           <_,True,True>      => {
                                       s= vv.s ++ BIND ++ vv.pres ++ vpPres; 
@@ -391,7 +391,7 @@ lin
                                       adV =[];
                                       containsAdV = False;
                                       containsComp = True;
-                                      containsComp2 = True
+                                      containsComp2 = True ; rootV = \\sh => vv.rootV ! sh ++ BIND ++ vv.pres ++ vpPres ; noNi = vv.noNi
                                     };
                           <_,True,_>      => {
                                       s= vv.s ++ BIND ++ vv.pres ++ vpPres; 
@@ -410,7 +410,7 @@ lin
                                       adV =[];
                                       containsAdV = False;
                                       containsComp = True;
-                                      containsComp2 = False
+                                      containsComp2 = False ; rootV = \\sh => vv.rootV ! sh ++ BIND ++ vv.pres ++ vpPres ; noNi = vv.noNi
                                     };
                           <_,_,_>      => {
                                       s= vv.s ++ BIND ++ vv.pres ++ vpPres; 
@@ -429,7 +429,7 @@ lin
                                       adV =[];
                                       containsAdV = False;
                                       containsComp = False;
-                                      containsComp2 = False
+                                      containsComp2 = False ; rootV = \\sh => vv.rootV ! sh ++ BIND ++ vv.pres ++ vpPres ; noNi = vv.noNi
                                     }
                   };
 
@@ -451,7 +451,7 @@ lin
     adV =[];
     containsAdV = False;
     containsComp = True;
-    containsComp2 = False
+    containsComp2 = False ; rootV = vs.rootV ; noNi = vs.noNi
   };
 
   {-
@@ -475,7 +475,7 @@ lin
     adV =[];
     containsAdV = False;
     containsComp = True;
-    containsComp2 = False
+    containsComp2 = False ; rootV = vq.rootV ; noNi = vq.noNi
   };
 
   {-
@@ -504,7 +504,7 @@ lin
     adV =[];
     containsAdV = False;
     containsComp = False;
-    containsComp2 = False
+    containsComp2 = False ; rootV = va.rootV ; noNi = va.noNi
   };
 
   -- Copula alone
