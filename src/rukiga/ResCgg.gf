@@ -109,6 +109,37 @@ oper
 
       
 
+    -- Passive voice (Rad-w-a; -ibw-/-ebw- after vowels and glides).
+    -- Present: gur-a -> gur-wa, gwejegye-ra -> gwejegye-rwa, gai-ta -> gai-twa,
+    --          r-ya -> r-ibwa, nyw-a -> nyw-ebwa, vowel-final roots -ibwa/-ebwa
+    --          by vowel harmony (e, o -> ebwa; a, i, u -> ibwa).
+    mkPassPres : Str -> Str -> Str = \rad, pres -> case <rad, pres> of {
+        <_, x + ("y" | "w") + "a">           => x + "ibwa" ;
+        <_ + ("e" | "o"), "a">               => "ebwa" ;
+        <_ + ("a" | "i" | "u"), "a">         => "ibwa" ;
+        <_ + "w", "a">                       => "ebwa" ;
+        <_, x + "a">                         => x + "wa" ;
+        _                                    => pres + "wa"
+      } ;
+    -- Perfective: -ire -> -irwe, -sire -> -sirwe, -zire -> -zirwe,
+    --             -ize -> -izibwe, -ise -> -isibwe, -iire -> -iibwe
+    -- t-final verbs with the -ise/-itse perfective take -sirwe/-tsirwe in the
+    -- passive: kwaise -> kwasirwe (Rk), kwaitse -> kwatsirwe (Ry)
+    mkPassPerfV : Str -> Str -> Str = \pres, perf -> case <pres, perf> of {
+        <"t" + _, _ + "itse"> => "tsirwe" ;
+        <"t" + _, _ + "ise">  => "sirwe" ;
+        _                     => mkPassPerf perf
+      } ;
+    mkPassPerf : Str -> Str = \perf -> case perf of {
+        x + "iire" => x + "iibwe" ;
+        x + "re"   => x + "rwe" ;
+        x + "ze"   => x + "zibwe" ;
+        x + "se"   => x + "sibwe" ;
+        x + "si"   => x + "sirwe" ;
+        x + "e"    => x + "we" ;
+        _          => perf
+      } ;
+
     mkVerb : Str ->Str ->Str ->Verb = \rad, end1,end2 ->{
     	s = rad;
     	pres = end1;
@@ -118,7 +149,7 @@ oper
     	--morphs = mkVerbMorphs;
     	isRegular = False;
       p = [];
-      isRefl = False
+      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; isRefl = False
 	};
   -- creates a verb of type that has particles (prepositions or 
   --adverbials. this is for phrasal verbs)
@@ -131,7 +162,7 @@ oper
       --morphs = mkVerbMorphs;
       isRegular = False;
       p = p;
-      isRefl = bool
+      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; isRefl = bool
   };
 	--These are regular verbs with {a-ire} entry in the dictionary
 	smartVerb : Str ->Verb = \rad ->{
@@ -143,7 +174,7 @@ oper
       isPerfBlank = False;
     	isRegular = True;
       p = [];
-      isRefl = False
+      passPres = mkPassPres rad "a" ; passPerf = mkPassPerf "ire" ; isRefl = False
 	};
   
   {-  Smart paradigm
@@ -1450,7 +1481,9 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
                       isPerfBlank : Bool;
                       isRegular: Bool;
                       p : Str;  -- some verbs have particles such as prepositions and adverbial that give the verb a meaning different from what would be automatically deduced
-                      isRefl : Bool
+                      isRefl : Bool ;
+                      passPres : Str ;  -- passive present ending: gur-wa, gwejegye-rwa, r-ibwa, nyw-ebwa
+                      passPerf : Str    -- passive perfective ending: shom-irwe, gai-sirwe, kom-izibwe, r-iibwe
                     };
       
       GVerb : Type = {
@@ -1531,7 +1564,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
           isPerfBlank = True;
           isRegular=False;
           p = [];
-          isRefl = False
+          passPres = [] ; passPerf = [] ; isRefl = False
         };
        mkBecome  :  Verb  ={
          	s = "b" ; 
@@ -1542,7 +1575,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
           --morphs= mkVerbMorphs; 
           isRegular=False;
           p = [];
-          isRefl = False
+          passPres = [] ; passPerf = [] ; isRefl = False
         };
 
 

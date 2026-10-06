@@ -23,6 +23,27 @@ lin
         containsAdV = False;
         containsComp = False;
         containsComp2 = False
+        };
+
+      PassV2 v = { -- passive: ekitabo kikashomwa, ekitabo kishomirwe (omwana)
+        s = v.s ; 
+        pres = v.passPres; 
+        perf = v.passPerf; 
+        --morphs = v.morphs;
+        isPresBlank = False;
+        isPerfBlank = False;
+        comp =[];
+        comp2 = [];
+        ap =[];
+        isCompApStem = False; 
+        agr = AgrNo; 
+        isRegular = v.isRegular;
+        adv =[];
+        containsAdv =False;
+        adV =[];
+        containsAdV = False;
+        containsComp = False;
+        containsComp2 = False
         };  --: V   -> VP; -- sleep --ignoring object agreement
 
   --  UseComp  : Comp -> VP ; -- be warm means complement of a copula especially adjectival Phrase

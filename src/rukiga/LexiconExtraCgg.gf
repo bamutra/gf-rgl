@@ -431,7 +431,6 @@ lin
 	gaiturura_1_1_V2 = mkV2 "gaituru" "ra"  "ire"; 
 	gaiturura_2_1_V2 = mkV2 "gaituru" "ra"  "ire"; 
 	gaiturura_3_1_V2 = mkV2 "gaituru" "ra"  "ire"; 
-	gaitwa_1_V = mkV "gai" "twa"  "sirwe"; -- TODO(passive): passive of gaita; drop once PassV2 derives it
 	gamba_1_1_V2 = mkV2 "gamb" "a"  "ire"; 
 	gamba_2_1_V2 = mkV2 "gamb" "a"  "ire"; 
 	gambira_1_V2 = mkV2 "gambi" "ra"  "ire"; 
@@ -884,7 +883,7 @@ lin
 	gira_enda_1_V = mkV "gira_en" "ra"  "zire"; 
 	hikirira_1_1_V = mkV "hik" "irira"  "iriire"; 
 	naija_1_V = mkV "naij" "a"  "ire"; 
-	yetwa_1_V = mkV "ye" "twa"  "sirwe"; -- TODO(passive): passive of yeta (was orikwetwa_1_V); drop once PassV2 derives it 
+	yeta_1_V2 = mkV2 "ye" "ta"  "sire"; -- was yetwa_1_V; passive yetwa/yesirwe via PassV2
 	guma_1_1_V = mkV "gum" "a"  "ire"; 
 	guma_2_1_V = mkV "gum" "a"  "ire"; 
 	gumira_1_V2 = mkV2 "gumi" "za"  "ize"; 
