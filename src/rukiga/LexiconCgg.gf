@@ -251,7 +251,7 @@ lin
     -- harbour_N
     hate_V2 = mkV2 "kwag" "a" "ire";
     head_N = mkN "omutwe" MU_MI;
-    hear_V2 = mkV2 "hurir" "a" "e";
+    hear_V2 = mkV2 "huri" "ra" "ire";
     heart_N = mkN "omutima" "emitima" MU_MI;
     hill_N = mkN "orushozi" "enshozi" N_N;
     hit_V2 = mkV2 "kangaa" "ta" "sire";
