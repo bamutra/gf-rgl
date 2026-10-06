@@ -924,37 +924,31 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
   -}
     -- TThis is for demonstrative pronouns which can also be use as Quantifiers
     -- How can it be done without code repeation?
+    -- "that/those" (near listener); free word, follows the noun: omuntu ogwo, embwa ezo
     mkThat  = table {
-              AgMUBAP1 Sg => mkClitic "ogwo";
-              --AgMUBAP1 Pl => mkClitic "aba" ;
-              AgMUBAP2 Sg => mkClitic "ogu"; --probably an error check your grammar book
-              --AgMUBAP2 Pl => mkClitic "aba" ;
-              AgP3 Sg MU_BA => mkClitic "ogu";
-              --AgP3 Pl MU_BA => mkClitic "aba" ;
-              --AgP3 Pl ZERO_BU => mkClitic "obu" ;
-              AgP3 Sg BU_MA => mkClitic "obwo" ;
-              --AgP3 Pl (KA_BU | RU_BU) => mkClitic "obu" ;
-              --AgP3 Pl (KI_BI | ZERO_BI) => mkClitic "ebi" ;
-              --AgP3 Pl (ZERO_MA | KU_MA | RI_MA | I_MA | BU_MA) => mkClitic "aga";
-              AgP3 Sg ZERO_MA => mkClitic "agwo";
-              AgP3 (Sg ) HA  => mkClitic "aho" ; -- of place HA 
-              AgP3 (Sg ) MU => mkClitic "omwo" ; -- of place  MU
-              AgP3 (Sg ) KU => mkClitic "okwo" ; -- of place KU
-              AgP3 Sg (I_ZERO | I_MA | RI_MA) =>mkClitic "eryo" ;
-              AgP3 Sg (KA_ZERO | KA_BU) =>mkClitic "ako" ;
-              AgP3 Sg KI_BI   => mkClitic "ekyo" ;
-              AgP3 Sg (KU_ZERO | KU_MA) => mkClitic "okwo" ;
-              AgP3 Sg (MU_MI | MU_ZERO) => mkClitic "ogwo" ;
-              AgP3 Sg (RU_ZERO | RU_BU | RU_MA| RU_N) => mkClitic "orwo" ;
-              --AgP3 Pl (ZERO_TU | KA_TU) =>mkClitic "otu" ;
-              AgP3 Sg (ZERO_ZERO | N_N) =>mkClitic "egyo" ;
-              --AgP3 Pl ZERO_MI =>mkClitic "egi" ;
-              --AgP3 Pl MU_MI => mkClitic "egi";
-              --AgP3 Pl (ZERO_ZERO | ZERO_N | N_N | RU_N)  =>mkClitic "ezi" ;
-              AgP3 Sg GU_GA => mkClitic "ogwo" ;
-              --AgP3 Pl GU_GA => mkClitic "aga" ;
-              _  => mkClitic "XXXThat" -- error checking for any case not catered for
-
+              AgMUBAP1 n => case n of {Sg => "ogwo" ; Pl => "abo"} ;
+              AgMUBAP2 n => case n of {Sg => "ogwo" ; Pl => "abo"} ;
+              AgP3 Sg MU_BA => "ogwo" ;
+              AgP3 Pl MU_BA => "abo" ;
+              AgP3 Sg (MU_MI | MU_ZERO | GU_GA) => "ogwo" ;
+              AgP3 Pl (MU_MI | ZERO_MI) => "egyo" ;
+              AgP3 Sg (I_ZERO | I_MA | RI_MA | RI_ZERO) => "eryo" ;
+              AgP3 Pl (ZERO_MA | KU_MA | RI_MA | I_MA | BU_MA | RU_MA | GU_GA | RI_ZERO) => "ago" ;
+              AgP3 Sg ZERO_MA => "ago" ;
+              AgP3 Sg (KI_BI | KI_ZERO) => "ekyo" ;
+              AgP3 Pl (KI_BI | ZERO_BI) => "ebyo" ;
+              AgP3 Sg (ZERO_ZERO | N_N | N_ZERO) => "egyo" ;
+              AgP3 Pl (ZERO_ZERO | ZERO_N | N_N | RU_N) => "ezo" ;
+              AgP3 Sg (RU_ZERO | RU_BU | RU_MA | RU_N) => "orwo" ;
+              AgP3 Sg (KA_ZERO | KA_BU | KA_TU) => "ako" ;
+              AgP3 Pl (ZERO_TU | KA_TU) => "otwo" ;
+              AgP3 Sg (BU_MA | ZERO_BU) => "obwo" ;
+              AgP3 Pl (ZERO_BU | KA_BU | RU_BU) => "obwo" ;
+              AgP3 Sg (KU_ZERO | KU_MA) => "okwo" ;
+              AgP3 _ HA => "aho" ;
+              AgP3 _ MU => "omwo" ;
+              AgP3 _ KU => "okwo" ;
+              _  => "XXXThat"
     };
 
     -- Adjectival Prefixes without initial vowel with the semantics for adjectives used in Imperative negative form
@@ -1361,7 +1355,10 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
             <Post, Pl> => {s = \\_=> cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 !AgP3 det.num cn.gender; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}; --subjClitic ++ cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 !AgP3 det.num cn.gender; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat};
             <Post, Sg> => {s = \\_=>cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 ! AgP3 det.num cn.gender; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat};
             <Pre, n> => case det.numeralExists  of {
-                              False => { s =\\_ =>  det.s2 !(AgP3 det.num cn.gender) ++ cn.s !n  ! Complete; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat};
+                              False => case det.doesAgree of {
+                                  True  => { s =\\_ =>  cn.s !n  ! Complete ++ det.s2 !(AgP3 det.num cn.gender); agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}; -- FIX: demonstrative follows noun (embwa ezi)
+                                  False => { s =\\_ =>  det.s2 !(AgP3 det.num cn.gender) ++ cn.s !n  ! Complete; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}
+                                 };
                               True  => { s =\\_ =>  cn.s !n  ! Complete ++ det.numeralS ! (AgP3 n cn.gender); agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}
                             }
           --<PostDeterminer, PFalse> => {s = \\_=> cn.s!det.ntype!det.num; agr = AgP3 det.num cn.gender }    
