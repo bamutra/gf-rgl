@@ -92,13 +92,13 @@ lin
   --ditransitive verbs
   bite_V2 = mkV2 "rum";
   break_V2 = mkV2 "hen" "da" "zire"; --: V2 ;
-  buy_V2   = mkV2 "gur" ;  --: V2 ;
+  buy_V2   = mkV2 "gu" "ra" "zire" ;  --: V2 ;
   close_V2 = mkV2 "king";
   count_V2 = mkV2 "ba" "ra" "zire";
   cut_V2 = mkV2 "sha" "ra" "zire";
   do_V2 = mkV2 "ko" "ra" "zire";
   drink_V2 = mkV2 "nyw";
-  eat_V2 = mkV2 "ry";
+  eat_V2 = mkV2 "r" "ya" "iire";
   fear_V2 = mkV2 "tiin";
   find_V2 = mkV2 "bon" ; --: V2 ; -- many words; kureeba, kubóna,kushanga, kumamya,kujumbura
   kill_V2 = mkV2 "it"; --: V2 ;
@@ -118,12 +118,12 @@ lin
   
 
 -- Intransitive verbs
-  come_V = mkV "ij";
-  die_V  = mkV "f";
+  come_V = mkV "i" "ja" "zire";
+  die_V  = mkV "f" "a" "iire";
   go_V = mkV "gyen" "da" "zire"; --: V ; -- Many words: kuza, kuraba,kutoora, kugyenda=go away, kushuma=go down
   jump_V = mkV "guruk" ;
   play_V = mkV "záàn"; --: V ;
-  live_V = mkV "tuur" ; --manyF: kutuura i.e. live somewhere, stay = kuráàra
+  live_V = mkV "tu" "ura" "ire" ; --manyF: kutuura i.e. live somewhere, stay = kuráàra
   run_V = mkV "íruk"; -- : V ;
   sleep_V = mkV "gwejegye" "ra" "ire" ; --: V ;--Kugwejegyera, kubyama
   swim_V = mkV "og"; --: V ;
@@ -157,7 +157,7 @@ lin
   distance_N3 = mkN3 (mkN "orugyendo" ZERO_BU) (lin Prep (mkPrep "kurunga" "" False)) (lin Prep (mkPrep "mpáka" "" False)); --could orugyendo work in its place?
   
   alas_Interj ={s="ryakareeba"; }; --: Interj ;
-  switch8off_V2 = mkV2 "raza" "za" "riize";
+  switch8off_V2 = mkV2 "ra" "za" "riize";
   television_N  = mkN "TV" N_N;
   doctor_N = mkN "omushaho"  MU_BA;
   clever_A =mkAdjective "amagyezi" Post False True False;
@@ -196,9 +196,9 @@ lin
     nose_N  = mkN "enyindo" N_N;
     --number_N = mkN "enamba" N_N -- TODO look out for the correct word
     oil_N = mkN "amajuta" N_N;
-    open_V2 = mkV2 "yingura" "ura" "wire";
+    open_V2 = mkV2 "ying" "ura" "wire";
     brown_A = mkAdjective "TODO: Get the right word for brown" Post False  True False;
-    burn_V = mkV "batur" "a" "ire";
+    burn_V = mkV "batu" "ra" "ire";
     butter_N = mkN "amajuta g'ente" "amajuta g'ente" N_N;
     camera_N = mkN "kamera" "kamera" ZERO_ZERO;
     cap_N = mkN "TODO-enkofiira" "enkofiira" N_N;
@@ -230,7 +230,7 @@ lin
     fingernail_N = mkN "ekyara ky'engaro" "ebyara by'engaro" KI_BI;
     --float_V
     --floor_N 
-    flow_V = mkV "TODO: confirm himintuk" "a" "ire";
+    flow_V = mkV "himintuk" "a" "ire";
     fly_V = mkV "guruk" "a" "ire";
     fog_N = mkN "TODO word for fog" "TODO word for fog" N_N;
     foot_N = mkN "ekigyere" "ebigyere" KI_BI;
@@ -352,16 +352,16 @@ lin
     split_V2 = mkV2 "gangabura";
     squeeze_V2 =mkV2 "ima" "ta" "sire";
     stab_V2 = mkV2 "cumi" "ta" "sire"; --edit for Runyankore
-    stand_V = mkV "yemerera" "ra" "ire";
+    stand_V = mkV "yemere" "ra" "ire";
     -- steel_N
     stick_N = mkN "omunyafu" "eminyafu" MU_MI;
     stone_N = mkN "eibare" "amabara" I_MA;
-    stop_V = mkV "komya" "ya" "ize";
+    stop_V = mkV "kom" "ya" "ize";
     stove_N = mkN "sitoovu" "sitoovu" ZERO_ZERO;
     straight_A = mkAdjective "gorwire" Post False False False;
     student_N = mkN "omwana w'eishomero" "abaana b'eishomero" MU_BA;
     stupid_A = mkAdjective "himbagire" Post False False False;
-    suck_V2 = mkV2 "komaguza" "za" "ize";
+    suck_V2 = mkV2 "komagu" "za" "ize";
     sun_N = mkN "omushana" "omushana" MU_ZERO;
     swell_V = mkV "bimba";
     switch8on_V2 = mkV2 "ya" "sya" "kise";
@@ -381,7 +381,7 @@ lin
     village_N = mkN "ekyalo" "ebyalo" KI_BI;
     vomit_V = mkV "tanaka"; 
     war_N = mkN "orutaro" "entaro" RU_N;
-    wash_V2 = mkV2 "yozya" "zya" "yogize";
+    wash_V2 = mkV2 "yo" "zya" "gize";
     watch_V2 = mkV2 "reeba";
     wet_A = mkAdjective "jubire" Post False False False;
     wide_A = mkAdjective "hango" Post False False False;
