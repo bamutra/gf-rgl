@@ -361,6 +361,13 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         _ => "ti" ++ Predef.BIND ++ mkSubjClitic a
       } ;
 
+    -- far past negative prefix ti-SC-ra- (Pneg-S-ra-Rad-ire), with n+r -> nd
+    -- in the first person singular: tindagwejegyeire, omwana taragwejegyeire
+    mkTiRaClitic : Agreement -> Str = \a -> case a of {
+        AgMUBAP1 Sg => mkClitic "tinda" ;
+        _           => mkTiSubjClitic a ++ "ra" ++ Predef.BIND
+      } ;
+
     -- Copulas with adjectival complements. Runyankore-Rukiga has two,
     -- used in different tenses:
     --   ni  : present             ekitabo ni-kihango

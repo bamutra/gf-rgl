@@ -17,6 +17,7 @@ lin
                 clitic = mkSubjClitic cl.subjAgr;
                 niClitic = mkNiSubjClitic cl.subjAgr;
                 tiClitic = mkTiSubjClitic cl.subjAgr;
+                tiRaClitic = mkTiRaClitic cl.subjAgr;
                 presSimul =  vMorphs ! VFPres; --this is not delivering the string
                 presAnt = vMorphs ! VFPastPart; --this is not delivering the string
                 root = cl.root;
@@ -60,10 +61,9 @@ lin
       <Past,Simul, Neg> => case <cl.isCopAP, cl.isPerfBlank> of { 
                                   -- copula -ri, negative: ekitabo kikaba kitari kihango
                                   <True, _>      => {s = subj ++ (mkCopulaAP Past Neg cl.subjAgr).s ++ compl};
-                                  <False, True>  => {s = subj ++ "ta" ++ Predef.BIND ++ clitic ++ Predef.BIND ++ "ra" ++ 
-                                                      Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                                  <False, False> => {s = subj ++ "ta" ++ Predef.BIND ++ clitic ++ "ra" ++ Predef.BIND ++ 
-                                                      root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+                                  -- far past negative: ti-SC-ra-root-ire (omwana taragwejegyeire, abaana tibara...)
+                                  <False, True>  => {s = subj ++ tiRaClitic ++ root ++ Predef.BIND ++ "ire" ++ compl};
+                                  <False, False> => {s = subj ++ tiRaClitic ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                                 };
 
       <Past,Anter, Pos> => case cl.isPerfBlank of { 
