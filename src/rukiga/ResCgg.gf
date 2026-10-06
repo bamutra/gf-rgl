@@ -320,6 +320,28 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
           AgP3 Pl KA_ZERO  => mkClitic "" ;
           _        => mkClitic "SubjNotKnown" --for checking if there is some class unaccounted for
       };
+    -- Nasal prefix N- (classes 9/10) with assimilation:
+    -- N+h -> mp (empango), N+r -> nn (ennungi), N+b -> mb, N+vowel -> ny,
+    -- nasal-initial stems unchanged, otherwise n+stem (enkuru, ento).
+    nasalize : Str -> Str = \stem -> case stem of {
+        "h" + x => "mp" + x ;
+        "r" + x => "nn" + x ;
+        ("b"|"p"|"f"|"v") + _ => "m" + stem ;
+        ("m"|"n") + _ => stem ;
+        ("a"|"e"|"i"|"o"|"u") + _ => "ny" + stem ;
+        _ => "n" + stem
+      } ;
+
+    -- agreements whose adjectival prefix is the nasal N- (classes 9/10)
+    isNasalAgr : Agreement -> Bool = \a -> case a of {
+        AgP3 Sg (ZERO_ZERO | N_N) => True ;
+        AgP3 Pl (ZERO_MI | ZERO_ZERO | ZERO_N | N_N | RU_N) => True ;
+        _ => False
+      } ;
+
+    adjForm : Adjective -> Agreement -> Str = \adj,a ->
+      case isNasalAgr a of { True => adj.nas ; False => adj.s } ;
+
     mkSubjClitic : Agreement -> Str = \a ->
       case a of {
           AgMUBAP1 n => mkClitics "n" "tu" n;
@@ -598,13 +620,14 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
     AdjectivalPhrase : Type = {s : Str ; position : Position; isProper : Bool; isPrep: Bool};
     --Adjective : Type = {s : Str ; post : Str; isPre : Bool; isProper : Bool; isPrep: Bool};
     Adjective : Type = {s : Str ; 
+                        nas : Str ; -- stem after class 9/10 nasal prefix N- (hango -> mpango)
                         position : Position; 
                         isProper : Bool; 
                         isPrep: Bool; 
                         isNeg : Bool -- this is for specifying that uncertain is the negative of certain
                       };
     mkAdjective: Str -> Position -> Bool -> Bool ->Bool-> Adjective = \ a , pos, isProper, isPrep,isNeg -> 
-     { s = a ; position = pos ; isPre = False; isProper = isProper; isPrep = isPrep; isNeg = isNeg}; 
+     { s = a ; nas = nasalize a ; position = pos ; isPre = False; isProper = isProper; isPrep = isPrep; isNeg = isNeg}; 
       
     {-
         TO DO:
@@ -632,10 +655,10 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
               AgP3 Sg (MU_MI | MU_ZERO) => mkClitic "omu" ;
               AgP3 Sg (RU_ZERO | RU_BU | RU_MA| RU_N) => mkClitic "oru" ;
               AgP3 Pl (ZERO_TU | KA_TU) =>mkClitic "otu" ;
-              AgP3 Sg (ZERO_ZERO | N_N) =>mkClitic "en" ;
-              AgP3 Pl ZERO_MI =>mkClitic "en" ;
+              AgP3 Sg (ZERO_ZERO | N_N) =>mkClitic "e" ;
+              AgP3 Pl ZERO_MI =>mkClitic "e" ;
               AgP3 Pl MU_MI => mkClitic "emi";
-              AgP3 Pl (ZERO_ZERO | ZERO_N | N_N | RU_N)  =>mkClitic "en" ;
+              AgP3 Pl (ZERO_ZERO | ZERO_N | N_N | RU_N)  =>mkClitic "e" ;
               AgP3 Sg GU_GA => mkClitic "ogu" ;
               AgP3 Pl GU_GA => mkClitic "aga" ;
               _  => mkClitic "XXX" -- error checking for any case not catered for
@@ -937,10 +960,10 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
               AgP3 Sg (MU_MI | MU_ZERO) => mkClitic "mu" ;
               AgP3 Sg (RU_ZERO | RU_BU | RU_MA| RU_N) => mkClitic "ru" ;
               AgP3 Pl (ZERO_TU | KA_TU) =>mkClitic "tu" ;
-              AgP3 Sg (ZERO_ZERO | N_N) =>mkClitic "n" ;
-              AgP3 Pl ZERO_MI =>mkClitic "n" ;
+              AgP3 Sg (ZERO_ZERO | N_N) =>[] ;
+              AgP3 Pl ZERO_MI =>[] ;
               AgP3 Pl MU_MI => mkClitic "mi";
-              AgP3 Pl (ZERO_ZERO | ZERO_N | N_N | RU_N)  =>mkClitic "n" ;
+              AgP3 Pl (ZERO_ZERO | ZERO_N | N_N | RU_N)  =>[] ;
               AgP3 Sg GU_GA => mkClitic "gu" ;
               AgP3 Pl GU_GA => mkClitic "ga" ;
               _  => mkClitic "XX" -- error checking for any case not catered for

@@ -5,7 +5,7 @@ concrete AdjectiveCgg of Adjective = CatCgg **
 
 lin
 
-    PositA a = {s=\\_=> a.s; position= a.position; isProper = a.isProper; isPrep = a.isPrep};
+    PositA a = {s=\\agr=> adjForm a agr; position= a.position; isProper = a.isProper; isPrep = a.isPrep};
 
     -- The superlative use is covered in $Ord$.
 
@@ -15,7 +15,7 @@ lin
 
     -- note: using ho means a little bigger.
     --UseComparA a ={s =\\_ => a.s ++ BIND ++ "ho" ++ "kukira"; position1= a.position1; isProper = a.isProper; isPrep = a.isPrep};
-    UseComparA a ={s =\\_ => a.s  ++ "kukira"; position= a.position; isProper = a.isProper; isPrep = a.isPrep};
+    UseComparA a ={s =\\agr => adjForm a agr ++ "kukira"; position= a.position; isProper = a.isProper; isPrep = a.isPrep};
 
     -- An adjectival phrase can be modified by an *adadjective*, such as "very".
     {-NOTE: AdA is an adjective modifying adverb-}

@@ -35,7 +35,7 @@ lin
                      False  =>  { 
                             s = \\ num, ns => cn.s  ! num ! ns ++ mkAdjPronIVClitic (AgP3 num cn.gender) -- FIX: adjectival prefix (omuti omu-hango), not demonstrative (ogu)
                                  
-                                 ++ ap.s ! AgP3 Sg KI_BI; 
+                                 ++ ap.s ! AgP3 num cn.gender; -- FIX: agreeing stem (nasal for cl. 9/10) 
                               gender = cn.gender; nounCat = cn.nounCat 
                           };
                      True  =>  { 

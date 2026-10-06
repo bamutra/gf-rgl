@@ -108,7 +108,7 @@ linref
   VPSlash =\vpslash -> vpslash.s ++ BIND ++ vpslash.pres;
 
 lindef
-  A2 = \s -> {s = s; position = Res.Post; isProper = False;
+  A2 = \s -> {s = s; nas = s; position = Res.Post; isProper = False;
               isPrep = False; isNeg = False;c2 = ""; isPre = True};
 
 
