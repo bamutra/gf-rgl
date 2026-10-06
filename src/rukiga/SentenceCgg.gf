@@ -15,6 +15,8 @@ lin
                 subj = cl.s;
                 vMorphs = mkVerbMorphs;
                 clitic = mkSubjClitic cl.subjAgr;
+                niClitic = mkNiSubjClitic cl.subjAgr;
+                tiClitic = mkTiSubjClitic cl.subjAgr;
                 presSimul =  vMorphs ! VFPres; --this is not delivering the string
                 presAnt = vMorphs ! VFPastPart; --this is not delivering the string
                 root = cl.root;
@@ -25,13 +27,14 @@ lin
                 in 
   case <temp.t,temp.a, pol.p> of {
       <Pres,Simul, Pos> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ "ni" ++ clitic ++ root  ++ Predef.BIND ++ "a" ++ compl};
-                                  False => {s = subj ++ "ni" ++clitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  -- ni- fused with the subject prefix (omwana naaribata, abaana nibareeba)
+                                  True  => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ "a" ++ compl};
+                                  False => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                           };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Pres,Simul, Neg> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++ root ++ compl};
-                                  False => {s = subj ++ "ti" ++ Predef.BIND ++ clitic ++
+                                  True  => {s = subj ++ tiClitic ++ root ++ compl};
+                                  False => {s = subj ++ tiClitic ++
                                               root ++ Predef.BIND ++ presRestOfVerb ++ compl}
                             };
       <Pres,Anter, Pos> => case cl.isPerfBlank of { 
@@ -71,9 +74,9 @@ lin
                               };
 
       <Fut,Simul, Pos> => case cl.isPresBlank of { 
-                                  True  => {s = subj ++ "ni" ++ Predef.BIND ++clitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
+                                  True  => {s = subj ++ niClitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
                                             root ++ "a" ++ compl};
-                                  False => {s = subj ++ "ni" ++ Predef.BIND ++clitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
+                                  False => {s = subj ++ niClitic ++ "za ku" ++ Predef.BIND ++  --choice of za over ija
               root ++ Predef.BIND ++ presRestOfVerb ++ compl}
                               };
 

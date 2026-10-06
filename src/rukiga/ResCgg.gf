@@ -342,6 +342,25 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
     adjForm : Adjective -> Agreement -> Str = \adj,a ->
       case isNasalAgr a of { True => adj.nas ; False => adj.s } ;
 
+    -- present tense marker ni- fused with the subject prefix:
+    -- ni+a -> naa, ni+o -> noo, ni+e -> nee, otherwise ni+SP (nibaa, nikiri, nin-)
+    mkNiSubjClitic : Agreement -> Str = \a -> case a of {
+        AgMUBAP2 Sg   => mkClitic "noo" ;
+        AgP3 Sg MU_BA => mkClitic "naa" ;
+        AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => mkClitic "nee" ;
+        AgP3 Sg (ZERO_MI | ZERO_ZERO) | AgP3 Pl KA_ZERO => mkClitic "ni" ;
+        _ => "ni" ++ Predef.BIND ++ mkSubjClitic a
+      } ;
+
+    -- negative ti- fused with the subject prefix: ti+a -> ta, ti+o -> to, ti+e -> te
+    mkTiSubjClitic : Agreement -> Str = \a -> case a of {
+        AgMUBAP2 Sg   => mkClitic "to" ;
+        AgP3 Sg MU_BA => mkClitic "ta" ;
+        AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI) => mkClitic "te" ;
+        AgP3 Sg (ZERO_MI | ZERO_ZERO) | AgP3 Pl KA_ZERO => mkClitic "ti" ;
+        _ => "ti" ++ Predef.BIND ++ mkSubjClitic a
+      } ;
+
     mkSubjClitic : Agreement -> Str = \a ->
       case a of {
           AgMUBAP1 n => mkClitics "n" "tu" n;
