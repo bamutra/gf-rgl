@@ -26,10 +26,12 @@ lin
                 compl = cl.compl
                 in 
   case <temp.t,temp.a, pol.p> of {
-      <Pres,Simul, Pos> => case cl.isPresBlank of { 
+      <Pres,Simul, Pos> => case <cl.isCopAP, cl.isPresBlank> of { 
+                                  -- copula ni: ekitabo nikihango, omwana nimurungi
+                                  <True, _>      => {s = subj ++ (mkCopulaAP Pres Pos cl.subjAgr).s ++ compl};
                                   -- ni- fused with the subject prefix (omwana naaribata, abaana nibareeba)
-                                  True  => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ "a" ++ compl};
-                                  False => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
+                                  <False, True>  => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ "a" ++ compl};
+                                  <False, False> => {s = subj ++ niClitic ++ root  ++ Predef.BIND ++ presRestOfVerb ++ compl}
                           };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
       <Pres,Simul, Neg> => case cl.isPresBlank of { 
@@ -48,16 +50,20 @@ lin
                             };
 
 
-      <Past,Simul, Pos> => case cl.isPerfBlank of { 
-                                  _  => {s = subj ++ clitic ++ "ka" ++ Predef.BIND ++ root ++ Predef.BIND ++ presRestOfVerb ++ compl}--;
+      <Past,Simul, Pos> => case cl.isCopAP of { 
+                                  -- FIX: past copula SC-ka-ba SC-ri ADJ: ekitabo kikaba kiri kihango
+                                  True => {s = subj ++ (mkCopulaAP Past Pos cl.subjAgr).s ++ compl}; -- copula -ri
+                                  False  => {s = subj ++ clitic ++ "ka" ++ Predef.BIND ++ root ++ Predef.BIND ++ presRestOfVerb ++ compl}--;
                                   --False => {s = subj ++ clitic  ++ "ka" ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                           };
       {-Note: when I use pol.s instead of ti, the word alignment instead becomes worse-}
-      <Past,Simul, Neg> => case cl.isPerfBlank of { 
-                                  True  => {s = subj ++ "ta" ++ Predef.BIND ++ clitic ++ Predef.BIND ++ "ra" ++ 
-                                              Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
-                                  False => {s = subj ++ "ta" ++ Predef.BIND ++ clitic ++ "ra" ++ Predef.BIND ++ 
-                                              root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
+      <Past,Simul, Neg> => case <cl.isCopAP, cl.isPerfBlank> of { 
+                                  -- copula -ri, negative: ekitabo kikaba kitari kihango
+                                  <True, _>      => {s = subj ++ (mkCopulaAP Past Neg cl.subjAgr).s ++ compl};
+                                  <False, True>  => {s = subj ++ "ta" ++ Predef.BIND ++ clitic ++ Predef.BIND ++ "ra" ++ 
+                                                      Predef.BIND ++ root ++ Predef.BIND ++ "ire" ++ compl};
+                                  <False, False> => {s = subj ++ "ta" ++ Predef.BIND ++ clitic ++ "ra" ++ Predef.BIND ++ 
+                                                      root ++ Predef.BIND ++ pastRestOfVerb ++ compl}
                                 };
 
       <Past,Anter, Pos> => case cl.isPerfBlank of { 
@@ -288,6 +294,7 @@ lin
               <False,False,True,False,False>    => {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
+                        isCopAP = vp.isCompApStem;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -307,6 +314,7 @@ lin
               <False,True,False,False,False>    => {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
+                        isCopAP = vp.isCompApStem;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -327,6 +335,7 @@ lin
               <_, _,_,True,False>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
+                        isCopAP = vp.isCompApStem;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -341,11 +350,12 @@ lin
                         pastPart  = mkVerbPastPart vp.root;                              -- subject
                       -}
                       --root = vp.root ;
-                        compl = (case vp.isCompApStem of {True => mkSubjClitic np.agr ; False => []}) ++ vp.comp --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
+                        compl = (case vp.isCompApStem of {True => mkAdjPronNoIVClitic np.agr ; False => []}) ++ vp.comp --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
                       };
               <_, _,_,True, True>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
+                        isCopAP = vp.isCompApStem;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -360,11 +370,12 @@ lin
                         pastPart  = mkVerbPastPart vp.root;                              -- subject
                       -}
                       --root = vp.root ;
-                        compl = (case vp.isCompApStem of {True => mkSubjClitic np.agr ; False => []}) ++ vp.comp ++ vp.comp2 --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
+                        compl = (case vp.isCompApStem of {True => mkAdjPronNoIVClitic np.agr ; False => []}) ++ vp.comp ++ vp.comp2 --mkSubjClitic np.agr ++ Predef.BIND ++ vp.comp
                       };
               <_, _,_,_, _>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
+                        isCopAP = vp.isCompApStem;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -430,6 +441,7 @@ lin
                             {
                               s = np.s ! Nom;
                               subjAgr     = np.agr;
+                              isCopAP = False;
                               root        = vpslash.s;
                               pres        = vpslash.pres;
                               perf        = vpslash.perf;

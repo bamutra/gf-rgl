@@ -33,9 +33,9 @@ lin
         case comp.source of{
               AdjP => {
                       s = mkBecome.s ;  --Assuming there is no AP which is prepositional
-                      pres =[]; 
+                      pres = mkBecome.pres ; -- FIX: kikaba kihango (was kikab)
                       perf = [];
-                      isPresBlank = True;
+                      isPresBlank = False;
                       isPerfBlank = True;
                       --morphs=\\form,morphs=>[]; 
                       comp = comp.s;

@@ -361,6 +361,24 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         _ => "ti" ++ Predef.BIND ++ mkSubjClitic a
       } ;
 
+    -- Copulas with adjectival complements. Runyankore-Rukiga has two,
+    -- used in different tenses:
+    --   ni  : present             ekitabo ni-kihango
+    --   -ri : after SC-ka-ba      ekitabo ki-ka-ba ki-ri kihango
+    --                             ekitabo ki-ka-ba ki-ta-ri kihango (negative)
+    -- Returns the copula part only; the agreeing adjective (ki-hango) follows.
+    -- exists = False means no copula form is defined yet for that tense and
+    -- polarity, and the clause falls back to its ordinary verb forms.
+    CopForm : Type = {s : Str ; exists : Bool} ;
+    mkCopulaAP : Tense -> Polarity -> Agreement -> CopForm = \t,p,a -> case <t,p> of {
+        <Pres, Pos> => {s = "ni" ++ Predef.BIND ; exists = True} ;
+        <Past, Pos> => {s = mkSubjClitic a ++ "ka" ++ Predef.BIND ++ "ba" ++
+                            mkSubjClitic a ++ "ri" ; exists = True} ;
+        <Past, Neg> => {s = mkSubjClitic a ++ "ka" ++ Predef.BIND ++ "ba" ++
+                            mkSubjClitic a ++ "ta" ++ Predef.BIND ++ "ri" ; exists = True} ;
+        _           => {s = [] ; exists = False}
+      } ;
+
     mkSubjClitic : Agreement -> Str = \a ->
       case a of {
           AgMUBAP1 n => mkClitics "n" "tu" n;
@@ -1651,6 +1669,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
       Clause : Type = {   -- word order is fixed in S and QS
 	      s : Str ; --subject
 	      subjAgr : Agreement;
+	      isCopAP : Bool; -- copular adjectival clause: present tense is ni-PREFIX-stem
 	      root : Str;
 	      pres: Str;
 	      perf: Str;
