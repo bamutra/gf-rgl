@@ -125,7 +125,7 @@ lin
   play_V = mkV "záàn"; --: V ;
   live_V = mkV "tuur" ; --manyF: kutuura i.e. live somewhere, stay = kuráàra
   run_V = mkV "íruk"; -- : V ;
-  sleep_V = mkV "gwejegyer" ; --: V ;--Kugwejegyera, kubyama
+  sleep_V = mkV "gwejegye" "ra" "ire" ; --: V ;--Kugwejegyera, kubyama
   swim_V = mkV "og"; --: V ;
   travel_V = mkV "gyen" "da" "zire" ;--: V ;
   walk_V = mkV "ribá" "ta" "si"; --: V ; or kuribata Runynakore it is different
