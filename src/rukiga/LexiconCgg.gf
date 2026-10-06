@@ -128,7 +128,7 @@ lin
   sleep_V = mkV "gwejegye" "ra" "ire" ; --: V ;--Kugwejegyera, kubyama
   swim_V = mkV "og"; --: V ;
   travel_V = mkV "gyen" "da" "zire" ;--: V ;
-  walk_V = mkV "ribá" "ta" "si"; --: V ; or kuribata Runynakore it is different
+  walk_V = mkV "ribá" "ta" "sire"; --: V ; or kuribata Runynakore it is different
 
   -- A verb whose complement is a sentence
   fear_VS = mkVS (lin V (mkV "tin")); --: VS ;
@@ -236,7 +236,7 @@ lin
     foot_N = mkN "ekigyere" "ebigyere" KI_BI;
     forest_N = mkN "eihamba" "amahamba" I_MA;
     forget_V2 = mkV2 "yebw" "a" "ire";
-    freeze_V = mkV "kwat" "a" "sire";
+    freeze_V = mkV "kwa" "ta" "ise";
     fridge_N = mkN "firigi" "firigi" ZERO_ZERO; 
     fruit_N = mkN "ekijuma" "ebijuma" KI_BI;
     full_A = mkAdjective "injwire" Post False True False;
@@ -255,7 +255,7 @@ lin
     heart_N = mkN "omutima" "emitima" MU_MI;
     hill_N = mkN "orushozi" "enshozi" N_N;
     hit_V2 = mkV2 "kangaa" "ta" "sire";
-    hold_V2 = mkV2 "kwa" "ta" "sire";
+    hold_V2 = mkV2 "kwa" "ta" "ise";
     horn_N = mkN "eihembe" "amahembe" I_MA;
     hunt_V2 = mkV2 "hiig" "a" "ire";
     husband_N = mkN "iba" "biba" ZERO_ZERO;
@@ -350,7 +350,7 @@ lin
     speak_V2 = mkV2 "gamba";
     spit_V = mkV "cwer" "a" "ire";
     split_V2 = mkV2 "gangabura";
-    squeeze_V2 =mkV2 "imat" "a" "si";
+    squeeze_V2 =mkV2 "ima" "ta" "sire";
     stab_V2 = mkV2 "cumi" "ta" "sire"; --edit for Runyankore
     stand_V = mkV "yemerera" "ra" "ire";
     -- steel_N
