@@ -27,6 +27,8 @@ param
 					  KA_ZERO |ZERO_BAA | N_ZERO | KI_ZERO | Null;
 	Case = Acc | Nom |Gen; -- we need to include Gen because we shall need it with Gen Pronouns
 	RCase = RSubj | RObj;
+	QKind = QWho | QWhat | QOther ; -- subject questions: who/what take the relative form
+  QKind = QWho | QWhat | QOther ; -- subject questions: who/what take the relative form
   RForm = RF RCase | Such_That;
   ComplType = Nn |Ap | Adverbial |AdverbialVerb | Empty; 
   	PersonalPronounType = SubjM | Obj  | RelSubj | RelObj |

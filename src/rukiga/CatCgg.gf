@@ -7,7 +7,7 @@ lincat
   
   
   Imp = {s : Res.ImpPol=> Str};
-  QS = {s : Str} ;
+  QS = {s : Str ; emb : Str} ; -- emb: embedded form (ninmanya ogwejegyeire)
 
   -- Note: SS is a shorthand for {s:Str}, defined in Prelude.gf
   -- You must change some of the lincats (e.g., for NP, Det and Pron) so that everything works
@@ -15,7 +15,7 @@ lincat
   S = SS ;                        -- declarative sentence                e.g. "she lived here"
   Cl  = Res.Clause ;               -- declarative clause, with all tenses e.g. "she looks at this"
   --Questions
-  QCl = Res.Clause ** {posibleSubAgr: Res.Agreement =>Str} ; 
+  QCl = Res.Clause ** {posibleSubAgr: Res.Agreement =>Str ; isSubjQ : Bool ; qWord : Str ; subjRel : Res.Tense => Res.Anteriority => Res.Polarity => Str} ; -- subject question: noha ogwejegyeire 
   IComp = 
     {
       s : Str; 
@@ -26,7 +26,7 @@ lincat
       usesAux : Bool;
       endOfSentence : Bool
     } ; 
-  IP   = {s :Str ; n : Res.INumber; isVerbSuffix: Bool; requiresIPPrefix: Bool; aux:Str; endOfSentence:Bool}; -- other holds the Idet without a prefix
+  IP   = {s :Str ; n : Res.INumber; isVerbSuffix: Bool; requiresIPPrefix: Bool; aux:Str; endOfSentence:Bool ; qKind : Res.QKind ; qWord : Str}; -- who/what: question word of subject questions (noha, nibaha, niki) -- other holds the Idet without a prefix
   IAdv = {s : Str ; requiresSubjPrefix: Bool; endOfSentence:Bool};
   IDet = {s : Str ; n : Res.Number; requiresSubjPrefix: Bool};
   IQuant   = {s : Res.Number =>Str ; requiresSubjPrefix: Bool};

@@ -196,10 +196,10 @@ lin
 
   {-Beggining of Interrogative Pronoun-}
 
-  whatPl_IP = { s= "ki";  n = IPl;  isVerbSuffix = True; requiresIPPrefix = False; aux=[]; endOfSentence = True} ; -- what (plural)
-  whatSg_IP = { s= "ki";  n = ISg;  isVerbSuffix = True; requiresIPPrefix = False; aux=[]; endOfSentence = True}; --: IP ; -- what (singular)
-  whoPl_IP  = { s=  "ha";  n = IPl; isVerbSuffix = True; requiresIPPrefix = False; aux="ni"; endOfSentence = True} ;--: IP ;  -- who (plural)
-  whoSg_IP =  { s=  "ha"; n = ISg;  isVerbSuffix = True; requiresIPPrefix = False; aux="ni"; endOfSentence = True}; --: IP ;  -- who (singular)
+  whatPl_IP = { s= "ki";  n = IPl;  isVerbSuffix = True; requiresIPPrefix = False; aux=[]; endOfSentence = True; qKind = QWhat ; qWord = "niki"} ; -- what (plural)
+  whatSg_IP = { s= "ki";  n = ISg;  isVerbSuffix = True; requiresIPPrefix = False; aux=[]; endOfSentence = True; qKind = QWhat ; qWord = "niki"}; --: IP ; -- what (singular)
+  whoPl_IP  = { s=  "ha";  n = IPl; isVerbSuffix = True; requiresIPPrefix = False; aux="ni"; endOfSentence = True; qKind = QWho ; qWord = "nibaha"} ;--: IP ;  -- who (plural)
+  whoSg_IP =  { s=  "ha"; n = ISg;  isVerbSuffix = True; requiresIPPrefix = False; aux="ni"; endOfSentence = True; qKind = QWho ; qWord = "noha"}; --: IP ;  -- who (singular)
   --You may need to use booleans to indicate that you need these tables rather than carrying them.
   --interogative adverbs
   how_IAdv = {s ="ta"; requiresSubjPrefix = True; endOfSentence =True};  --: IAdv ;

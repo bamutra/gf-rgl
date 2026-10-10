@@ -465,7 +465,7 @@ lin
     --morphs = vq.morphs;
     isPresBlank = vq.isPresBlank;
     isPerfBlank = vq.isPerfBlank;
-    comp=qs.s ;
+    comp=qs.emb ; -- embedded question: ninmanya ogwejegyeire
     comp2 = [];
     ap = []; 
     isCompApStem = False; 
