@@ -1690,7 +1690,8 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
                   containsComp : Bool;
                   containsComp2 : Bool;
                   rootV : PrefShape => Str;
-                  noNi : Bool
+                  noNi : Bool;
+                  isCompNP : Bool   -- copula with a noun complement: eizoba ni tata
       					};
       -- in VP formation, all verbs are lifted to GVerb, but morphology doesn't need to know this
      verb2gverb : Verb ->Str -> GVerb = \v, ba -> {
@@ -1902,7 +1903,8 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
             containsComp : Bool;
             containsComp2 : Bool;
             rootV : PrefShape => Str;
-            noNi : Bool
+            noNi : Bool;
+            isCompNP : Bool
   					}; --comp is empty
   
 
@@ -1915,6 +1917,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 	      s : Str ; --subject
 	      subjAgr : Agreement;
 	      isCopAP : Bool; -- copular adjectival clause: present tense is ni-PREFIX-stem
+	      isCopNP : Bool; -- copula with a noun complement: present tense is ni + NP
 	      vcl, vni, vti, vku : Str; -- SC+root, ni-SC+root, ti-SC+root, ku+root with vowel coalescence
 	      rootV : PrefShape => Str; -- root joined to tense markers (-ka-, -ra-, -kaa-)
 	      vka : Str; -- remote past stem: SC-ka-root (akoga), stative SC-kaba SC-root (kikaba kiine)

@@ -209,7 +209,7 @@ lin
     coat_N = mkN "kabuti" "kabuti" ZERO_ZERO;
     country_N = mkN "eihanga" "amahanga" I_MA;
     cousin_N = mkN "munyanyako" "banyanyako" MU_BA;
-    day_N = mkN "eizooba" "amazoba" I_MA;
+    day_N = mkN "eizoba" "amazoba" I_MA;
     dig_V = mkV "hiing" "a" "ire";
     dirty_A = mkAdjective "rofa" Post False False False;
     door_N = mkN "orwigi" "enyigi" RU_N;
