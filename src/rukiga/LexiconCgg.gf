@@ -102,7 +102,7 @@ lin
   fear_V2 = mkV2 "tiin";
   find_V2 = mkV2 "bon" ; --: V2 ; -- many words; kureeba, kubóna,kushanga, kumamya,kujumbura
   kill_V2 = mkV2 "it"; --: V2 ;
-  love_V2 = mkV2 "kûnd" "da" "zire"; --: V2 ;
+  love_V2 = mkV2 "kûn" "da" "zire"; --: V2 ;
   read_V2 = mkV2 "shom";--: V2 ;
   see_V2 = mkV2 "reeb"; --: V2 ;
   teach_V2 = mkV2 "shomes" ; --: V2 ; or kwegyesa
