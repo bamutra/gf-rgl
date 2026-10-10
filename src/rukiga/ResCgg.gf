@@ -473,7 +473,13 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         SZi    => case <i, r> of { <False, "i" + _> => "i" + r ; _ => cv "i" r } ;
         SLongA => cv "a" ("y" + r) ;
         SLongO => cv "o" ("y" + r) ;
-        SLongE => cv "e" ("y" + r)
+        SLongE => cv "e" ("y" + r) ;
+        SNasal => case r of {                                   -- 1sg object marker n-:
+                    "r" + x => "nd" + x ;                        -- ndeeba
+                    "h" + x => "mp" + x ;                        -- nampééreza "gives me" (reviewed)
+                    ("b" | "p") + _ => "m" + r ;                  -- mbona
+                    ("a"|"e"|"i"|"o"|"u") + _ => "ny" + r ;       -- nyingura
+                    _ => "n" + r }
       } ;
     -- base and shape of the plain subject prefix
     scBase : Agreement -> Str * PrefShape = \a0 -> let a : Agreement = normSubj a0 in case a of {
@@ -522,6 +528,34 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         False => mkSubjClitic a ++ "k" ++ Predef.BIND ++ rv ! SCa
       } ;
     joinV : (Str * PrefShape) -> (PrefShape => Str) -> Str = \b, rv -> b.p1 ++ Predef.BIND ++ rv ! b.p2 ;
+
+    -- Object markers (reviewed): base and shape of the OM before the root,
+    -- with the same vowel coalescence as subject prefixes (kwingura, gingura).
+    omBase : Agreement -> Str * PrefShape = \a -> case a of {
+        AgMUBAP1 Sg => <"", SNasal> ;          -- n-: nandeeba, nanyingura
+        AgMUBAP2 Sg => <"k", SCu> ;            -- ku
+        AgMUBAP1 Pl => <"t", SCu> ;            -- tu
+        AgMUBAP2 Pl => <"b", SCa> ;            -- ba
+        AgP3 _ HA   => <"h", SCa> ;            -- ha (cl.16, at/near)
+        AgP3 _ MU   => <"m", SCu> ;            -- mu (cl.18, in)
+        AgP3 _ KU   => <"k", SCu> ;            -- ku (cl.17, on)
+        _ => case normSubj a of {
+               AgP3 Sg MU_BA => <"m", SCu> ;   -- mu (cl.1)
+               AgP3 Sg N_N   => <"g", SCi> ;   -- gi (cl.9)
+               AgP3 Pl (MU_MI | ZERO_MI) => <"g", SCi> ;   -- gi (cl.4; the subject prefix is e-)
+               b => scBase b } } ;             -- otherwise as the subject prefix: ba, gu, gi, ri, ga, ki, bi, zi, ru, ka, tu, bu, ku
+    -- the verb root with an object marker, joined to the prefixes before it:
+    -- the OM starts with a consonant, so prefixes join to it as to a consonant root,
+    -- and the long present na-/no-/ne- is short before it (nakureeba)
+    omRootV : Agreement -> (PrefShape => Str) -> (PrefShape => Str) = \a, rv ->
+      let b = omBase a ;
+          w : Str = case b.p2 of { SNasal => rv ! SNasal ; _ => joinV b rv } in -- 1sg n- has no separate base
+      \\sh => case sh of {
+        SPlain | SLongA | SLongO | SLongE | SNasal => w ;
+        SCu => "u" ++ Predef.BIND ++ w ;
+        SCi | SZi => "i" ++ Predef.BIND ++ w ;
+        SCa => "a" ++ Predef.BIND ++ w ;
+        SCaa => "aa" ++ Predef.BIND ++ w } ;
 
     -- Subject relatives (reviewed): relative prefix = initial vowel + subject
     -- prefix, as in mkRPs ! RSubj (o-, aba-, eki-, ...), joined to the root.
@@ -1582,7 +1616,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
     
     Preposition : Type = {s : Str; other : Str; isGenPrep : Bool}; 
     
-    NounPhrase : Type = {s :Case => Str; agr : Agreement};
+    NounPhrase : Type = {s :Case => Str; agr : Agreement; isPron : Bool}; -- isPron: pronoun objects become object markers (nakureeba)
 
     --NounPhrase : Type = {s : Number=>  NounState => Str; agr : Agreement};
     
@@ -1609,16 +1643,16 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
     let subjClitic = mkSubjClitic (AgP3 det.num cn.gender) 
     in
       case <det.pos, det.num> of {
-            <Post, Pl> => {s = \\_=> cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 !AgP3 det.num cn.gender; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}; --subjClitic ++ cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 !AgP3 det.num cn.gender; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat};
-            <Post, Sg> => {s = \\_=>cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 ! AgP3 det.num cn.gender; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat};
+            <Post, Pl> => {s = \\_=> cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 !AgP3 det.num cn.gender; isPron = False ; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}; --subjClitic ++ cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 !AgP3 det.num cn.gender; isPron = False ; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat};
+            <Post, Sg> => {s = \\_=>cn.s!det.num! det.ntype ++ subjClitic ++ det.s2 ! AgP3 det.num cn.gender; isPron = False ; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat};
             <Pre, n> => case det.numeralExists  of {
                               False => case det.doesAgree of {
-                                  True  => { s =\\_ =>  cn.s !n  ! Complete ++ det.s2 !(AgP3 det.num cn.gender); agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}; -- FIX: demonstrative follows noun (embwa ezi)
-                                  False => { s =\\_ =>  det.s2 !(AgP3 det.num cn.gender) ++ cn.s !n  ! Complete; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}
+                                  True  => { s =\\_ =>  cn.s !n  ! Complete ++ det.s2 !(AgP3 det.num cn.gender); isPron = False ; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}; -- FIX: demonstrative follows noun (embwa ezi)
+                                  False => { s =\\_ =>  det.s2 !(AgP3 det.num cn.gender) ++ cn.s !n  ! Complete; isPron = False ; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}
                                  };
-                              True  => { s =\\_ =>  cn.s !n  ! Complete ++ det.numeralS ! (AgP3 n cn.gender); agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}
+                              True  => { s =\\_ =>  cn.s !n  ! Complete ++ det.numeralS ! (AgP3 n cn.gender); isPron = False ; agr = AgP3 det.num cn.gender; nounCat = cn.nounCat}
                             }
-          --<PostDeterminer, PFalse> => {s = \\_=> cn.s!det.ntype!det.num; agr = AgP3 det.num cn.gender }    
+          --<PostDeterminer, PFalse> => {s = \\_=> cn.s!det.ntype!det.num; isPron = False ; agr = AgP3 det.num cn.gender }    
       };
                            
 
@@ -1905,7 +1939,8 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
             containsComp2 : Bool;
             rootV : PrefShape => Str;
             noNi : Bool;
-            isCompNP : Bool
+            isCompNP : Bool;
+            omOK : Bool    -- a pronoun object can become an object marker on this verb (not after VV)
   					}; --comp is empty
   
 
@@ -1941,7 +1976,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 param 
   CompSource = NounP | ADverb | AdjP | CommonNoun;
   -- how a subject prefix meets the verb root (see mkRootV)
-  PrefShape = SPlain | SCu | SCi | SCa | SCaa | SZi | SLongA | SLongO | SLongE ;
+  PrefShape = SPlain | SCu | SCi | SCa | SCaa | SZi | SLongA | SLongO | SLongE | SNasal ; -- SNasal: 1sg object n- (ndeeba, nyingura)
 oper
   Comp : Type = {s:Str; source : CompSource};
 

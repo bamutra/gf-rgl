@@ -266,12 +266,12 @@ lin
    -- must has no passive form
    must_VV = {s = "shemere"; pres="ra"; perf = "ire"; isPresBlank = False;
                         isPerfBlank = False; p = []; passPres = []; passPerf = []; rootV = mkRootV "shemere"; noNi = False; isRefl = False; morphs=mkVerbMorphs; isRegular=False; inf=[]; whenUsed = VVPerf}; --VV 
-  everybody_NP = {s = \\_=>"buri muntu" ; agr=AgP3 Sg MU_BA};
-  everything_NP = {s = \\_=>"buri kintu" ; agr=AgP3 Sg KI_BI};
-  somebody_NP = {s = \\_=>"omuntu omwe" ; agr=AgP3 Sg MU_BA}; --: NP ;
-  something_NP = {s = \\_=>"ekintu kimwe" ; agr=AgP3 Sg KI_BI} ; -- NP ;
-  nobody_NP = {s = \\_=>"tihiine muntu" ; agr=AgP3 Sg MU_BA};
-  nothing_NP = {s = \\_=>"tihiine kintu" ; agr=AgP3 Sg KI_BI};
+  everybody_NP = {s = \\_=>"buri muntu" ; isPron = False ; agr =AgP3 Sg MU_BA};
+  everything_NP = {s = \\_=>"buri kintu" ; isPron = False ; agr =AgP3 Sg KI_BI};
+  somebody_NP = {s = \\_=>"omuntu omwe" ; isPron = False ; agr =AgP3 Sg MU_BA}; --: NP ;
+  something_NP = {s = \\_=>"ekintu kimwe" ; isPron = False ; agr =AgP3 Sg KI_BI} ; -- NP ;
+  nobody_NP = {s = \\_=>"tihiine muntu" ; isPron = False ; agr =AgP3 Sg MU_BA};
+  nothing_NP = {s = \\_=>"tihiine kintu" ; isPron = False ; agr =AgP3 Sg KI_BI};
 
   
 

@@ -6,18 +6,18 @@ concrete NounCgg of Noun = CatCgg **
 lin 
   
   --UsePN   : PN -> NP ;          -- John
-  UsePN pn = {s = \\ _ =>  pn.s; agr = pn.a; nounCat = PropNoun}; -- John
+  UsePN pn = {s = \\ _ =>  pn.s; isPron = False ; agr = pn.a; nounCat = PropNoun}; -- John
   
   {- need use of a pre -}
   UsePron pron = 
     let default3PAgr = (AgP3 Sg KI_BI)
     in case <pron.agr> of {
-            <(AgrYes a)> => {s = pron.s;  agr = a; nounCat = ComNoun};  --: Pron -> NP ;            -- he
-            <_>        =>   {s = pron.third !default3PAgr; agr = default3PAgr; nounCat = ComNoun}
+            <(AgrYes a)> => {s = pron.s;  isPron = True ; agr = a; nounCat = ComNoun};  --: Pron -> NP ;            -- he
+            <_>        =>   {s = pron.third !default3PAgr; isPron = True ; agr = default3PAgr; nounCat = ComNoun}
        };
   --UsePron pron = pron; -- the result of use pron is a NounPhrase
   --MassNP     : CN -> NP ;            -- (beer)
-  MassNP cn = {s = \\_ =>cn.s ! Sg ! Complete; agr = AgP3 Sg cn.gender; nounCat = ComNoun};   --: CN -> NP ; -- milk
+  MassNP cn = {s = \\_ =>cn.s ! Sg ! Complete; isPron = False ; agr = AgP3 Sg cn.gender; nounCat = ComNoun};   --: CN -> NP ; -- milk
   --DetCN det cn = mkDeterminer det cn; --Should be named mkDetCN
   DetCN  det cn =  mkDetCN det cn;       -- the man
   UseN noun = noun ;
@@ -73,25 +73,25 @@ lin
                              accS = np.s ! Acc;
                          in
                           case <predet.isMWE, predet.isInflected> of {
-                              <False, True>  => {s = \\_ =>nomS ++ mkPredetPref a ++ predet.s ; agr = a; nounCat = np.nounCat};
+                              <False, True>  => {s = \\_ =>nomS ++ mkPredetPref a ++ predet.s ; isPron = False ; agr = a; nounCat = np.nounCat};
                               <True, True >  => {s = \\_ =>nomS ++ mkPredetPref a ++ predet.s  ++
-                                                 mkPredetPref a  ++ predet.s2; agr = a; nounCat = np.nounCat};
-                              <False,False>  => {s = \\_ =>nomS ++ predet.s ; agr = a; nounCat = np.nounCat};
-                              <True,False>   => {s = \\_ =>nomS ++ predet.s ++ predet.s2; agr = a; nounCat = np.nounCat} -- never seen this case              
+                                                 mkPredetPref a  ++ predet.s2; isPron = False ; agr = a; nounCat = np.nounCat};
+                              <False,False>  => {s = \\_ =>nomS ++ predet.s ; isPron = False ; agr = a; nounCat = np.nounCat};
+                              <True,False>   => {s = \\_ =>nomS ++ predet.s ++ predet.s2; isPron = False ; agr = a; nounCat = np.nounCat} -- never seen this case              
                           };
       
       --AdvNP   : NP -> Adv -> NP ;    -- Paris today
-      AdvNP np adv = {s= \\c => np.s ! c ++ adv.s; agr = np.agr; nounCat = np.nounCat };
+      AdvNP np adv = {s= \\c => np.s ! c ++ adv.s; isPron = False ; agr = np.agr; nounCat = np.nounCat };
       --PPartNP : NP -> V2  -> NP ;    -- the man seen use the Passive form of the verb see. abantu abarebirwe
       PPartNP np v2 = 
-        {s= \\c => np.s!c ++ joinV (scBase np.agr) v2.rootV ++ BIND ++ v2.passPerf; agr = np.agr; nounCat = np.nounCat};
+        {s= \\c => np.s!c ++ joinV (scBase np.agr) v2.rootV ++ BIND ++ v2.passPerf; isPron = False ; agr = np.agr; nounCat = np.nounCat};
 
       {-What the hell does this mean?-}
-      ExtAdvNP np adv = {s= \\c => np.s ! c  ++ embedInCommas adv.s; agr = np.agr; nounCat = np.nounCat}; -- how do I do the adverbial clause?
+      ExtAdvNP np adv = {s= \\c => np.s ! c  ++ embedInCommas adv.s; isPron = False ; agr = np.agr; nounCat = np.nounCat}; -- how do I do the adverbial clause?
   --    Determiner: Type = {s:Str; ntype:NounType; num:Number; pos:Position}; -- type for Determier necessary for catCgg.gf
      RelNP np rs ={
        s = \\c => np.s ! c ++ case rs.isSubjRel of { True => rs.sa ! np.agr ; False => rs.s! (RF RSubj) }; 
-       agr =np.agr; nounCat = np.nounCat};   
+       isPron = False ; agr =np.agr; nounCat = np.nounCat};   
         -- The determiner has a fine-grained structure, in which a 'nucleus'
   -- quantifier and an optional numeral can be discerned.
      --DetQuant    : Quant -> Num -> Det ;  -- these five
@@ -187,15 +187,15 @@ lin
 
   --CountNP : Det -> NP -> NP ;    -- three of them, some of the boys
   CountNP det np = case det.doesAgree of {
-                        True  => {s=\\c=> np.s!c ++ "emye ahari" ++ det.s2 ! np.agr; agr = np.agr; nounCat = np.nounCat};
-                        False => {s=\\c=> np.s!c ++ det.s; agr = np.agr; nounCat = np.nounCat} 
+                        True  => {s=\\c=> np.s!c ++ "emye ahari" ++ det.s2 ! np.agr; isPron = False ; agr = np.agr; nounCat = np.nounCat};
+                        False => {s=\\c=> np.s!c ++ det.s; isPron = False ; agr = np.agr; nounCat = np.nounCat} 
                       };
 
 --Determiners can form noun phrases directly.
   --DetNP   : Det -> NP ;  -- these five
   DetNP det = case det.doesAgree of {
-                        True  => {s=\\_=> det.s2 ! AgP3 Sg KI_BI; agr = AgP3 Sg KI_BI; nounCat = ComNoun};
-                        False => {s=\\c=> det.s; agr = AgP3 Sg KI_BI; nounCat = ComNoun} 
+                        True  => {s=\\_=> det.s2 ! AgP3 Sg KI_BI; isPron = False ; agr = AgP3 Sg KI_BI; nounCat = ComNoun};
+                        False => {s=\\c=> det.s; isPron = False ; agr = AgP3 Sg KI_BI; nounCat = ComNoun} 
                       };
 -- Nouns can also be modified by embedded sentences and questions.
 -- For some nouns this makes little sense, but we leave this for applications

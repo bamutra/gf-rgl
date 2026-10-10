@@ -160,7 +160,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = False;
-        containsComp2 =False ; rootV = v2.rootV ; noNi = v2.noNi ; isCompNP = False
+        containsComp2 =False ; rootV = v2.rootV ; noNi = v2.noNi ; isCompNP = False ; omOK = True
       };
       --Slash2V3 : V3  -> NP -> VPSlash ;  -- give it (to her)
       Slash2V3 v3 np ={
@@ -179,7 +179,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = True;
-        containsComp2 =False ; rootV = v3.rootV ; noNi = v3.noNi ; isCompNP = False
+        containsComp2 =False ; rootV = v3.rootV ; noNi = v3.noNi ; isCompNP = False ; omOK = True
       };
 
       --Slash3V3 : V3  -> NP -> VPSlash ;  -- give (it) to her
@@ -199,7 +199,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = True;
-        containsComp2 = True ; rootV = v3.rootV ; noNi = v3.noNi ; isCompNP = False
+        containsComp2 = True ; rootV = v3.rootV ; noNi = v3.noNi ; isCompNP = False ; omOK = True
       };
       --SlashVV    : VV  -> VPSlash -> VPSlash ;       -- want to buy
       SlashVV vv vpslash ={
@@ -221,7 +221,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = False;
-        containsComp2 = False ; rootV = vv.rootV ; noNi = vv.noNi ; isCompNP = False
+        containsComp2 = False ; rootV = vv.rootV ; noNi = vv.noNi ; isCompNP = False ; omOK = False
       };
       --SlashV2V : V2V -> VP -> VPSlash ;  -- beg (her) to go
 
@@ -236,7 +236,8 @@ lin
         --morphs = vpslash.morphs;
         isPresBlank = vpslash.isPresBlank;
         isPerfBlank = vpslash.isPerfBlank; 
-        comp = vpslash.comp ++  np.s ! Acc;
+        -- pronoun objects become object markers in the verb (nakureeba); other NPs follow it
+        comp = case <np.isPron, vpslash.omOK> of { <True, True> => vpslash.comp ; _ => vpslash.comp ++  np.s ! Acc } ;
         comp2 =vpslash.comp2; --should be empty
         ap = [];
         isCompApStem = False; 
@@ -246,7 +247,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = True;
-        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi ; isCompNP = vpslash.isCompNP
+        containsComp2 = vpslash.containsComp2 ; rootV = case <np.isPron, vpslash.omOK> of { <True, True> => omRootV np.agr vpslash.rootV ; _ => vpslash.rootV } ; noNi = vpslash.noNi ; isCompNP = vpslash.isCompNP
       };
 --   AdvVP    : VP -> Adv -> VP ;        -- sleep here
 --   VerbPhrase: Type = {s:Str; morphs: VMorphs ; comp:Str ; isCompApStem : Bool; agr : AgrExist};
@@ -314,7 +315,7 @@ lin
         adV =[];
         containsAdV = False;
         containsComp = vpslash.containsComp;
-        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi ; isCompNP = vpslash.isCompNP
+        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi ; isCompNP = vpslash.isCompNP ; omOK = vpslash.omOK
       };
     -- Adverb directly attached to verb
     --AdVVPSlash : AdV -> VPSlash -> VPSlash ;  -- always use (it)
@@ -338,7 +339,7 @@ lin
         adV =adV.s;
         containsAdV = True;
         containsComp = vpslash.containsComp;
-        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi ; isCompNP = vpslash.isCompNP
+        containsComp2 = vpslash.containsComp2 ; rootV = vpslash.rootV ; noNi = vpslash.noNi ; isCompNP = vpslash.isCompNP ; omOK = vpslash.omOK
       };
   -- Verb phrases are constructed from verbs by providing their
   -- complements. There is one rule for each verb category.
