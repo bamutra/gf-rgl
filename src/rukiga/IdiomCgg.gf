@@ -10,10 +10,12 @@ lin
   ImpPl1  vp = {s = optStr "reka" ++ joinV (scBase (AgMUBAP1 Pl)) vp.rootV ++ Predef.BIND ++ vp.presSubj ++ vp.comp};  -- let's go
   -- "let X ...": X is the object of reka. A noun follows plain reka (reka abaana bagwejegyere);
   -- a pronoun becomes an object marker on reka: bareke bagwejegyere "let them sleep",
-  -- kireke kigwe "let it fall", mureke agwejegyere "let him/her sleep"; "let you (pl.)" also takes mu-
+  -- kireke kigwe "let it fall", mureke agwejegyere "let him/her sleep"; "let you (pl.)" also takes mu-;
+  -- "let me" is ndeka (reviewed: ndeka ngwejegyere, kureke ogwejegyere, tureke tugwejegyere)
   ImpP3 np vp = let
       rekaOM : Agreement -> Str = \a -> case a of {
         AgMUBAP2 Pl => "mureke" ;
+        AgMUBAP1 Sg => "ndeka" ;   -- "let me" keeps -a: ndeka ngwejegyere (reviewed)
         _ => omRootV a (mkRootV "rek") ! SPlain ++ Predef.BIND ++ "e" } ;
       subjunct : Str = joinV (scBase np.agr) vp.rootV ++ Predef.BIND ++ vp.presSubj ++ vp.comp
     in {s = case np.isPron of {
