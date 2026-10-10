@@ -30,7 +30,7 @@ lincat
   IAdv = {s : Str ; requiresSubjPrefix: Bool; endOfSentence:Bool};
   IDet = {s : Str ; n : Res.Number; requiresSubjPrefix: Bool};
   IQuant   = {s : Res.Number =>Str ; requiresSubjPrefix: Bool};
-  RS = {s :Res.RForm => Str} ; -- relative                            e.g. "in which she lived"
+  RS = {s :Res.RForm => Str ; sa : Res.Agreement => Str ; isSubjRel : Bool} ; -- relative e.g. "in which she lived"; sa = subject relative, agreeing with its head                            e.g. "in which she lived"
   V,VS, VQ, VA = Res.Verb ;   --change to {verb : Str ; comp = []}               -- one-place verb                      e.g. "sleep"  
   V2,V2Q, V2S = Res.Verb2;
   V2A,V3 = Res.Verb3;    -- three-place verb                    e.g. "show"
@@ -69,7 +69,8 @@ lincat
       isPerfBlank : Bool;
       compl : Str; -- after verb: complement, adverbs
       isCompApStem : Bool;
-      whichRel: Res.RForm
+      whichRel: Res.RForm ;
+      rootV : Res.PrefShape => Str -- root joined to prefixes (vowel coalescence)
       } ;
   --VPSlash ={s:Str; morphs: VMorphs};  --VPSlash ; -- verb phrase missing complement    e.g. "give to John"
   --ClSlash;-- clause missing NP (S/NP in GPSG)    e.g. "she looks at"

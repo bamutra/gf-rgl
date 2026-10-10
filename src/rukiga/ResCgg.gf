@@ -520,7 +520,62 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         False => mkSubjClitic a ++ "k" ++ Predef.BIND ++ rv ! SCa
       } ;
     joinV : (Str * PrefShape) -> (PrefShape => Str) -> Str = \b, rv -> b.p1 ++ Predef.BIND ++ rv ! b.p2 ;
+-- Paste into src/rukiga/ResCgg.gf directly after the line that starts with:  joinV : (Str * PrefShape)
 
+    -- Subject relatives (reviewed): relative prefix = initial vowel + subject
+    -- prefix, as in mkRPs ! RSubj (o-, aba-, eki-, ...), joined to the root.
+    relBase : Agreement -> Str * PrefShape = \a0 -> let a : Agreement = normSubj a0 in case a of {
+        AgMUBAP1 Sg | AgMUBAP2 Sg | AgP3 Sg MU_BA => <"o", SPlain> ;
+        AgMUBAP1 Pl | AgMUBAP2 Pl                 => <"ab", SCa> ;
+        AgP3 Sg N_N | AgP3 Pl (MU_MI | ZERO_MI)   => <"e", SCi> ;     -- ei-
+        _ => let b = scBase a in case b.p2 of {
+               SCi | SZi => <"e" + b.p1, b.p2> ;
+               SCa       => <"a" + b.p1, b.p2> ;
+               SCu       => <"o" + b.p1, b.p2> ;
+               _         => b }
+      } ;
+    -- the whole prefix as a string: o, aba, eki, ei, ogu, ...
+    relFull : Agreement -> Str = \a -> let b = relBase a in case b.p2 of {
+        SCa => b.p1 + "a" ; SCi | SZi => b.p1 + "i" ; SCu => b.p1 + "u" ; _ => b.p1 } ;
+    -- prefix + past -a-: owa-, abaa-, ekya-, ogwa-, eya-, eza- (the root follows)
+    relPastBase : Agreement -> Str * PrefShape = \a -> let b = relBase a in case b.p2 of {
+        SPlain => <b.p1 + "w", SCa> ;                -- owa-
+        SCa    => <b.p1, SCaa> ;                     -- abaa-
+        SCi    => <b.p1 + "y", SCa> ;                -- ekya-, eya-
+        SCu    => <b.p1 + "w", SCa> ;                -- ogwa-
+        _      => <b.p1, SCa> } ;                    -- eza-
+    relPastFull : Agreement -> Str = \a -> let b = relPastBase a in case b.p2 of {
+        SCaa => b.p1 + "aa" ; _ => b.p1 + "a" } ;
+    -- negative relative prefix before -ta-: class 1 a- (past: o-), otherwise as positive
+    relNeg : Bool -> Agreement -> Str = \past, a0 -> let a : Agreement = normSubj a0 in case a of {
+        AgMUBAP1 Sg | AgMUBAP2 Sg | AgP3 Sg MU_BA => case past of { True => "o" ; False => "a" } ;
+        _ => relFull a } ;
+
+    -- the subject-relative verb form for each tense, aspect and polarity
+    mkSubjRel : Tense -> Anteriority -> Polarity -> (PrefShape => Str) -> Str -> Str -> Str -> Agreement -> Str =
+      \t, ant, p, rv, pres, perf, vku, a ->
+      let j : Str -> PrefShape -> Str -> Str = \px, sh, fv -> px ++ Predef.BIND ++ rv ! sh ++ Predef.BIND ++ fv ;
+          sc : Str = mkSubjClitic a ;
+          scV : Str -> Str = \fv -> joinV (scBase a) rv ++ Predef.BIND ++ fv ;
+          scNegV : Str -> Str = \fv -> sc ++ "t" ++ Predef.BIND ++ rv ! SCa ++ Predef.BIND ++ fv
+      in case <t, ant, p> of {
+        <Pres, Simul, Pos> => j (relFull a + "rik") SCu pres ;                  -- orikugwejegyera
+        <Pres, Simul, Neg> => j (relNeg False a + "tarik") SCu pres ;           -- atarikugwejegyera
+        <Pres, Anter, Pos> => joinV (relBase a) rv ++ Predef.BIND ++ perf ;     -- ogwejegyeire
+        <Pres, Anter, Neg> => j (relNeg False a + "t") SCa perf ;               -- atagwejegyeire
+        <Past, Simul, Pos> => joinV (relPastBase a) rv ++ Predef.BIND ++ perf ; -- owagwejegyeire, ekyagwire
+        <Past, Simul, Neg> => j (relNeg True a + "tar") SCa perf ;              -- otaragwejegyeire
+        <Past, Anter, Pos> => relPastFull a + "baire" ++ scV perf ;             -- owabaire agwejegyeire
+        <Past, Anter, Neg> => relPastFull a + "baire" ++ scNegV perf ;          -- owabaire atagwejegyeire
+        <Fut, Simul, Pos>  => relFull a + "raaza" ++ vku ++ Predef.BIND ++ pres ;           -- oraaza kugwejegyera
+        <Fut, Simul, Neg>  => relNeg False a + "taraaza" ++ vku ++ Predef.BIND ++ pres ;    -- ataraaza kugwejegyera
+        <Fut, Anter, Pos>  => relFull a + "raaba" ++ scV perf ;                 -- oraaba agwejegyeire
+        <Fut, Anter, Neg>  => relFull a + "raaba" ++ scNegV perf ;              -- oraaba atagwejegyeire
+        <Cond, Simul, Pos> => j (relFull a + "k") SCaa pres ;                   -- okaagwejegyera
+        <Cond, Simul, Neg> => j (relNeg False a + "tak") SCaa pres ;            -- atakaagwejegyera
+        <Cond, Anter, Pos> => j (relFull a + "k") SCaa perf ;                   -- okaagwejegyeire
+        <Cond, Anter, Neg> => j (relNeg False a + "tak") SCaa perf              -- atakaagwejegyeire
+      } ;    
     -- Copulas with adjectival complements. Runyankore-Rukiga has two,
     -- used in different tenses:
     --   ni  : present             ekitabo ni-kihango

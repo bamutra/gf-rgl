@@ -36,7 +36,7 @@ lin
       isPerfBlank = cl.isPerfBlank;
       compl =cl.compl;
       isCompApStem = False;
-      whichRel = Such_That;                             
+      whichRel = Such_That; rootV = cl.rootV;                             
       }; -- such that John loves her. why does it need any case?
 
 	-- The more proper ways are from a verb phrase 
@@ -58,7 +58,8 @@ lin
       isPerfBlank = vp.isPerfBlank;
       compl =vp.comp;
       isCompApStem = vp.isCompApStem;
-      whichRel = RF RSubj;                           
+      whichRel = RF RSubj; 
+      rootV = vp.rootV;                           
       };
 	
   --RelSlash : RP -> ClSlash -> RCl ; -- whom John loves
@@ -87,7 +88,8 @@ lin
       isPerfBlank = clSlash.isPerfBlank;
       compl  = comp;
       isCompApStem = isCompApStem;
-      whichRel = RF RObj;                           
+      whichRel = RF RObj; 
+      rootV = clSlash.rootV;                           
     };
 
 	{-

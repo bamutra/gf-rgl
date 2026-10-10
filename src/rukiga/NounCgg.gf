@@ -58,7 +58,10 @@ lin
 
     --RelCN   : CN -> RS  -> CN ;   -- house that John bought
     --RelCN cn rs = {s=\\n,ns => cn.s !n ! ns ++ rs.s! (RF RObj); gender = cn.gender; nounCat = cn.nounCat};
-    RelCN cn rs = {s=\\n,ns => cn.s !n ! ns ++ mkRPsNoClitic !RObj ! (AgP3 n cn.gender) ++ rs.s! (RF RObj); gender = cn.gender; nounCat = cn.nounCat};
+    RelCN cn rs = {s=\\n,ns => cn.s !n ! ns ++ case rs.isSubjRel of {
+                       True  => rs.sa ! AgP3 n cn.gender ;   -- omwana ogwejegyeire, ekitabo ekyagwire
+                       False => mkRPsNoClitic !RObj ! (AgP3 n cn.gender) ++ rs.s! (RF RObj) } ;
+                     gender = cn.gender; nounCat = cn.nounCat};
 
     {-
       A predeterminer is any word that modifies a noun Phrase.
@@ -86,7 +89,9 @@ lin
       {-What the hell does this mean?-}
       ExtAdvNP np adv = {s= \\c => np.s ! c  ++ embedInCommas adv.s; agr = np.agr; nounCat = np.nounCat}; -- how do I do the adverbial clause?
   --    Determiner: Type = {s:Str; ntype:NounType; num:Number; pos:Position}; -- type for Determier necessary for catCgg.gf
-     RelNP np rs ={s = \\c => np.s ! c ++ rs.s! (RF RSubj); agr =np.agr; nounCat = np.nounCat};   
+     RelNP np rs ={
+       s = \\c => np.s ! c ++ case rs.isSubjRel of { True => rs.sa ! np.agr ; False => rs.s! (RF RSubj) }; 
+       agr =np.agr; nounCat = np.nounCat};   
         -- The determiner has a fine-grained structure, in which a 'nucleus'
   -- quantifier and an optional numeral can be discerned.
      --DetQuant    : Quant -> Num -> Det ;  -- these five

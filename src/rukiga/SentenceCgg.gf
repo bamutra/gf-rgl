@@ -155,9 +155,15 @@ lin
                             presRestOfVerb = rcl.pres;
                             pastRestOfVerb = rcl.perf; --morphs ! VFPastPart ! RestOfVerb;
 
-                            compl = rcl.compl
+                            compl = rcl.compl ;
+                            -- subject relatives (reviewed forms), agreeing with the head noun
+                            vku = joinV <"k", SCu> rcl.rootV ;
+                            subjRel : Agreement => Str = \\a => mkSubjRel temp.t temp.a pol.p rcl.rootV presRestOfVerb pastRestOfVerb vku a ++ compl ;
+                            isSubjRel : Bool = case <rcl.whichRel, rcl.isPresBlank, rcl.isPerfBlank, rcl.isCompApStem> of {
+                                                <RF RSubj, False, False, False> => True ;  -- copular VPs keep the old forms for now
+                                                _ => False }
                       in {- will these strings I am introducing allow back translation? Yes, it simply depends on functions-}
-                        case <temp.t,temp.a, pol.p> of {
+                        (case <temp.t,temp.a, pol.p> of {
                             <Pres,Simul, Pos> => {s = table { 
                                                       RF RSubj  => subj ++ rsubjClitic ++  root ++ Predef.BIND ++ presRestOfVerb ++ compl;
                                                       RF RObj   => subj ++ robjClitic ++  root ++ Predef.BIND ++ presRestOfVerb ++ compl;
@@ -280,7 +286,7 @@ lin
       
                             <Cond,Anter, Neg> => {s = \\_ => subj ++ "ti" ++ Predef.BIND ++ subjClitic ++  "kaa" ++Predef.BIND 
                                          ++ root ++ Predef.BIND ++ pastRestOfVerb ++ compl}  --: Temp -> Pol -> QCl  -> QS ; -- has John walked
-                      };
+                      }) ** {sa = subjRel ; isSubjRel = isSubjRel};
 
   
 
