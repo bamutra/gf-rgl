@@ -124,7 +124,7 @@ lin
     
    have_V2 ={s= "in"; pres="e"; perf ="e"; isPresBlank = False;
                         isPerfBlank = False;
-                        p = []; passPres = []; passPerf = []; passPres = []; passPerf = []; rootV = mkRootV "in"; noNi = True; isRefl = False;
+                        p = []; passPres = []; passPerf = []; rootV = mkRootV "in"; noNi = True; isRefl = False;
                         morphs = mkVerbMorphs; comp = []; isCompN2 = False; 
                         isRegular=False};  --: V2 ;
 
@@ -196,7 +196,7 @@ lin
 
   {-Beggining of Interrogative Pronoun-}
 
-  whatPl_IP = { s= "ki";  n = IPl;  isVerbSuffix = True; requiresIPPrefix = False; aux=[]; endOfSentence = True; qKind = QWhat ; qWord = "niki"} ; -- what (plural)
+  whatPl_IP = { s= "ki";  n = IPl;  isVerbSuffix = True; requiresIPPrefix = False; aux=[]; endOfSentence = True; qKind = QWhat ; qWord = "nibiki"} ; -- what (plural)
   whatSg_IP = { s= "ki";  n = ISg;  isVerbSuffix = True; requiresIPPrefix = False; aux=[]; endOfSentence = True; qKind = QWhat ; qWord = "niki"}; --: IP ; -- what (singular)
   whoPl_IP  = { s=  "ha";  n = IPl; isVerbSuffix = True; requiresIPPrefix = False; aux="ni"; endOfSentence = True; qKind = QWho ; qWord = "nibaha"} ;--: IP ;  -- who (plural)
   whoSg_IP =  { s=  "ha"; n = ISg;  isVerbSuffix = True; requiresIPPrefix = False; aux="ni"; endOfSentence = True; qKind = QWho ; qWord = "noha"}; --: IP ;  -- who (singular)

@@ -522,7 +522,6 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         False => mkSubjClitic a ++ "k" ++ Predef.BIND ++ rv ! SCa
       } ;
     joinV : (Str * PrefShape) -> (PrefShape => Str) -> Str = \b, rv -> b.p1 ++ Predef.BIND ++ rv ! b.p2 ;
--- Paste into src/rukiga/ResCgg.gf directly after the line that starts with:  joinV : (Str * PrefShape)
 
     -- Subject relatives (reviewed): relative prefix = initial vowel + subject
     -- prefix, as in mkRPs ! RSubj (o-, aba-, eki-, ...), joined to the root.
