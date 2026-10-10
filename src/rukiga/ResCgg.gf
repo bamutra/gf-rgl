@@ -151,7 +151,7 @@ oper
     	--morphs = mkVerbMorphs;
     	isRegular = False;
       p = [];
-      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; rootV = mkRootV rad ; noNi = False ; isRefl = False
+      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; rootV = mkRootV rad ; noNi = False ; isRefl = False ; presSubj = mkSubjEnd end1
 	};
   -- creates a verb of type that has particles (prepositions or 
   --adverbials. this is for phrasal verbs)
@@ -164,7 +164,7 @@ oper
       --morphs = mkVerbMorphs;
       isRegular = False;
       p = p;
-      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; rootV = mkRootV rad ; noNi = False ; isRefl = bool
+      passPres = mkPassPres rad end1 ; passPerf = mkPassPerfV end1 end2 ; rootV = mkRootV rad ; noNi = False ; isRefl = bool ; presSubj = mkSubjEnd end1
   };
 	--These are regular verbs with {a-ire} entry in the dictionary
 	smartVerb : Str ->Verb = \rad ->{
@@ -176,7 +176,7 @@ oper
       isPerfBlank = False;
     	isRegular = True;
       p = [];
-      passPres = mkPassPres rad "a" ; passPerf = mkPassPerf "ire" ; rootV = mkRootV rad ; noNi = False ; isRefl = False
+      passPres = mkPassPres rad "a" ; passPerf = mkPassPerf "ire" ; rootV = mkRootV rad ; noNi = False ; isRefl = False ; presSubj = "e"
 	};
   
   {-  Smart paradigm
@@ -527,6 +527,8 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
         True  => mkSubjClitic a ++ "kaba" ++ joinV (scBase a) rv ;
         False => mkSubjClitic a ++ "k" ++ Predef.BIND ++ rv ! SCa
       } ;
+    -- subjunctive ending from the present ending: -ra -> -re, -a -> -e, -da -> -de
+    mkSubjEnd : Str -> Str = \e -> case e of { x + "a" => x + "e" ; _ => e + "e" } ;
     joinV : (Str * PrefShape) -> (PrefShape => Str) -> Str = \b, rv -> b.p1 ++ Predef.BIND ++ rv ! b.p2 ;
 
     -- Object markers (reviewed): base and shape of the OM before the root,
@@ -1676,7 +1678,8 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
                       passPres : Str ;  -- passive present ending: gur-wa, gwejegye-rwa, r-ibwa, nyw-ebwa
                       passPerf : Str ;  -- passive perfective ending: shom-irwe, gai-sirwe, kom-izibwe, r-iibwe
                       rootV : PrefShape => Str ; -- root as joined to each kind of subject prefix (vowel coalescence)
-                      noNi : Bool               -- stative verb: present without ni- (ekitabo kiine enju)
+                      noNi : Bool ;             -- stative verb: present without ni- (ekitabo kiine enju)
+                      presSubj : Str            -- subjunctive ending: gwejegye-re, gw-e (taraagwejegyere, tugwejegyere)
                     };
       
       GVerb : Type = {
@@ -1726,6 +1729,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
                   containsComp2 : Bool;
                   rootV : PrefShape => Str;
                   noNi : Bool;
+                  presSubj : Str;
                   isCompNP : Bool   -- copula with a noun complement: eizoba ni tata
       					};
       -- in VP formation, all verbs are lifted to GVerb, but morphology doesn't need to know this
@@ -1751,7 +1755,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 
      
        be_Copula : Verb = {
-          s = "ri" ; rootV = mkRootV "ri" ; noNi = False ;
+          s = "ri" ; rootV = mkRootV "ri" ; noNi = False ; presSubj = "e" ;
           pres=[]; 
           perf=[]; 
           --morphs= mkVerbMorphs;
@@ -1762,7 +1766,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
           passPres = [] ; passPerf = [] ; isRefl = False
         };
        mkBecome  :  Verb  ={
-         	s = "b" ; rootV = mkRootV "b" ; noNi = False ;
+         	s = "b" ; rootV = mkRootV "b" ; noNi = False ; presSubj = "e" ;
           pres="a"; 
           perf="ire";
           isPresBlank = False;
@@ -1939,6 +1943,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
             containsComp2 : Bool;
             rootV : PrefShape => Str;
             noNi : Bool;
+            presSubj : Str;
             isCompNP : Bool;
             omOK : Bool    -- a pronoun object can become an object marker on this verb (not after VV)
   					}; --comp is empty
@@ -1956,6 +1961,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
 	      isCopNP : Bool; -- copula with a noun complement: present tense is ni + NP
 	      vcl, vni, vti, vku : Str; -- SC+root, ni-SC+root, ti-SC+root, ku+root with vowel coalescence
 	      rootV : PrefShape => Str; -- root joined to tense markers (-ka-, -ra-, -kaa-)
+	      presSubj : Str; -- subjunctive ending
 	      vka : Str; -- remote past stem: SC-ka-root (akoga), stative SC-kaba SC-root (kikaba kiine)
 	      root : Str;
 	      pres: Str;

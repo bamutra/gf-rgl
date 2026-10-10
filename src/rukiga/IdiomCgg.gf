@@ -5,7 +5,20 @@ concrete IdiomCgg of Idiom = CatCgg **
 
 
 lin
-  ImpPl1  vp = {s="tu" ++ BIND ++ vp.s ++ BIND ++ vp.pres ++ BIND ++ "6e"};      -- let's go
+  -- subjunctive: SC-root-e (tugwejegyere "let us sleep", omwana agwejegyere "let the child sleep")
+  -- "let us ...": reka is optional (reka tuhage / tuhage); plain linearization gives the full form
+  ImpPl1  vp = {s = optStr "reka" ++ joinV (scBase (AgMUBAP1 Pl)) vp.rootV ++ Predef.BIND ++ vp.presSubj ++ vp.comp};  -- let's go
+  -- "let X ...": X is the object of reka. A noun follows plain reka (reka abaana bagwejegyere);
+  -- a pronoun becomes an object marker on reka: bareke bagwejegyere "let them sleep",
+  -- kireke kigwe "let it fall", mureke agwejegyere "let him/her sleep"; "let you (pl.)" also takes mu-
+  ImpP3 np vp = let
+      rekaOM : Agreement -> Str = \a -> case a of {
+        AgMUBAP2 Pl => "mureke" ;
+        _ => omRootV a (mkRootV "rek") ! SPlain ++ Predef.BIND ++ "e" } ;
+      subjunct : Str = joinV (scBase np.agr) vp.rootV ++ Predef.BIND ++ vp.presSubj ++ vp.comp
+    in {s = case np.isPron of {
+              True  => rekaOM np.agr ++ subjunct ;
+              False => "reka" ++ np.s ! Nom ++ subjunct } } ; -- let John walk
 {-
 --1 Idiom: Idiomatic Expressions
 

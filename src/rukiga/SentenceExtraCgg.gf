@@ -205,8 +205,8 @@ concrete SentenceExtraCgg of SentenceExtra = CatCgg, TenseExtraCgg  **
                 											};
                 		-- Uses the subjunctive e.g a + e = e
                 		<NearFut, Performative, Neg>     => case cl.isPerfBlank of {
-                		 									True => {s = subj ++ tiRaClitic ++ "a" ++ Predef.BIND ++ root ++ Predef.BIND ++ "e" ++ compl};
-                		 									False => {s = subj ++ tiRaClitic ++ "a" ++ Predef.BIND ++ root  ++ Predef.BIND ++ presRestOfVerb ++Predef.BIND ++"e" ++ compl} -- my own way of performing the subjuctive i.e a+e =e
+                		 									True => {s = subj ++ tiRaClitic ++ "a" ++ Predef.BIND ++ root ++ Predef.BIND ++ cl.presSubj ++ compl};
+                		 									False => {s = subj ++ tiRaClitic ++ "a" ++ Predef.BIND ++ root  ++ Predef.BIND ++ cl.presSubj ++ compl} -- subjunctive: taraagwejegyere
                 											};
                 		<NearFut, (Perfect | Resultative), Pos> => case cl.isPerfBlank of {
                                   True => {s = subj ++ mkSubjWord agr "raba" ++ cl.vcl ++ Predef.BIND ++ "ire" ++ compl};

@@ -124,7 +124,7 @@ lin
     
    have_V2 ={s= "in"; pres="e"; perf ="e"; isPresBlank = False;
                         isPerfBlank = False;
-                        p = []; passPres = []; passPerf = []; rootV = mkRootV "in"; noNi = True; isRefl = False;
+                        p = []; passPres = []; passPerf = []; rootV = mkRootV "in"; noNi = True; presSubj = "e"; isRefl = False;
                         morphs = mkVerbMorphs; comp = []; isCompN2 = False; 
                         isRegular=False};  --: V2 ;
 
@@ -257,15 +257,15 @@ lin
 
   
   want_VV =  {s = "en"; pres="da"; perf = "zire"; isPresBlank = False;
-                        isPerfBlank = False; isRegular = True; p = []; passPres = []; passPerf = []; rootV = mkRootV "en"; noNi = False; isRefl = False; morphs=mkVerbMorphs; inf=[]; whenUsed = VVBoth};
+                        isPerfBlank = False; isRegular = True; p = []; passPres = []; passPerf = []; rootV = mkRootV "en"; noNi = False; presSubj = "de"; isRefl = False; morphs=mkVerbMorphs; inf=[]; whenUsed = VVBoth};
   can8know_VV = {s = "baas"; pres="a"; perf = "ize"; isPresBlank = False;
-                        isPerfBlank = False; isRegular = True; p = []; passPres = []; passPerf = []; rootV = mkRootV "baas"; noNi = False; isRefl = False; morphs=mkVerbMorphs; inf=[]; whenUsed = VVBoth};--: VV ; -- can (capacity)
+                        isPerfBlank = False; isRegular = True; p = []; passPres = []; passPerf = []; rootV = mkRootV "baas"; noNi = False; presSubj = "e"; isRefl = False; morphs=mkVerbMorphs; inf=[]; whenUsed = VVBoth};--: VV ; -- can (capacity)
   can_VV =  {s = "baas"; pres="a"; perf = "ize"; isPresBlank = False;
-                        isPerfBlank = False; isRegular = True; p = [];passPres = []; passPerf = []; rootV = mkRootV "baas"; noNi = False; isRefl = False; morphs=mkVerbMorphs; inf=[]; whenUsed = VVBoth};--: VV ;      -- can (possibility)
+                        isPerfBlank = False; isRegular = True; p = [];passPres = []; passPerf = []; rootV = mkRootV "baas"; noNi = False; presSubj = "e"; isRefl = False; morphs=mkVerbMorphs; inf=[]; whenUsed = VVBoth};--: VV ;      -- can (possibility)
    -- must_VV used especially in the perfective mood: see dictionary entry shemerera on Pg 501 of Mpairwe
    -- must has no passive form
    must_VV = {s = "shemere"; pres="ra"; perf = "ire"; isPresBlank = False;
-                        isPerfBlank = False; p = []; passPres = []; passPerf = []; rootV = mkRootV "shemere"; noNi = False; isRefl = False; morphs=mkVerbMorphs; isRegular=False; inf=[]; whenUsed = VVPerf}; --VV 
+                        isPerfBlank = False; p = []; passPres = []; passPerf = []; rootV = mkRootV "shemere"; noNi = False; presSubj = "re"; isRefl = False; morphs=mkVerbMorphs; isRegular=False; inf=[]; whenUsed = VVPerf}; --VV 
   everybody_NP = {s = \\_=>"buri muntu" ; isPron = False ; agr =AgP3 Sg MU_BA};
   everything_NP = {s = \\_=>"buri kintu" ; isPron = False ; agr =AgP3 Sg KI_BI};
   somebody_NP = {s = \\_=>"omuntu omwe" ; isPron = False ; agr =AgP3 Sg MU_BA}; --: NP ;

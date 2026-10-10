@@ -90,6 +90,7 @@ lincat
         complType: Res.ComplType;
         vcl, vni, vti, vku : Str;
         rootV : Res.PrefShape => Str;
+        presSubj : Str;
         vka : Str;
         } ;
   Numeral = {s : Res.CardOrd=>Res.Agreement=> Str ; g : Res.Gender;  n: Res.Number} ;

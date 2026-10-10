@@ -307,7 +307,7 @@ lin
               <False,False,True,False,False>    => {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
+                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; presSubj = vp.presSubj; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -327,7 +327,7 @@ lin
               <False,True,False,False,False>    => {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
+                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; presSubj = vp.presSubj; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -348,7 +348,7 @@ lin
               <_, _,_,True,False>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
+                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; presSubj = vp.presSubj; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -368,7 +368,7 @@ lin
               <_, _,_,True, True>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
+                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; presSubj = vp.presSubj; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -388,7 +388,7 @@ lin
               <_, _,_,_, _>    =>  {
                         s = np.s ! Nom;   -- : NP -> VP -> Cl ;            -- John walks / John does not walk
                         subjAgr = np.agr;
-                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem np.agr vp.noNi vp.rootV;
+                        isCopAP = vp.isCompApStem; isCopNP = vp.isCompNP; vcl = joinV (scBase np.agr) vp.rootV; vni = case vp.noNi of { True => joinV (scBase np.agr) vp.rootV ; False => joinV (niBase np.agr) vp.rootV }; vti = joinV (tiBase np.agr) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; presSubj = vp.presSubj; vka = mkPastStem np.agr vp.noNi vp.rootV;
                         pres = vp.pres;
                         perf = vp.perf;
                         root = vp.s;
@@ -454,7 +454,7 @@ lin
                             {
                               s = np.s ! Nom;
                               subjAgr     = np.agr;
-                              isCopAP = False; isCopNP = vpslash.isCompNP; vcl = joinV (scBase np.agr) vpslash.rootV; vni = case vpslash.noNi of { True => joinV (scBase np.agr) vpslash.rootV ; False => joinV (niBase np.agr) vpslash.rootV }; vti = joinV (tiBase np.agr) vpslash.rootV; vku = joinV <"k", SCu> vpslash.rootV; rootV = vpslash.rootV; vka = mkPastStem np.agr vpslash.noNi vpslash.rootV;
+                              isCopAP = False; isCopNP = vpslash.isCompNP; vcl = joinV (scBase np.agr) vpslash.rootV; vni = case vpslash.noNi of { True => joinV (scBase np.agr) vpslash.rootV ; False => joinV (niBase np.agr) vpslash.rootV }; vti = joinV (tiBase np.agr) vpslash.rootV; vku = joinV <"k", SCu> vpslash.rootV; rootV = vpslash.rootV; presSubj = vpslash.presSubj; vka = mkPastStem np.agr vpslash.noNi vpslash.rootV;
                               root        = vpslash.s;
                               pres        = vpslash.pres;
                               perf        = vpslash.perf;

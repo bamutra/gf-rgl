@@ -14,7 +14,7 @@ concrete QuestionCgg of Question = CatCgg ** open ResCgg, Prelude in {
     QuestVP ip vp = {
       s =  ip.s;
       subjAgr = NONE; -- no option but to just pick one
-      isCopAP = False; isCopNP = vp.isCompNP; vcl = joinV (scBase NONE) vp.rootV; vni = case vp.noNi of { True => joinV (scBase NONE) vp.rootV ; False => joinV (niBase NONE) vp.rootV }; vti = joinV (tiBase NONE) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; vka = mkPastStem NONE vp.noNi vp.rootV;
+      isCopAP = False; isCopNP = vp.isCompNP; vcl = joinV (scBase NONE) vp.rootV; vni = case vp.noNi of { True => joinV (scBase NONE) vp.rootV ; False => joinV (niBase NONE) vp.rootV }; vti = joinV (tiBase NONE) vp.rootV; vku = joinV <"k", SCu> vp.rootV; rootV = vp.rootV; presSubj = vp.presSubj; vka = mkPastStem NONE vp.noNi vp.rootV;
       posibleSubAgr = mkSubjCliticTable;
       isSubjQ = case ip.qKind of { QOther => False ; _ => True } ; qWord = ip.qWord ; -- noha ogwejegyeire
       subjRel = \\t,a,p => mkSubjRel t a p vp.rootV vp.pres vp.perf (joinV <"k", SCu> vp.rootV)
@@ -49,7 +49,7 @@ concrete QuestionCgg of Question = CatCgg ** open ResCgg, Prelude in {
         in    {
               s =  ip.s;
               subjAgr = NONE; -- no option but to just pick one
-              isCopAP = False; isCopNP = False; vcl = clSlash.vcl; vni = clSlash.vni; vti = clSlash.vti; vku = clSlash.vku; rootV = clSlash.rootV; vka = clSlash.vka;
+              isCopAP = False; isCopNP = False; vcl = clSlash.vcl; vni = clSlash.vni; vti = clSlash.vti; vku = clSlash.vku; rootV = clSlash.rootV; presSubj = clSlash.presSubj; vka = clSlash.vka;
               posibleSubAgr = mkSubjCliticTable; isSubjQ = False ; qWord = [] ; subjRel = \\_,_,_ => [];
               root = clSlash.s;
               pres = clSlash.pres;
@@ -72,7 +72,7 @@ concrete QuestionCgg of Question = CatCgg ** open ResCgg, Prelude in {
             {
               s =  iadv.s ++ cl.s;
               subjAgr = cl.subjAgr; -- no option but to just pick one
-              isCopAP = cl.isCopAP; isCopNP = cl.isCopNP; vcl = cl.vcl; vni = cl.vni; vti = cl.vti; vku = cl.vku; rootV = cl.rootV; vka = cl.vka;
+              isCopAP = cl.isCopAP; isCopNP = cl.isCopNP; vcl = cl.vcl; vni = cl.vni; vti = cl.vti; vku = cl.vku; rootV = cl.rootV; presSubj = cl.presSubj; vka = cl.vka;
               posibleSubAgr = mkSubjCliticTable; isSubjQ = False ; qWord = [] ; subjRel = \\_,_,_ => [];
               root = cl.s;
               pres = cl.pres;
@@ -99,7 +99,7 @@ concrete QuestionCgg of Question = CatCgg ** open ResCgg, Prelude in {
                                    <True, True>   =>{ --such as ta?
                                                       s = np.s ! Acc;
                                                       subjAgr = np.agr; -- no option but to just pick one
-                                                      isCopAP = False; isCopNP = False; vcl = joinV (scBase np.agr) be_Copula.rootV; vni = joinV (niBase np.agr) be_Copula.rootV; vti = joinV (tiBase np.agr) be_Copula.rootV; vku = joinV <"k", SCu> be_Copula.rootV; rootV = be_Copula.rootV; vka = mkPastStem np.agr False be_Copula.rootV;
+                                                      isCopAP = False; isCopNP = False; vcl = joinV (scBase np.agr) be_Copula.rootV; vni = joinV (niBase np.agr) be_Copula.rootV; vti = joinV (tiBase np.agr) be_Copula.rootV; vku = joinV <"k", SCu> be_Copula.rootV; rootV = be_Copula.rootV; presSubj = be_Copula.presSubj; vka = mkPastStem np.agr False be_Copula.rootV;
                                                       posibleSubAgr = mkSubjCliticTable; isSubjQ = False ; qWord = [] ; subjRel = \\_,_,_ => [];
                                                       root = be_Copula.s;
                                                       pres = be_Copula.pres;
@@ -120,7 +120,7 @@ concrete QuestionCgg of Question = CatCgg ** open ResCgg, Prelude in {
                                     <True, False>   =>{ -- such as nkahe?
                                                       s = np.s ! Acc;
                                                       subjAgr = np.agr; -- no option but to just pick one
-                                                      isCopAP = False; isCopNP = False; vcl = joinV (scBase np.agr) be_Copula.rootV; vni = joinV (niBase np.agr) be_Copula.rootV; vti = joinV (tiBase np.agr) be_Copula.rootV; vku = joinV <"k", SCu> be_Copula.rootV; rootV = be_Copula.rootV; vka = mkPastStem np.agr False be_Copula.rootV;
+                                                      isCopAP = False; isCopNP = False; vcl = joinV (scBase np.agr) be_Copula.rootV; vni = joinV (niBase np.agr) be_Copula.rootV; vti = joinV (tiBase np.agr) be_Copula.rootV; vku = joinV <"k", SCu> be_Copula.rootV; rootV = be_Copula.rootV; presSubj = be_Copula.presSubj; vka = mkPastStem np.agr False be_Copula.rootV;
                                                       posibleSubAgr = mkSubjCliticTable; isSubjQ = False ; qWord = [] ; subjRel = \\_,_,_ => [];
                                                       root = be_Copula.s;
                                                       pres = be_Copula.pres;
@@ -141,7 +141,7 @@ concrete QuestionCgg of Question = CatCgg ** open ResCgg, Prelude in {
                                   <_, _>  => {
                                               s = icomp.s;
                                               subjAgr = np.agr; -- no option but to just pick one
-                                              isCopAP = False; isCopNP = False; vcl = joinV (scBase np.agr) be_Copula.rootV; vni = joinV (niBase np.agr) be_Copula.rootV; vti = joinV (tiBase np.agr) be_Copula.rootV; vku = joinV <"k", SCu> be_Copula.rootV; rootV = be_Copula.rootV; vka = mkPastStem np.agr False be_Copula.rootV;
+                                              isCopAP = False; isCopNP = False; vcl = joinV (scBase np.agr) be_Copula.rootV; vni = joinV (niBase np.agr) be_Copula.rootV; vti = joinV (tiBase np.agr) be_Copula.rootV; vku = joinV <"k", SCu> be_Copula.rootV; rootV = be_Copula.rootV; presSubj = be_Copula.presSubj; vka = mkPastStem np.agr False be_Copula.rootV;
                                               posibleSubAgr = mkSubjCliticTable; isSubjQ = False ; qWord = [] ; subjRel = \\_,_,_ => [];
                                               root = be_Copula.s;
                                               pres = be_Copula.pres;

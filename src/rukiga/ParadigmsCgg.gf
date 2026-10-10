@@ -129,7 +129,7 @@ oper
                         isPerfBlank = v.isPerfBlank; 
                         isRegular = v.isRegular; 
                         p = v.p ;
-                        passPres = v.passPres; passPerf = v.passPerf; rootV = v.rootV; noNi = v.noNi; isRefl = v.isRefl; 
+                        passPres = v.passPres; passPerf = v.passPerf; rootV = v.rootV; noNi = v.noNi ; presSubj = v.presSubj; isRefl = v.isRefl; 
                         comp = p.s;
                         isCompN2 = p.isGenPrep}; --; isRefl = v.isRefl} ;
   -- stative verbs take no ni- in the present: ekitabo kiine enju
@@ -167,7 +167,7 @@ oper
                       isPerfBlank = v.isPerfBlank;
                       isRegular = v.isRegular;
                       p = p ; 
-                      passPres = v.passPres; passPerf = v.passPerf; rootV = v.rootV; noNi = v.noNi; isRefl = v.isRefl
+                      passPres = v.passPres; passPerf = v.passPerf; rootV = v.rootV; noNi = v.noNi ; presSubj = v.presSubj; isRefl = v.isRefl
                     } ;
   partV2  : V2 -> Str -> V2 ; -- with particle, e.g. switch + on
   partV2 v p = lin V2 {s = v.s ; 
@@ -177,7 +177,7 @@ oper
                       isPerfBlank = v.isPerfBlank;
                       isRegular = v.isRegular;
                       p = p ; 
-                      passPres = v.passPres; passPerf = v.passPerf; rootV = v.rootV; noNi = v.noNi; isRefl = v.isRefl;
+                      passPres = v.passPres; passPerf = v.passPerf; rootV = v.rootV; noNi = v.noNi ; presSubj = v.presSubj; isRefl = v.isRefl;
                       comp = []; isCompN2 = False} ;
   
   -- mkVA  : V -> VA ; -- e.g. become (AP)
