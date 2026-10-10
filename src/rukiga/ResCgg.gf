@@ -457,7 +457,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
     --   SZi    (z):                       i+reeba | enda        nizireeba, nizenda, nizingura
     --   SLongA/O/E (na, no, ne):          a/o/e+reeba | y+enda  naareeba, nayenda, noyenda, neyenda
     mkRootV : Str -> (PrefShape => Str) = \r ->
-      let v : Bool = case r of { ("a"|"e"|"i"|"o"|"u") + _ => True ; _ => False } ;
+      let v : Bool = case r of { ("a"|"e"|"i"|"o"|"u"|"á"|"é"|"í"|"ó"|"ú"|"à"|"è"|"ì"|"ò"|"ù"|"â"|"ê"|"î"|"ô"|"û") + _ => True ; _ => False } ;  -- tone-marked vowels count too (tukyétegyereze)
           -- Ci + i -> Ci only before a nasal cluster (kingura); otherwise the
           -- long vowel stays (kiine, kiisa)
           i : Bool = case r of { "i" + ("ng"|"nd"|"nz"|"nj"|"mb"|"mp"|"nt"|"nk") + _ => True ; _ => False } ;
@@ -478,7 +478,7 @@ mkSubjPrefix : Agreement -> Str =\a ->case a of {
                     "r" + x => "nd" + x ;                        -- ndeeba
                     "h" + x => "mp" + x ;                        -- nampééreza "gives me" (reviewed)
                     ("b" | "p") + _ => "m" + r ;                  -- mbona
-                    ("a"|"e"|"i"|"o"|"u") + _ => "ny" + r ;       -- nyingura
+                    ("a"|"e"|"i"|"o"|"u"|"á"|"é"|"í"|"ó"|"ú"|"à"|"è"|"ì"|"ò"|"ù"|"â"|"ê"|"î"|"ô"|"û") + _ => "ny" + r ;       -- nyingura
                     _ => "n" + r }
       } ;
     -- base and shape of the plain subject prefix
